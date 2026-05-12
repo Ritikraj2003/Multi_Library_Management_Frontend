@@ -1,0 +1,89 @@
+<form [formGroup]="studentForm" (ngSubmit)="onSubmit()" class="p-2">
+  <div class="row g-3">
+    <!-- Basic Info -->
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Full Name</label>
+      <input type="text" formControlName="fullName" class="form-control rounded-3" placeholder="Student Name"
+        [class.is-invalid]="studentForm.get('fullName')?.touched && studentForm.get('fullName')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Father's Name</label>
+      <input type="text" formControlName="fatherName" class="form-control rounded-3" placeholder="Father's Name"
+        [class.is-invalid]="studentForm.get('fatherName')?.touched && studentForm.get('fatherName')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Mobile Number</label>
+      <input type="text" formControlName="mobile" class="form-control rounded-3" placeholder="10-digit mobile"
+        [class.is-invalid]="studentForm.get('mobile')?.touched && studentForm.get('mobile')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Date of Birth</label>
+      <input type="date" formControlName="dob" class="form-control rounded-3"
+        [class.is-invalid]="studentForm.get('dob')?.touched && studentForm.get('dob')?.invalid">
+    </div>
+
+    <div class="col-12">
+      <label class="form-label fw-bold small text-muted">Address</label>
+      <textarea formControlName="address" class="form-control rounded-3" rows="2" placeholder="Residential Address"
+        [class.is-invalid]="studentForm.get('address')?.touched && studentForm.get('address')?.invalid"></textarea>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Library</label>
+      <select formControlName="libraryId" class="form-select rounded-3"
+        [class.is-invalid]="studentForm.get('libraryId')?.touched && studentForm.get('libraryId')?.invalid">
+        <option [ngValue]="null">Select Library</option>
+        <option *ngFor="let lib of libraries" [ngValue]="lib.id">{{lib.name}}</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">RFID Code</label>
+      <input type="text" formControlName="rfidCode" class="form-control rounded-3" placeholder="RFID Tag Code">
+    </div>
+
+    <!-- Identity & Images -->
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Document Type</label>
+      <select formControlName="documentType" class="form-select rounded-3"
+        [class.is-invalid]="studentForm.get('documentType')?.touched && studentForm.get('documentType')?.invalid">
+        <option value="">Select Document</option>
+        <option value="Aadhar">Aadhar Card</option>
+        <option value="PAN">PAN Card</option>
+        <option value="VoterID">Voter ID</option>
+        <option value="DrivingLicense">Driving License</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Student Image</label>
+      <div class="d-flex align-items-start gap-2">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="studentImagePreview">
+          <img [src]="studentImagePreview" class="img-fluid w-100 h-100 object-fit-cover">
+        </div>
+        <input type="file" (change)="onFileChange($event, 'student')" class="form-control rounded-3" accept="image/*">
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Document Image</label>
+      <div class="d-flex align-items-start gap-2">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="documentImagePreview">
+          <img [src]="documentImagePreview" class="img-fluid w-100 h-100 object-fit-cover">
+        </div>
+        <input type="file" (change)="onFileChange($event, 'document')" class="form-control rounded-3" accept="image/*">
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+    <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()" [disabled]="loading">Cancel</button>
+    <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      {{ isEdit ? 'Update Student' : 'Add Student' }}
+    </button>
+  </div>
+</form>

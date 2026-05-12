@@ -1,0 +1,21 @@
+.avatar {
+  width: 35px;
+  height: 35px;
+  font-weight: bold;
+}
+
+.extra-small {
+  font-size: 0.7rem;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+.dropdown-item {
+  font-size: 0.9rem;
+}
+
+.navbar {
+  z-index: 1000;
+}

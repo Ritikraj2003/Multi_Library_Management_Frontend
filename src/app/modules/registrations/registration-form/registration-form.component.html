@@ -1,0 +1,88 @@
+<form [formGroup]="regForm" (ngSubmit)="onSubmit()" class="row g-3">
+  
+  <div class="col-md-12">
+    <label class="form-label fw-bold small text-muted">Select Student</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="studentId" [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid">
+      <option [ngValue]="null">-- Choose Student --</option>
+      <option *ngFor="let s of students" [value]="s.id">{{s.fullName}} ({{s.mobile}})</option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Assign Seat</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="tableSeatId" [class.is-invalid]="regForm.get('tableSeatId')?.touched && regForm.get('tableSeatId')?.invalid">
+      <option [ngValue]="null">-- Choose Seat --</option>
+      <option *ngFor="let s of seats" [value]="s.id">Seat: {{s.seatNumber}} (Table: {{s.tableNumber}})</option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Select Batch</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="batchId" [class.is-invalid]="regForm.get('batchId')?.touched && regForm.get('batchId')?.invalid">
+      <option [ngValue]="null">-- Choose Batch --</option>
+      <option *ngFor="let b of batches" [value]="b.id || b.batchId" [disabled]="b.isOccupied">
+        {{ b.name || b.batchName }} ({{ b.startTime || b.batchTime }}) {{ b.isOccupied ? '(Occupied)' : '' }}
+      </option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Start Date</label>
+    <input type="date" class="form-control rounded-3 shadow-sm" formControlName="startDate" [class.is-invalid]="regForm.get('startDate')?.touched && regForm.get('startDate')?.invalid">
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Due Date</label>
+    <input type="date" class="form-control rounded-3 shadow-sm" formControlName="dueDate" [class.is-invalid]="regForm.get('dueDate')?.touched && regForm.get('dueDate')?.invalid">
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label fw-bold small text-muted">Monthly Amount</label>
+    <div class="input-group">
+      <span class="input-group-text bg-light border-end-0 rounded-start-3">₹</span>
+      <input type="number" class="form-control rounded-end-3 shadow-sm border-start-0" formControlName="monthlyAmount">
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label fw-bold small text-muted">Security Amount</label>
+    <div class="input-group">
+      <span class="input-group-text bg-light border-end-0 rounded-start-3">₹</span>
+      <input type="number" class="form-control rounded-end-3 shadow-sm border-start-0" formControlName="securityAmount">
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label fw-bold small text-muted">Payment Mode</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="paymentMode">
+      <option value="Cash">Cash</option>
+      <option value="Online">Online</option>
+      <option value="Cheque">Cheque</option>
+    </select>
+  </div>
+
+  <div class="col-md-12">
+    <label class="form-label fw-bold small text-muted">Notes (Optional)</label>
+    <textarea class="form-control rounded-3 shadow-sm" formControlName="notes" rows="2" placeholder="Any special requests..."></textarea>
+  </div>
+
+  <div class="col-md-12" *ngIf="isEdit">
+    <div class="form-check form-switch p-0 d-flex align-items-center gap-3">
+      <label class="form-check-label fw-bold small text-muted mb-0" for="statusToggle">Registration Status:</label>
+      <div class="form-check form-switch m-0">
+        <input class="form-check-input ms-0" type="checkbox" role="switch" id="statusToggle" formControlName="isActiveStatus" style="width: 3em; height: 1.5em; cursor: pointer;">
+      </div>
+      <span class="badge rounded-pill px-3" [ngClass]="regForm.get('isActiveStatus')?.value ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'">
+        {{ regForm.get('isActiveStatus')?.value ? 'Active' : 'Cancelled' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="col-12 mt-4 text-end">
+    <button type="button" class="btn btn-light rounded-3 px-4 me-2" (click)="cancelled.emit()">Cancel</button>
+    <button type="submit" class="btn btn-primary rounded-3 px-4 shadow" [disabled]="loading">
+      <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+      {{ isEdit ? 'Update Registration' : 'Register Student' }}
+    </button>
+  </div>
+</form>

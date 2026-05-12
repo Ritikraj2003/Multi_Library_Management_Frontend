@@ -1,0 +1,39 @@
+<form [formGroup]="renewForm" (ngSubmit)="onSubmit()" class="row g-3">
+  
+  <div class="col-md-12">
+    <label class="form-label fw-bold small text-muted">Number of Months</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="months">
+      <option *ngFor="let m of [1,2,3,4,5,6,12]" [value]="m">{{m}} Month(s)</option>
+    </select>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Renewal Amount</label>
+    <div class="input-group">
+      <span class="input-group-text bg-light border-end-0 rounded-start-3">₹</span>
+      <input type="number" class="form-control rounded-end-3 shadow-sm border-start-0" formControlName="amount">
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label fw-bold small text-muted">Payment Mode</label>
+    <select class="form-select rounded-3 shadow-sm" formControlName="paymentMode">
+      <option value="Cash">Cash</option>
+      <option value="Online">Online</option>
+      <option value="Cheque">Cheque</option>
+    </select>
+  </div>
+
+  <div class="col-md-12">
+    <label class="form-label fw-bold small text-muted">Notes</label>
+    <textarea class="form-control rounded-3 shadow-sm" formControlName="notes" rows="2" placeholder="Reference ID or comments..."></textarea>
+  </div>
+
+  <div class="col-12 mt-4 text-end">
+    <button type="button" class="btn btn-light rounded-3 px-4 me-2" (click)="cancelled.emit()">Cancel</button>
+    <button type="submit" class="btn btn-success rounded-3 px-4 shadow" [disabled]="loading">
+      <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+      Confirm Renewal
+    </button>
+  </div>
+</form>

@@ -1,0 +1,57 @@
+<form [formGroup]="libraryForm" (ngSubmit)="onSubmit()" class="p-2">
+  <div class="row g-3">
+    <div class="col-12">
+      <label class="form-label fw-bold small text-muted">Library Name</label>
+      <input type="text" formControlName="name" class="form-control rounded-3" placeholder="e.g. Kautaly Library"
+        [class.is-invalid]="libraryForm.get('name')?.touched && libraryForm.get('name')?.invalid">
+      <div class="invalid-feedback">Name is required</div>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label fw-bold small text-muted">Address</label>
+      <textarea formControlName="address" class="form-control rounded-3" rows="2" placeholder="Full address..."
+        [class.is-invalid]="libraryForm.get('address')?.touched && libraryForm.get('address')?.invalid"></textarea>
+      <div class="invalid-feedback">Address is required</div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">City</label>
+      <input type="text" formControlName="city" class="form-control rounded-3" placeholder="City"
+        [class.is-invalid]="libraryForm.get('city')?.touched && libraryForm.get('city')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">State</label>
+      <input type="text" formControlName="state" class="form-control rounded-3" placeholder="State"
+        [class.is-invalid]="libraryForm.get('state')?.touched && libraryForm.get('state')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Pincode</label>
+      <input type="text" formControlName="pincode" class="form-control rounded-3" placeholder="Pincode"
+        [class.is-invalid]="libraryForm.get('pincode')?.touched && libraryForm.get('pincode')?.invalid">
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Mobile Number</label>
+      <input type="text" formControlName="mobile" class="form-control rounded-3" placeholder="10-digit mobile"
+        [class.is-invalid]="libraryForm.get('mobile')?.touched && libraryForm.get('mobile')?.invalid">
+      <div class="invalid-feedback">Valid 10-digit mobile is required</div>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label fw-bold small text-muted">Email Address</label>
+      <input type="email" formControlName="email" class="form-control rounded-3" placeholder="email@example.com"
+        [class.is-invalid]="libraryForm.get('email')?.touched && libraryForm.get('email')?.invalid">
+      <div class="invalid-feedback">Valid email is required</div>
+    </div>
+  </div>
+
+  <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
+    <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()" [disabled]="loading">Cancel</button>
+    <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      {{ isEdit ? 'Update Library' : 'Create Library' }}
+    </button>
+  </div>
+</form>

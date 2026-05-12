@@ -1,0 +1,173 @@
+<div class="container-fluid py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="fw-bold mb-0">Sections / Floors</h3>
+      <p class="text-muted small">Manage library sections and floors</p>
+    </div>
+    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+      <i class="bi bi-plus-lg me-2"></i> Add Section
+    </button>
+  </div>
+
+  <!-- Table Card -->
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted small text-uppercase">
+            <tr>
+              <th class="ps-4 py-3"># ID</th>
+              <th class="py-3">Section Name</th>
+              <th class="py-3">Floor Number</th>
+              <th class="py-3 text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="border-top-0">
+
+            <!-- Loading State -->
+            <tr *ngIf="loading">
+              <td colspan="4" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="!loading && floors.length === 0">
+              <td colspan="4" class="text-center py-5">
+                <i class="bi bi-layers fs-1 text-muted d-block mb-2"></i>
+                <span class="text-muted">No sections found. Add your first section!</span>
+              </td>
+            </tr>
+
+            <!-- Data Rows -->
+            <tr *ngFor="let floor of floors">
+              <td class="ps-4 fw-bold text-muted small">#{{floor.id}}</td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="batch-icon bg-info-subtle text-info rounded-3 p-2 me-3">
+                    <i class="bi bi-bookshelf"></i>
+                  </div>
+                  <div class="fw-semibold text-dark">{{floor.name}}</div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 rounded-pill">
+                  Floor {{floor.floorNumber}}
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
+                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(floor)">
+                    <i class="bi bi-pencil text-primary"></i>
+                  </button>
+                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(floor.id)">
+                    <i class="bi bi-trash text-danger"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center" *ngIf="floors.length > 0">
+      <div class="text-muted small">
+        Showing <b>{{floors.length}}</b> section(s) <span *ngIf="pagination">of <b>{{pagination.totalRecords}}</b> total</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Section Modal ===================== -->
+<div class="modal fade" id="floorModal" tabindex="-1" aria-labelledby="floorModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4">
+
+      <!-- Modal Header -->
+      <div class="modal-header border-bottom-0 pt-4 px-4">
+        <div>
+          <h5 class="modal-title fw-bold mb-0" id="floorModalLabel">
+            <i class="bi bi-layers me-2 text-primary"></i>
+            {{ selectedFloor ? 'Edit Section' : 'Add New Section' }}
+          </h5>
+          <p class="text-muted small mb-0 mt-1">
+            {{ selectedFloor ? 'Update the section details below.' : 'Fill in the details to create a new section/floor.' }}
+          </p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body px-4 pb-2">
+        <form [formGroup]="floorForm" (ngSubmit)="onSubmit()">
+
+          <!-- Section Name -->
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold">
+              Section Name <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="bi bi-tag text-muted"></i>
+              </span>
+              <input
+                id="name"
+                type="text"
+                class="form-control border-start-0"
+                formControlName="name"
+                placeholder="e.g. Science Section, Main Hall"
+                [class.is-invalid]="f['name'].invalid && f['name'].touched">
+              <div class="invalid-feedback">
+                Section name is required (min 2 characters).
+              </div>
+            </div>
+          </div>
+
+          <!-- Floor Number -->
+          <div class="mb-3">
+            <label for="floorNumber" class="form-label fw-semibold">
+              Floor Number <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0">
+                <i class="bi bi-building text-secondary"></i>
+              </span>
+              <input
+                id="floorNumber"
+                type="number"
+                class="form-control border-start-0"
+                formControlName="floorNumber"
+                placeholder="e.g. 1, 2, 3"
+                [class.is-invalid]="f['floorNumber'].invalid && f['floorNumber'].touched">
+              <div class="invalid-feedback">Floor number is required.</div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer border-top-0 px-4 pb-4 pt-3">
+        <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary rounded-3 px-4"
+          (click)="onSubmit()"
+          [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <i *ngIf="!saving" class="bi bi-check-lg me-2"></i>
+          {{ saving ? 'Saving...' : (selectedFloor ? 'Update Section' : 'Create Section') }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

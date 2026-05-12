@@ -1,0 +1,27 @@
+.extra-small {
+  font-size: 0.7rem;
+}
+
+.table th {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  font-size: 0.875rem;
+  padding-top: 0.85rem;
+  padding-bottom: 0.85rem;
+}
+
+.badge {
+  font-size: 0.78rem;
+}
+
+/* Modal polish */
+.modal-content {
+  border-radius: 1rem !important;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+}

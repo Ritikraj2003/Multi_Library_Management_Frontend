@@ -1,0 +1,33 @@
+<div class="sidebar bg-dark text-white shadow">
+  <div class="sidebar-header p-4 border-bottom border-secondary">
+    <div class="d-flex align-items-center">
+      <i class="bi bi-book-half fs-3 me-2 text-primary"></i>
+      <h5 class="mb-0 fw-bold">Library MS</h5>
+    </div>
+  </div>
+
+  <div class="sidebar-content py-3">
+    <ul class="nav flex-column">
+      <li class="nav-item mb-1" *ngFor="let item of menuItems">
+        <a *ngIf="!item.isMaster" [routerLink]="item.route" routerLinkActive="active" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center">
+          <i class="bi {{item.icon}} me-3 fs-5"></i>
+          <span>{{item.title}}</span>
+        </a>
+
+        <a *ngIf="item.isMaster" (click)="toggleMaster()" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center cursor-pointer" [class.active]="isMasterExpanded">
+          <i class="bi {{item.icon}} me-3 fs-5"></i>
+          <span class="flex-grow-1">{{item.title}}</span>
+          <i class="bi" [ngClass]="isMasterExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+        </a>
+
+        <ul class="nav flex-column ms-4 small submenu" *ngIf="item.children" [class.show]="item.isMaster && isMasterExpanded">
+          <li class="nav-item" *ngFor="let child of item.children">
+            <a [routerLink]="child.route" routerLinkActive="text-white fw-bold" class="nav-link text-white-50 py-2">
+              {{child.title}}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
