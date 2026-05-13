@@ -25,12 +25,12 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}Library/GetById/${id}`);
   }
 
-  createLibrary(body: any): Observable<any> {
+  createLibrary(body: FormData): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}Library/Create`, body);
   }
 
-  updateLibrary(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}Library/Update`, { ...body, id });
+  updateLibrary(body: FormData): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}Library/Update`, body);
   }
 
   deleteLibrary(id: number): Observable<any> {
@@ -42,12 +42,16 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}User/GetAll`, { params });
   }
 
-  createUser(body: any): Observable<any> {
+  getUserById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}User/GetById/${id}`);
+  }
+
+  createUser(body: FormData): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}User/Create`, body);
   }
 
-  updateUser(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}User/Update`, { ...body, id });
+  updateUser(body: FormData): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}User/Update`, body);
   }
 
   deleteUser(id: number): Observable<any> {

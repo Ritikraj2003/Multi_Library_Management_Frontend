@@ -7,6 +7,7 @@ export interface User {
   roleName: string;
   libraryId: number | null;
   libraryName: string | null;
+  libraryIcon: string | null;
   isSuperadmin: boolean;
   permissions: string[];
 }

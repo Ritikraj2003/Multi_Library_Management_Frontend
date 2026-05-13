@@ -22,6 +22,9 @@ export class UserFormComponent implements OnInit, OnChanges {
   isEdit = false;
   libraries: any[] = [];
   roles: any[] = [];
+  profileImagePreview: string | ArrayBuffer | null = null;
+  profileImageFile: File | null = null;
+  imageBaseUrl = 'https://localhost:7098/';
 
   get isCurrentUserSuperadmin(): boolean {
     return this.authService.currentUserValue?.isSuperadmin || false;
@@ -67,11 +70,31 @@ export class UserFormComponent implements OnInit, OnChanges {
       this.userForm.patchValue(this.userData);
       this.userForm.get('password')?.clearValidators();
       this.userForm.get('password')?.updateValueAndValidity();
+      
+      if (this.userData.profileImage) {
+        this.profileImagePreview = this.imageBaseUrl + this.userData.profileImage;
+      } else {
+        this.profileImagePreview = null;
+      }
     } else {
       this.isEdit = false;
       this.userForm.reset({ roleId: 2, isSuperadmin: false });
+      this.profileImagePreview = null;
+      this.profileImageFile = null;
       this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
       this.userForm.get('password')?.updateValueAndValidity();
+    }
+  }
+
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.profileImageFile = file;
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.profileImagePreview = reader.result;
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -120,10 +143,25 @@ export class UserFormComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
-    const formData = this.userForm.value;
+    const formData = new FormData();
+    const formValues = this.userForm.value;
+
+    Object.keys(formValues).forEach(key => {
+      if (formValues[key] !== null && formValues[key] !== undefined) {
+        formData.append(key, formValues[key]);
+      }
+    });
+
+    if (this.isEdit) {
+      formData.append('id', this.userData.id.toString());
+    }
+
+    if (this.profileImageFile) {
+      formData.append('profileImageFile', this.profileImageFile);
+    }
 
     const request = this.isEdit 
-      ? this.apiService.updateUser(this.userData.id, formData)
+      ? this.apiService.updateUser(formData)
       : this.apiService.createUser(formData);
 
     request.pipe(finalize(() => this.loading = false))

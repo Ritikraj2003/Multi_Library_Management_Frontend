@@ -46,6 +46,37 @@
       <div class="invalid-feedback">Valid email is required</div>
     </div>
 
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Library Icon</label>
+      <div class="d-flex align-items-start gap-2">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="libraryIconPreview">
+          <img [src]="libraryIconPreview" class="img-fluid w-100 h-100 object-fit-cover">
+        </div>
+        <input type="file" (change)="onFileChange($event, 'icon')" class="form-control rounded-3" accept="image/*">
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Document Type</label>
+      <select formControlName="documentType" class="form-select rounded-3">
+        <option value="">Select Document</option>
+        <option value="Aadhar">Aadhar Card</option>
+        <option value="PAN">PAN Card</option>
+        <option value="VoterID">Voter ID</option>
+        <option value="DrivingLicense">Driving License</option>
+      </select>
+    </div>
+
+    <div class="col-12">
+      <label class="form-label fw-bold small text-muted">Document Image</label>
+      <div class="d-flex align-items-start gap-2">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="documentImagePreview">
+          <img [src]="documentImagePreview" class="img-fluid w-100 h-100 object-fit-cover">
+        </div>
+        <input type="file" (change)="onFileChange($event, 'document')" class="form-control rounded-3" accept="image/*">
+      </div>
+    </div>
+
     <div class="col-12 mt-3">
       <div class="form-check form-switch p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
         <div>

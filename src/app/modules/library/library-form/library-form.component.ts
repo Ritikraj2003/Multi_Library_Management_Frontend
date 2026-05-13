@@ -19,6 +19,12 @@ export class LibraryFormComponent implements OnInit {
   libraryForm: FormGroup;
   loading = false;
   isEdit = false;
+  
+  libraryIconFile: File | null = null;
+  documentImageFile: File | null = null;
+  libraryIconPreview: string | ArrayBuffer | null = null;
+  documentImagePreview: string | ArrayBuffer | null = null;
+  imageBaseUrl = 'https://localhost:7098/'; // Should ideally come from environment
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +38,7 @@ export class LibraryFormComponent implements OnInit {
       pincode: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.required, Validators.email]],
+      documentType: [''],
       isActive: [true]
     });
   }
@@ -48,9 +55,32 @@ export class LibraryFormComponent implements OnInit {
     if (this.libraryData) {
       this.isEdit = true;
       this.libraryForm.patchValue(this.libraryData);
+      this.libraryIconPreview = this.libraryData.libraryIcon ? this.imageBaseUrl + this.libraryData.libraryIcon : null;
+      this.documentImagePreview = this.libraryData.documentImage ? this.imageBaseUrl + this.libraryData.documentImage : null;
     } else {
       this.isEdit = false;
       this.libraryForm.reset({ isActive: true });
+      this.libraryIconFile = null;
+      this.documentImageFile = null;
+      this.libraryIconPreview = null;
+      this.documentImagePreview = null;
+    }
+  }
+
+  onFileChange(event: any, type: string): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (type === 'icon') {
+          this.libraryIconFile = file;
+          this.libraryIconPreview = reader.result;
+        } else {
+          this.documentImageFile = file;
+          this.documentImagePreview = reader.result;
+        }
+      };
+      reader.readAsDataURL(file);
     }
   }
 
@@ -61,10 +91,26 @@ export class LibraryFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const formData = this.libraryForm.value;
+    const formData = new FormData();
+    const formValue = this.libraryForm.value;
+
+    Object.keys(formValue).forEach(key => {
+      formData.append(key, formValue[key]);
+    });
+
+    if (this.libraryIconFile) {
+      formData.append('libraryIconFile', this.libraryIconFile);
+    }
+    if (this.documentImageFile) {
+      formData.append('documentImageFile', this.documentImageFile);
+    }
+
+    if (this.isEdit) {
+      formData.append('id', this.libraryData.id);
+    }
 
     const request = this.isEdit 
-      ? this.apiService.updateLibrary(this.libraryData.id, formData)
+      ? this.apiService.updateLibrary(formData)
       : this.apiService.createLibrary(formData);
 
     request.pipe(finalize(() => this.loading = false))
