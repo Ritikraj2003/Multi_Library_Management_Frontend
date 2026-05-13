@@ -31,7 +31,8 @@ export class LibraryFormComponent implements OnInit {
       state: ['', [Validators.required]],
       pincode: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      isActive: [true]
     });
   }
 
@@ -49,7 +50,7 @@ export class LibraryFormComponent implements OnInit {
       this.libraryForm.patchValue(this.libraryData);
     } else {
       this.isEdit = false;
-      this.libraryForm.reset();
+      this.libraryForm.reset({ isActive: true });
     }
   }
 

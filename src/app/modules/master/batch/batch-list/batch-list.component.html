@@ -22,6 +22,7 @@
               <th class="py-3">Start Time</th>
               <th class="py-3">End Time</th>
               <th class="py-3">Duration</th>
+              <th class="py-3">Status</th>
               <th class="py-3 text-end pe-4">Actions</th>
             </tr>
           </thead>
@@ -69,6 +70,12 @@
                 <span class="text-muted small">
                   <i class="bi bi-hourglass-split me-1"></i>
                   {{batch.startTime}} – {{batch.endTime}}
+                </span>
+              </td>
+              <td>
+                <span class="badge rounded-pill px-3 fw-normal" 
+                  [ngClass]="batch.isActive ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'">
+                  {{ batch.isActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td class="text-end pe-4">
@@ -180,6 +187,17 @@
                   [class.is-invalid]="f['endTime'].invalid && f['endTime'].touched">
                 <div class="invalid-feedback">End time is required.</div>
               </div>
+            </div>
+          </div>
+
+          <!-- Status Toggle -->
+          <div class="mt-3 d-flex align-items-center justify-content-between p-3 bg-light rounded-3">
+            <div>
+              <label class="form-label fw-semibold mb-0">Active Status</label>
+              <p class="text-muted small mb-0 text-dark">Enable or disable this batch</p>
+            </div>
+            <div class="form-check form-switch fs-4">
+              <input class="form-check-input mt-0" type="checkbox" role="switch" formControlName="isActive">
             </div>
           </div>
 

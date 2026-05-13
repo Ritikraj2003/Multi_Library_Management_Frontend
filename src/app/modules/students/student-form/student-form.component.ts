@@ -79,18 +79,23 @@ export class StudentFormComponent implements OnInit, OnChanges {
   }
 
   loadLibraries(): void {
-    this.apiService.getAllLibraries().subscribe({
-      next: (res: any) => {
-        this.libraries = res.data.items || (res.data ? [res.data] : []);
-        if (!this.authService.currentUserValue?.isSuperadmin) {
-          const myLibId = this.authService.currentUserValue?.libraryId;
-          this.libraries = this.libraries.filter(l => l.id === myLibId);
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser?.isSuperadmin) {
+      this.apiService.getAllLibraries().subscribe({
+        next: (res: any) => {
+          this.libraries = res.data.items || (res.data ? [res.data] : []);
+        }
+      });
+    } else if (currentUser?.libraryId) {
+      this.apiService.getLibraryById(currentUser.libraryId).subscribe({
+        next: (res: any) => {
+          this.libraries = res.data ? [res.data] : [];
           if (this.libraries.length > 0) {
-            this.studentForm.patchValue({ libraryId: myLibId });
+            this.studentForm.patchValue({ libraryId: currentUser.libraryId });
           }
         }
-      }
-    });
+      });
+    }
   }
 
   onFileChange(event: any, type: string): void {

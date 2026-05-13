@@ -33,7 +33,8 @@ export class BatchListComponent implements OnInit {
     this.batchForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       startTime: ['', [Validators.required]],
-      endTime: ['', [Validators.required]]
+      endTime: ['', [Validators.required]],
+      isActive: [true]
     });
   }
 
@@ -57,7 +58,7 @@ export class BatchListComponent implements OnInit {
 
   openAddModal(): void {
     this.selectedBatch = null;
-    this.batchForm.reset();
+    this.batchForm.reset({ isActive: true });
     this.showModal();
   }
 
@@ -66,7 +67,8 @@ export class BatchListComponent implements OnInit {
     this.batchForm.patchValue({
       name: batch.name,
       startTime: batch.startTime,
-      endTime: batch.endTime
+      endTime: batch.endTime,
+      isActive: batch.isActive
     });
     this.showModal();
   }

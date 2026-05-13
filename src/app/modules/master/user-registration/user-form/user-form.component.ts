@@ -76,24 +76,32 @@ export class UserFormComponent implements OnInit, OnChanges {
   }
 
   loadLibraries(): void {
-    this.apiService.getAllLibraries().subscribe({
-      next: (res) => {
-        this.libraries = res.data.items || (res.data ? [res.data] : []);
-        // If not superadmin, restrict to their own library
-        if (!this.authService.currentUserValue?.isSuperadmin) {
-          const myLibId = this.authService.currentUserValue?.libraryId;
-          this.libraries = this.libraries.filter(l => l.id === myLibId);
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser?.isSuperadmin) {
+      this.apiService.getAllLibraries().subscribe({
+        next: (res) => {
+          this.libraries = res.data.items || (res.data ? [res.data] : []);
+          this.handleLibraryLoaded();
+        }
+      });
+    } else if (currentUser?.libraryId) {
+      this.apiService.getLibraryById(currentUser.libraryId).subscribe({
+        next: (res) => {
+          this.libraries = res.data ? [res.data] : [];
           if (this.libraries.length > 0) {
-            this.userForm.patchValue({ libraryId: myLibId });
+            this.userForm.patchValue({ libraryId: currentUser.libraryId });
           }
+          this.handleLibraryLoaded();
         }
-        
-        const currentLibId = this.userForm.get('libraryId')?.value;
-        if (currentLibId) {
-          this.loadRoles(currentLibId);
-        }
-      }
-    });
+      });
+    }
+  }
+
+  private handleLibraryLoaded(): void {
+    const currentLibId = this.userForm.get('libraryId')?.value;
+    if (currentLibId) {
+      this.loadRoles(currentLibId);
+    }
   }
 
   loadRoles(libraryId: number): void {

@@ -30,11 +30,11 @@ export class ApiService {
   }
 
   updateLibrary(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}libraries/${id}`, body);
+    return this.http.put<any>(`${this.baseUrl}Library/Update`, { ...body, id });
   }
 
   deleteLibrary(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}libraries/${id}`);
+    return this.http.delete<any>(`${this.baseUrl}Library/Delete/${id}`);
   }
 
   // User Endpoints
@@ -47,7 +47,7 @@ export class ApiService {
   }
 
   updateUser(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}User/Update/${id}`, body);
+    return this.http.put<any>(`${this.baseUrl}User/Update`, { ...body, id });
   }
 
   deleteUser(id: number): Observable<any> {
@@ -69,7 +69,7 @@ export class ApiService {
   }
 
   updateBatch(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}Batch/Update/${id}`, body);
+    return this.http.put<any>(`${this.baseUrl}Batch/Update`, { ...body, id });
   }
 
   deleteBatch(id: number): Observable<any> {
@@ -86,7 +86,7 @@ export class ApiService {
   }
 
   updateFloor(id: number, body: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}Floor/Update/${id}`, body);
+    return this.http.put<any>(`${this.baseUrl}Floor/Update`, { ...body, id });
   }
 
   deleteFloor(id: number): Observable<any> {

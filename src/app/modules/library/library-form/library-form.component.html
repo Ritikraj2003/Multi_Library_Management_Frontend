@@ -45,6 +45,16 @@
         [class.is-invalid]="libraryForm.get('email')?.touched && libraryForm.get('email')?.invalid">
       <div class="invalid-feedback">Valid email is required</div>
     </div>
+
+    <div class="col-12 mt-3">
+      <div class="form-check form-switch p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+        <div>
+          <label class="form-check-label fw-bold small text-muted mb-0">Library Active Status</label>
+          <p class="text-muted extra-small mb-0">Enable or disable this library in the system</p>
+        </div>
+        <input class="form-check-input mt-0 fs-4" type="checkbox" role="switch" formControlName="isActive">
+      </div>
+    </div>
   </div>
 
   <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
