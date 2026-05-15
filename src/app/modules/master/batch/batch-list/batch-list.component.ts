@@ -50,7 +50,15 @@ export class BatchListComponent implements OnInit {
       .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
       .subscribe({
         next: (res) => {
-          this.batches = res?.data ?? res ?? [];
+          const data = res?.data || res || [];
+          this.batches = (Array.isArray(data) ? data : []).map((b: any) => ({
+            id: b.id ?? b.Id,
+            name: b.name ?? b.Name,
+            startTime: b.startTime ?? b.StartTime,
+            endTime: b.endTime ?? b.EndTime,
+            isActive: b.isActive ?? b.IsActive,
+            libraryId: b.libraryId ?? b.LibraryId
+          }));
         },
         error: (err) => console.error('Error loading batches:', err)
       });

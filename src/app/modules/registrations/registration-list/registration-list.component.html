@@ -5,9 +5,14 @@
       <h3 class="fw-bold mb-0">Student Registrations</h3>
       <p class="text-muted small">Manage seat assignments and renewal history</p>
     </div>
-    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
-      <i class="bi bi-plus-lg me-2"></i> New Registration
-    </button>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary shadow-sm rounded-3 px-4" (click)="openQrModal()">
+        <i class="bi bi-qr-code me-2"></i> Share QR
+      </button>
+      <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+        <i class="bi bi-plus-lg me-2"></i> New Registration
+      </button>
+    </div>
   </div>
 
   <!-- Tabs Navigation -->
@@ -79,7 +84,7 @@
               </td>
               <td>
                 <span class="badge rounded-pill px-3" [ngClass]="getStatusClass(reg.status)">
-                  {{reg.status}}
+                  {{getStatusText(reg.status)}}
                 </span>
               </td>
               <td class="text-end pe-4">
@@ -90,7 +95,7 @@
                   <button class="btn btn-white btn-sm" title="History" (click)="openHistoryModal(reg)">
                     <i class="bi bi-clock-history text-info"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Cancel" *ngIf="reg.status !== 'Cancelled'" (click)="cancelRegistration(reg)">
+                  <button class="btn btn-white btn-sm" title="Cancel" *ngIf="getStatusText(reg.status) !== 'Cancelled'" (click)="cancelRegistration(reg)">
                     <i class="bi bi-x-circle text-danger"></i>
                   </button>
                   <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(reg)">
@@ -162,6 +167,41 @@
       </div>
       <div class="modal-body px-4 pb-4">
         <app-payment-history [registrationId]="selectedRegistration?.id"></app-payment-history>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+      <div class="modal-header border-0 pt-4 px-4 bg-primary text-white">
+        <h5 class="modal-title fw-bold text-white">Student Registration QR</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="text-muted mb-4 small">Students can scan this QR code to register themselves directly from their mobile devices.</p>
+        
+        <div class="bg-light p-4 rounded-4 mb-4 border d-inline-block shadow-sm">
+          <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + qrUrl" 
+               alt="QR Code" class="img-fluid rounded-3" style="max-width: 250px;">
+        </div>
+
+        <div class="mt-3 text-start">
+          <label class="form-label small fw-bold text-muted text-uppercase">Registration Link</label>
+          <div class="input-group">
+            <input type="text" class="form-control border-0 bg-light small" [value]="qrUrl" readonly #qrLinkInput>
+            <button class="btn btn-primary" (click)="qrLinkInput.select(); copyToClipboard(qrUrl)">
+              <i class="bi bi-clipboard"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="alert alert-info mt-4 mb-0 small text-start border-0 rounded-3">
+          <i class="bi bi-info-circle me-2"></i>
+          Owner can take a screenshot of this QR and share it on social media.
+        </div>
       </div>
     </div>
   </div>

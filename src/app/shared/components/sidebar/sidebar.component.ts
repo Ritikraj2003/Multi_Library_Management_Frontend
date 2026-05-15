@@ -24,7 +24,8 @@ export class SidebarComponent {
         { title: 'Batch', route: '/dashboard/master/batch' },
         { title: 'Section', route: '/dashboard/master/section' },
         { title: 'Tables', route: '/dashboard/master/tables' },
-        { title: 'User Registration', route: '/dashboard/master/user-registration' }
+        { title: 'User Registration', route: '/dashboard/master/user-registration' },
+        { title: 'General Setting', route: '/dashboard/master/general-setting' }
       ]
     },
     { title: 'Library', icon: 'bi-building', route: '/dashboard/library' }

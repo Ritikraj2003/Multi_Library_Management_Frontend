@@ -10,6 +10,13 @@
   flex-direction: column;
   overflow-y: auto;
   background-color: #f8f9fa;
+  /* Hide scrollbar */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.main-panel::-webkit-scrollbar {
+  display: none;
 }
 
 .content {

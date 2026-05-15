@@ -25,7 +25,8 @@ export class RegistrationListComponent implements OnInit {
   libraryId!: number;
   isSuperadmin = false;
   modal: any;
-  currentModalType: 'form' | 'renew' | 'history' | 'view' = 'form';
+  currentModalType: 'form' | 'renew' | 'history' | 'view' | 'qr' = 'form';
+  qrUrl = '';
 
 
   constructor(
@@ -119,6 +120,19 @@ export class RegistrationListComponent implements OnInit {
     this.showModal('viewModal');
   }
 
+  openQrModal(): void {
+    const baseUrl = window.location.origin;
+    this.qrUrl = `${baseUrl}/public/register/${this.libraryId}`;
+    this.currentModalType = 'qr';
+    this.showModal('qrModal');
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Link copied to clipboard!');
+    });
+  }
+
 
   cancelRegistration(reg: any): void {
     if (!confirm(`Are you sure you want to cancel the registration for ${reg.studentName}? This will free up the seat.`)) {
@@ -166,12 +180,27 @@ export class RegistrationListComponent implements OnInit {
     }
   }
 
-  getStatusClass(status: string): string {
-    switch(status.toLowerCase()) {
-      case 'active': return 'bg-success';
-      case 'expired': return 'bg-danger';
-      case 'due': return 'bg-warning text-dark';
+  getStatusClass(status: any): string {
+    if (status === undefined || status === null) return 'bg-secondary';
+    const s = String(status).toLowerCase();
+    switch(s) {
+      case 'active': case '1': return 'bg-success';
+      case 'expired': case '2': return 'bg-danger';
+      case 'due': case '4': return 'bg-warning text-dark';
+      case 'cancelled': case '3': return 'bg-secondary';
       default: return 'bg-secondary';
+    }
+  }
+
+  getStatusText(status: any): string {
+    if (status === undefined || status === null) return 'Unknown';
+    const s = String(status).toLowerCase();
+    switch(s) {
+      case 'active': case '1': return 'Active';
+      case 'expired': case '2': return 'Expired';
+      case 'cancelled': case '3': return 'Cancelled';
+      case 'due': case '4': return 'Due';
+      default: return s.charAt(0).toUpperCase() + s.slice(1);
     }
   }
 }

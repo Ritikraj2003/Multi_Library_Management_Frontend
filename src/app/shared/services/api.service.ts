@@ -186,4 +186,17 @@ export class ApiService {
   getDashboardStats(libraryId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}Dashboard/stats/${libraryId}`);
   }
+
+  // General Setting Endpoints
+  getSettingsByLibraryId(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}GeneralSetting/GetByLibraryId/${libraryId}`);
+  }
+
+  upsertSetting(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}GeneralSetting/Upsert`, body);
+  }
+
+  deleteSetting(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}GeneralSetting/Delete/${id}`);
+  }
 }

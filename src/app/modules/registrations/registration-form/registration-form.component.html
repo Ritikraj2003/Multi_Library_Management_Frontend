@@ -4,7 +4,7 @@
     <label class="form-label fw-bold small text-muted">Select Student</label>
     <select class="form-select rounded-3 shadow-sm" formControlName="studentId" [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid">
       <option [ngValue]="null">-- Choose Student --</option>
-      <option *ngFor="let s of students" [value]="s.id">{{s.fullName}} ({{s.mobile}})</option>
+      <option *ngFor="let s of students" [ngValue]="s.id">{{s.fullName}} ({{s.mobile}})</option>
     </select>
   </div>
 
@@ -12,7 +12,7 @@
     <label class="form-label fw-bold small text-muted">Assign Seat</label>
     <select class="form-select rounded-3 shadow-sm" formControlName="tableSeatId" [class.is-invalid]="regForm.get('tableSeatId')?.touched && regForm.get('tableSeatId')?.invalid">
       <option [ngValue]="null">-- Choose Seat --</option>
-      <option *ngFor="let s of seats" [value]="s.id">Seat: {{s.seatNumber}} (Table: {{s.tableNumber}})</option>
+      <option *ngFor="let s of seats" [ngValue]="s.id">Seat: {{s.seatNumber}} (Table: {{s.tableNumber}})</option>
     </select>
   </div>
 
@@ -20,8 +20,8 @@
     <label class="form-label fw-bold small text-muted">Select Batch</label>
     <select class="form-select rounded-3 shadow-sm" formControlName="batchId" [class.is-invalid]="regForm.get('batchId')?.touched && regForm.get('batchId')?.invalid">
       <option [ngValue]="null">-- Choose Batch --</option>
-      <option *ngFor="let b of batches" [value]="b.id || b.batchId" [disabled]="b.isOccupied">
-        {{ b.name || b.batchName }} ({{ b.startTime || b.batchTime }}) {{ b.isOccupied ? '(Occupied)' : '' }}
+      <option *ngFor="let b of batches" [ngValue]="b.id" [disabled]="b.isOccupied">
+        {{ b.name }} ({{ b.batchTime }}) {{ b.isOccupied ? '(Occupied)' : '' }}
       </option>
     </select>
   </div>

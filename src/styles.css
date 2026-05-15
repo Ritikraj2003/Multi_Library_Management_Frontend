@@ -6,6 +6,18 @@ body {
   color: #333;
 }
 
+/* Hide browser scrollbar but keep functionality */
+html, body {
+  overflow-x: hidden;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+html::-webkit-scrollbar, 
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 .rounded-4 {
   border-radius: 1rem !important;
 }

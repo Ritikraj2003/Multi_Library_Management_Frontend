@@ -4,6 +4,7 @@ import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
 import { Pagination } from '../../../shared/models/pagination.model';
+import { environment } from '../../../../environments/environment';
 import { StudentFormComponent } from '../student-form/student-form.component';
 
 declare var bootstrap: any;
@@ -24,7 +25,7 @@ export class StudentListComponent implements OnInit {
   isSuperadmin = false;
   pagination: Pagination | null = null;
   viewSelectedStudent: any = null;
-  imageBaseUrl = 'https://localhost:7098/'; // Should ideally come from environment
+  imageBaseUrl = environment.imageBaseUrl;
 
   constructor(
     private apiService: ApiService,

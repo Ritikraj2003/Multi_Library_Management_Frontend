@@ -16,6 +16,10 @@ export const routes: Routes = [
     ]
   },
   {
+    path: 'public/register/:libraryId',
+    loadComponent: () => import('./public/public-registration/public-registration.component').then(m => m.PublicRegistrationComponent)
+  },
+  {
     path: 'dashboard',
     component: MainLayoutComponent,
     canActivate: [authGuard],

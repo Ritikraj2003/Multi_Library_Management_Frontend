@@ -7,6 +7,7 @@ import { SectionListComponent } from './master/section/section-list/section-list
 import { TableListComponent } from './master/tables/table-list/table-list.component';
 import { StudentListComponent } from './students/student-list/student-list.component';
 import { RegistrationListComponent } from './registrations/registration-list/registration-list.component';
+import { GeneralSettingComponent } from './master/general-setting/general-setting.component';
 
 export const MODULE_ROUTES: Routes = [
     { path: '', component: DashboardComponent },
@@ -16,6 +17,7 @@ export const MODULE_ROUTES: Routes = [
     { path: 'master/batch', component: BatchListComponent },
     { path: 'master/section', component: SectionListComponent },
     { path: 'master/tables', component: TableListComponent },
+    { path: 'master/general-setting', component: GeneralSettingComponent },
     { path: 'master', component: DashboardComponent }, // Placeholder
     { path: 'library', component: LibraryListComponent },
 ];

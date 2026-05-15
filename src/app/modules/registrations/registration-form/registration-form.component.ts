@@ -66,21 +66,39 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     if (this.registrationData) {
       this.isEdit = true;
       const data = { ...this.registrationData };
-      if (data.startDate) data.startDate = new Date(data.startDate).toISOString().substring(0, 10);
-      if (data.dueDate) data.dueDate = new Date(data.dueDate).toISOString().substring(0, 10);
       
-      // Load batches for the existing seat and then patch the batchId
-      if (data.tableSeatId) {
-        this.checkSeatAvailability(data.tableSeatId, data.batchId, data.id);
+      // Handle PascalCase vs camelCase from different APIs
+      const startDate = data.startDate || data.StartDate;
+      const dueDate = data.dueDate || data.DueDate;
+      const tableSeatId = data.tableSeatId || data.TableSeatId;
+      const batchId = data.batchId || data.BatchId;
+      const id = data.id || data.Id;
+      const status = data.status || data.Status;
+      const monthlyAmount = data.monthlyAmount || data.MonthlyAmount;
+      const securityAmount = data.securityAmount || data.SecurityAmount;
+      const notes = data.notes || data.Notes;
+
+      if (startDate) data.startDate = new Date(startDate).toISOString().substring(0, 10);
+      if (dueDate) data.dueDate = new Date(dueDate).toISOString().substring(0, 10);
+      
+      if (tableSeatId) {
+        this.checkSeatAvailability(tableSeatId, batchId, id);
       }
       
-      
       this.regForm.patchValue({
-        ...data,
-        isActiveStatus: data.status === 'Active'
+        studentId: data.studentId || data.StudentId,
+        tableSeatId: tableSeatId,
+        batchId: batchId,
+        startDate: data.startDate,
+        dueDate: data.dueDate,
+        monthlyAmount: monthlyAmount,
+        securityAmount: securityAmount,
+        notes: notes,
+        isActiveStatus: status === 'Active' || status === 1
       }, { emitEvent: false });
-      this.regForm.get('studentId')?.disable();
-      this.regForm.get('tableSeatId')?.disable();
+
+      this.regForm.get('studentId')?.disable({ emitEvent: false });
+      this.regForm.get('tableSeatId')?.disable({ emitEvent: false });
     } else {
       this.isEdit = false;
       this.regForm.enable();
@@ -91,29 +109,54 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   loadDropdowns(): void {
     const params = this.authService.currentUserValue?.isSuperadmin ? {} : { LibraryId: this.libraryId };
     
-    this.apiService.getAllStudents(params).subscribe(res => this.students = res.data.items || []);
+    this.apiService.getAllStudents(params).subscribe(res => {
+      const data = res.data?.items || res.data?.Items || [];
+      this.students = data.map((s: any) => ({
+        id: s.id ?? s.Id,
+        fullName: s.fullName ?? s.FullName,
+        mobile: s.mobile ?? s.Mobile
+      }));
+    });
     
     // Load all active seats (ignoring global IsOccupied as we now check per batch)
     this.apiService.getAllTables({ ...params, IsActive: true }).subscribe(res => {
-      this.seats = res.data.items || [];
+      const data = res.data?.items || res.data?.Items || [];
+      this.seats = data.map((s: any) => ({
+        id: s.id ?? s.Id,
+        seatNumber: s.seatNumber ?? s.SeatNumber,
+        tableNumber: s.tableNumber ?? s.TableNumber,
+        floorName: s.floorName ?? s.FloorName ?? s.Floors?.Name
+      }));
     });
 
     // We don't load all batches globally anymore if we want to filter by seat
     // But we might want to load them all first and then disable occupied ones
-    this.apiService.getBatchesByLibraryId(this.libraryId).subscribe(res => this.batches = res.data || []);
+    this.apiService.getBatchesByLibraryId(this.libraryId).subscribe(res => {
+      const data = res.data || [];
+      this.batches = (Array.isArray(data) ? data : []).map((b: any) => ({
+        id: b.id ?? b.Id,
+        name: b.name ?? b.Name,
+        isOccupied: b.isOccupied ?? b.IsOccupied
+      }));
+    });
   }
 
   checkSeatAvailability(seatId: number, patchBatchId?: number, registrationId?: number): void {
     this.apiService.getSeatAvailability(seatId, this.libraryId, registrationId).subscribe(res => {
       if (res.success) {
-        this.batches = res.data.batches;
+        const batchData = res.data.batches || res.data.Batches || [];
+        this.batches = batchData.map((b: any) => ({
+          id: b.id ?? b.Id ?? b.batchId ?? b.BatchId,
+          name: b.name ?? b.Name ?? b.batchName ?? b.BatchName,
+          batchTime: b.batchTime ?? b.BatchTime ?? (b.StartTime ? `${b.StartTime} - ${b.EndTime}` : ''),
+          isOccupied: b.isOccupied ?? b.IsOccupied
+        }));
         
         if (patchBatchId) {
           this.regForm.get('batchId')?.setValue(patchBatchId);
         } else {
-          // Optionally: if currently selected batch is occupied, reset it
           const currentBatchId = this.regForm.get('batchId')?.value;
-          const currentBatch = this.batches.find(b => (b.id || b.batchId) === currentBatchId);
+          const currentBatch = this.batches.find(b => b.id === currentBatchId);
           if (currentBatch && currentBatch.isOccupied) {
             this.regForm.get('batchId')?.setValue(null);
           }

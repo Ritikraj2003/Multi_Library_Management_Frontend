@@ -1,0 +1,119 @@
+<div class="registration-container">
+  <div class="form-card" *ngIf="!submitted">
+    <div class="form-header">
+      <h2 class="mb-0">Join Our Library</h2>
+      <p class="mb-0 mt-2 opacity-75">Please fill in your details to register</p>
+    </div>
+
+    <div class="form-body">
+      <form [formGroup]="regForm" (ngSubmit)="onSubmit()">
+        <div class="row g-4">
+          <!-- Full Name -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Full Name <span class="text-danger">*</span></label>
+            <input type="text" formControlName="fullName" class="form-control" placeholder="Enter your full name"
+              [class.is-invalid]="regForm.get('fullName')?.touched && regForm.get('fullName')?.invalid">
+          </div>
+
+          <!-- Father's Name -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Father's Name <span class="text-danger">*</span></label>
+            <input type="text" formControlName="fatherName" class="form-control" placeholder="Enter father's name"
+              [class.is-invalid]="regForm.get('fatherName')?.touched && regForm.get('fatherName')?.invalid">
+          </div>
+
+          <!-- Mobile -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Mobile Number <span class="text-danger">*</span></label>
+            <input type="tel" formControlName="mobile" class="form-control" placeholder="10-digit mobile number"
+              [class.is-invalid]="regForm.get('mobile')?.touched && regForm.get('mobile')?.invalid">
+          </div>
+
+          <!-- Date of Birth -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Date of Birth <span class="text-danger">*</span></label>
+            <input type="date" formControlName="dob" class="form-control"
+              [class.is-invalid]="regForm.get('dob')?.touched && regForm.get('dob')?.invalid">
+          </div>
+
+          <!-- Address -->
+          <div class="col-12">
+            <label class="form-label fw-bold">Full Address <span class="text-danger">*</span></label>
+            <textarea formControlName="address" class="form-control" rows="3" placeholder="Enter your complete address"
+              [class.is-invalid]="regForm.get('address')?.touched && regForm.get('address')?.invalid"></textarea>
+          </div>
+
+          <!-- Document Type -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Document Type <span class="text-danger">*</span></label>
+            <select formControlName="documentType" class="form-control"
+              [class.is-invalid]="regForm.get('documentType')?.touched && regForm.get('documentType')?.invalid">
+              <option value="">Select Document</option>
+              <option value="Aadhar Card">Aadhar Card</option>
+              <option value="Voter ID">Voter ID</option>
+              <option value="Driving License">Driving License</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <!-- RFID (Optional) -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">RFID Code (If any)</label>
+            <input type="text" formControlName="rfidCode" class="form-control" placeholder="Scan or enter RFID">
+          </div>
+
+          <!-- Photo Upload -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Your Photo</label>
+            <input type="file" (change)="onFileChange($event, 'student')" class="form-control" accept="image/*">
+            <div *ngIf="studentImagePreview" class="text-center">
+              <img [src]="studentImagePreview" class="preview-img" alt="Student Photo">
+            </div>
+          </div>
+
+          <!-- Document Image Upload -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Document Photo</label>
+            <input type="file" (change)="onFileChange($event, 'doc')" class="form-control" accept="image/*">
+            <div *ngIf="documentImagePreview" class="text-center">
+              <img [src]="documentImagePreview" class="preview-img" alt="Document Photo">
+            </div>
+          </div>
+
+          <div class="col-12 mt-5">
+            <button type="submit" class="btn btn-submit" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              {{ loading ? 'Submitting...' : 'Register Now' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-body p-0">
+          <div class="bg-success text-white p-4 text-center">
+            <i class="bi bi-check-circle-fill display-1"></i>
+            <h2 class="mt-3 fw-bold">Submitted Successfully!</h2>
+          </div>
+          <div class="p-4 text-center">
+            <p class="text-muted mb-4">Your registration details have been saved. Please keep your Enrollment Number safe.</p>
+            
+            <div class="bg-light p-4 rounded-4 mb-4 border">
+              <span class="text-uppercase small fw-bold text-muted d-block mb-2">Student ID</span>
+              <div class="display-3 fw-bold text-primary">{{ enrollmentNumber || '...' }}</div>
+            </div>
+
+            <button type="button" class="btn btn-primary w-100 py-3 rounded-3 fw-bold" (click)="resetForm()">
+              DONE / REGISTER NEW
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

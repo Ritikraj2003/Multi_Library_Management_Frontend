@@ -58,7 +58,14 @@ export class TableListComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res && res.data) {
-            this.floors = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            const items = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            this.floors = items.map((f: any) => ({
+              id: f.id ?? f.Id,
+              name: f.name ?? f.Name,
+              floorNumber: f.floorNumber ?? f.FloorNumber,
+              isActive: f.isActive ?? f.IsActive,
+              libraryId: f.libraryId ?? f.LibraryId
+            }));
             this.cdr.markForCheck();
           }
         },
@@ -82,7 +89,18 @@ export class TableListComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res && res.data) {
-            this.tables = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            const items = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            this.tables = items.map((t: any) => ({
+              id: t.id ?? t.Id,
+              floorId: t.floorId ?? t.FloorId,
+              tableNumber: t.tableNumber ?? t.TableNumber,
+              seatNumber: t.seatNumber ?? t.SeatNumber,
+              isOccupied: t.isOccupied ?? t.IsOccupied,
+              isActive: t.isActive ?? t.IsActive,
+              libraryId: t.libraryId ?? t.LibraryId,
+              floorName: t.floorName || t.FloorName || t.Floors?.Name || t.floors?.name
+            }));
+            
             if (res.data.totalCount !== undefined) {
                this.pagination = {
                  pageNumber: res.data.pageNumber,

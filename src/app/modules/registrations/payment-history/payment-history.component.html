@@ -19,14 +19,14 @@
         <td colspan="5" class="text-center py-4 text-muted small">No payment records found.</td>
       </tr>
       <tr *ngFor="let p of payments">
-        <td class="small">{{p.paymentDate | date:'mediumDate'}}</td>
-        <td><span class="fw-bold text-dark">₹{{p.amount}}</span></td>
+        <td class="small">{{(p.paymentDate || p.PaymentDate) | date:'mediumDate'}}</td>
+        <td><span class="fw-bold text-dark">₹{{p.amount || p.Amount}}</span></td>
         <td>
-          <span class="badge bg-light text-dark fw-normal border">{{p.paymentMode}}</span>
+          <span class="badge bg-light text-dark fw-normal border">{{p.paymentMode || p.PaymentMode}}</span>
         </td>
-        <td class="small text-muted">{{p.nextDueDate | date:'shortDate'}}</td>
-        <td class="small extra-small text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="p.notes">
-          {{p.notes || '-'}}
+        <td class="small text-muted">{{(p.nextDueDate || p.NextDueDate) | date:'shortDate'}}</td>
+        <td class="small extra-small text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="p.notes || p.Notes">
+          {{(p.notes || p.Notes) || '-'}}
         </td>
       </tr>
     </tbody>

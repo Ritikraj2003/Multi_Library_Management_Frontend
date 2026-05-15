@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
+import { environment } from '../../../../environments/environment';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -24,7 +25,7 @@ export class LibraryFormComponent implements OnInit {
   documentImageFile: File | null = null;
   libraryIconPreview: string | ArrayBuffer | null = null;
   documentImagePreview: string | ArrayBuffer | null = null;
-  imageBaseUrl = 'https://localhost:7098/'; // Should ideally come from environment
+  imageBaseUrl = environment.imageBaseUrl;
 
   constructor(
     private fb: FormBuilder,

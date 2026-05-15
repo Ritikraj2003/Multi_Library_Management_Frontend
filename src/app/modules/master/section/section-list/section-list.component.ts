@@ -57,7 +57,15 @@ export class SectionListComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res && res.data) {
-            this.floors = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            const items = res.data.items || (Array.isArray(res.data) ? res.data : [res.data]);
+            this.floors = items.map((f: any) => ({
+              id: f.id ?? f.Id,
+              name: f.name ?? f.Name,
+              floorNumber: f.floorNumber ?? f.FloorNumber,
+              isActive: f.isActive ?? f.IsActive,
+              libraryId: f.libraryId ?? f.LibraryId
+            }));
+            
             if (res.data.totalCount !== undefined) {
                this.pagination = {
                  pageNumber: res.data.pageNumber,

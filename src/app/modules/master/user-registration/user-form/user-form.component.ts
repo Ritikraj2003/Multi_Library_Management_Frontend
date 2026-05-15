@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../shared/services/api.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import { environment } from '../../../../../environments/environment';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -24,7 +25,7 @@ export class UserFormComponent implements OnInit, OnChanges {
   roles: any[] = [];
   profileImagePreview: string | ArrayBuffer | null = null;
   profileImageFile: File | null = null;
-  imageBaseUrl = 'https://localhost:7098/';
+  imageBaseUrl = environment.imageBaseUrl;
 
   get isCurrentUserSuperadmin(): boolean {
     return this.authService.currentUserValue?.isSuperadmin || false;
