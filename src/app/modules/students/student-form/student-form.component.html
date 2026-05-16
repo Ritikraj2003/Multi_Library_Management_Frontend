@@ -20,6 +20,12 @@
     </div>
 
     <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Email Address</label>
+      <input type="email" formControlName="email" class="form-control rounded-3" placeholder="student@example.com"
+        [class.is-invalid]="studentForm.get('email')?.touched && studentForm.get('email')?.invalid">
+    </div>
+
+    <div class="col-md-6">
       <label class="form-label fw-bold small text-muted">Date of Birth</label>
       <input type="date" formControlName="dob" class="form-control rounded-3"
         [class.is-invalid]="studentForm.get('dob')?.touched && studentForm.get('dob')?.invalid">

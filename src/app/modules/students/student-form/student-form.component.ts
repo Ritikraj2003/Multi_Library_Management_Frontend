@@ -37,6 +37,7 @@ export class StudentFormComponent implements OnInit, OnChanges {
       fullName: ['', [Validators.required]],
       fatherName: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      email: ['', [Validators.email]],
       address: ['', [Validators.required]],
       rfidCode: [''],
       documentType: ['', [Validators.required]],
