@@ -1,0 +1,144 @@
+.layout-container {
+  min-height: 100vh;
+  background-color: #f4f7f6;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 50px;
+  padding: 30px;
+  justify-items: center;
+}
+
+.table-item {
+  position: relative;
+  width: 130px;
+  height: 90px;
+  background: #ffffff;
+  border: 3px solid #e0e0e0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* All tables are now squares/rectangles as requested */
+.rectangle {
+  border-color: #f1c40f; /* Using yellow border for all as seen in screenshot */
+}
+
+.table-content {
+  text-align: center;
+  font-weight: 700;
+  color: #2d3436;
+}
+
+.table-id {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.seat-info {
+  font-size: 13px;
+  color: #636e72;
+  margin-top: 4px;
+}
+
+/* Chairs styling */
+.chairs .chair {
+  position: absolute;
+  width: 24px;
+  height: 14px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chair.available {
+  background-color: #2ecc71;
+}
+
+.chair.occupied {
+  background-color: #444444; /* Dark gray for chairs normally, or yellow if occupied? */
+  /* User said "shift yello coloor" and "second shift table keep green" */
+}
+
+/* Override: If occupied, chair becomes yellow */
+.chair.occupied {
+  background-color: #f1c40f;
+}
+
+/* Position mapping for up to 6 batches */
+.chair.pos-0 { top: -18px; left: 50%; transform: translateX(-50%); }
+.chair.pos-1 { bottom: -18px; left: 50%; transform: translateX(-50%); }
+.chair.pos-2 { left: -18px; top: 50%; transform: translateY(-50%) rotate(90deg); }
+.chair.pos-3 { right: -18px; top: 50%; transform: translateY(-50%) rotate(-90deg); }
+.chair.pos-4 { top: -18px; left: 20%; transform: translateX(-50%); }
+.chair.pos-5 { top: -18px; left: 80%; transform: translateX(-50%); }
+
+.batch-name-label {
+  position: absolute;
+  font-size: 8px;
+  white-space: nowrap;
+  color: #2d3436;
+  font-weight: 700;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* Label positioning based on chair location */
+.chair.pos-0 .batch-name-label, 
+.chair.pos-4 .batch-name-label, 
+.chair.pos-5 .batch-name-label {
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.chair.pos-1 .batch-name-label {
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.chair.pos-2 .batch-name-label {
+  left: -22px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.chair.pos-3 .batch-name-label {
+  right: -22px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.table-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.legend .bg-success { background-color: #2ecc71 !important; }
+.legend .bg-warning { background-color: #f1c40f !important; }
+
+.no-tables {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 0;
+}

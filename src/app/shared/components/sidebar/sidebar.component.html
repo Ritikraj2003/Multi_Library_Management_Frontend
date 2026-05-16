@@ -1,8 +1,11 @@
 <div class="sidebar bg-dark text-white shadow">
-  <div class="sidebar-header p-4 border-bottom border-secondary">
+  <div class="sidebar-header p-4 border-bottom border-secondary" *ngIf="currentUser$ | async as user">
     <div class="d-flex align-items-center">
-      <i class="bi bi-book-half fs-3 me-2 text-primary"></i>
-      <h5 class="mb-0 fw-bold">Library MS</h5>
+      <img *ngIf="user.libraryIcon" [src]="imageBaseUrl + user.libraryIcon" class="me-2 rounded shadow-sm" style="width: 35px; height: 35px; object-fit: cover;">
+      <i *ngIf="!user.libraryIcon" class="bi bi-book-half fs-3 me-2 text-primary"></i>
+      <h5 class="mb-0 fw-bold text-truncate" [title]="user.libraryName || 'Library MS'">
+        {{ user.libraryName || 'Library MS' }}
+      </h5>
     </div>
   </div>
 

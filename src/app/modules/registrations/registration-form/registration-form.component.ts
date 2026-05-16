@@ -20,6 +20,8 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   loading = false;
   isEdit = false;
   students: any[] = [];
+  filteredStudents: any[] = [];
+  searchTerm: string = '';
   seats: any[] = [];
   batches: any[] = [];
   libraryId!: number;
@@ -97,17 +99,33 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
         isActiveStatus: status === 'Active' || status === 1
       }, { emitEvent: false });
 
+      // Find student and set search term
+      const student = this.students.find(s => s.id === (data.studentId || data.StudentId));
+      if (student) {
+        this.searchTerm = `${student.fullName} (${student.mobile})`;
+      } else if (data.studentName || data.fullName || data.FullName) {
+        this.searchTerm = `${data.studentName || data.fullName || data.FullName} (${data.mobile || data.Mobile || ''})`;
+      }
+
       this.regForm.get('studentId')?.disable({ emitEvent: false });
       this.regForm.get('tableSeatId')?.disable({ emitEvent: false });
     } else {
       this.isEdit = false;
+      this.searchTerm = '';
       this.regForm.enable();
       this.regForm.reset({ paymentMode: 'Cash', monthlyAmount: 0, securityAmount: 0 });
     }
   }
 
+  closeDropdown(): void {
+    setTimeout(() => {
+      this.filteredStudents = [];
+    }, 200);
+  }
+
   loadDropdowns(): void {
-    const params = this.authService.currentUserValue?.isSuperadmin ? {} : { LibraryId: this.libraryId };
+    const params: any = this.authService.currentUserValue?.isSuperadmin ? {} : { LibraryId: this.libraryId };
+    params.PageSize = 1000; // Increase page size to get all students
     
     this.apiService.getAllStudents(params).subscribe(res => {
       const data = res.data?.items || res.data?.Items || [];
@@ -116,6 +134,12 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
         fullName: s.fullName ?? s.FullName,
         mobile: s.mobile ?? s.Mobile
       }));
+      this.filteredStudents = [...this.students];
+      
+      // If we are in edit mode, we need to set the search term now that students are loaded
+      if (this.isEdit) {
+        this.updateForm();
+      }
     });
     
     // Load all active seats (ignoring global IsOccupied as we now check per batch)
@@ -145,12 +169,51 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     this.apiService.getSeatAvailability(seatId, this.libraryId, registrationId).subscribe(res => {
       if (res.success) {
         const batchData = res.data.batches || res.data.Batches || [];
-        this.batches = batchData.map((b: any) => ({
-          id: b.id ?? b.Id ?? b.batchId ?? b.BatchId,
-          name: b.name ?? b.Name ?? b.batchName ?? b.BatchName,
-          batchTime: b.batchTime ?? b.BatchTime ?? (b.StartTime ? `${b.StartTime} - ${b.EndTime}` : ''),
-          isOccupied: b.isOccupied ?? b.IsOccupied
-        }));
+        const processedBatches = batchData.map((b: any) => {
+          let st = b.startTime ?? b.StartTime ?? '';
+          let et = b.endTime ?? b.EndTime ?? '';
+          
+          const bt = b.batchTime ?? b.BatchTime ?? '';
+          if (!st && bt.includes('-')) {
+            const parts = bt.split('-').map((p: string) => p.trim());
+            st = parts[0];
+            et = parts[1];
+          }
+
+          return {
+            id: b.id ?? b.Id ?? b.batchId ?? b.BatchId,
+            name: b.name ?? b.Name ?? b.batchName ?? b.BatchName,
+            batchTime: bt || (st ? `${st} - ${et}` : ''),
+            startTime: st,
+            endTime: et,
+            isOccupied: b.isOccupied ?? b.IsOccupied,
+            isDirectlyOccupied: b.isDirectlyOccupied ?? b.IsDirectlyOccupied ?? false
+          };
+        });
+
+        // Apply overlap logic: ONLY check overlaps against batches that are DIRECTLY booked
+        const directlyOccupiedBatches = processedBatches.filter((b: any) => b.isDirectlyOccupied);
+        
+        this.batches = processedBatches.map((b: any) => {
+          // If it's already directly occupied, or the server already says it's occupied (overlap), keep it.
+          if (b.isOccupied) {
+            // If it's occupied but NOT directly, it means it's an overlap
+            if (!b.isDirectlyOccupied && !b.name.includes('(Time Overlap)')) {
+              return { ...b, name: `${b.name} (Time Overlap)` };
+            }
+            return b;
+          }
+          
+          // Double check overlap on client side against directly booked shifts
+          const hasOverlap = directlyOccupiedBatches.some((occ: any) => 
+            this.isOverlapping(b.startTime, b.endTime, occ.startTime, occ.endTime)
+          );
+          
+          if (hasOverlap) {
+            return { ...b, isOccupied: true, name: `${b.name} (Time Overlap)` };
+          }
+          return b;
+        });
         
         if (patchBatchId) {
           this.regForm.get('batchId')?.setValue(patchBatchId);
@@ -163,6 +226,74 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
         }
       }
     });
+  }
+
+  filterStudents(term: string): void {
+    this.searchTerm = term;
+    if (!term) {
+      this.filteredStudents = [...this.students];
+      this.regForm.get('studentId')?.setValue(null);
+      return;
+    }
+
+    const lowTerm = term.toLowerCase();
+    
+    // If the term exactly matches a selected student's display string, don't show dropdown
+    const selectedId = this.regForm.get('studentId')?.value;
+    const selectedStudent = this.students.find(s => s.id === selectedId);
+    const displayString = selectedStudent ? `${selectedStudent.fullName} (${selectedStudent.mobile})`.toLowerCase() : '';
+    
+    if (lowTerm === displayString) {
+      this.filteredStudents = [];
+      return;
+    }
+
+    this.filteredStudents = this.students.filter(s => 
+      s.fullName.toLowerCase().includes(lowTerm) || 
+      s.mobile.includes(lowTerm) ||
+      s.id.toString().includes(lowTerm)
+    );
+  }
+
+  selectStudent(student: any): void {
+    this.regForm.get('studentId')?.setValue(student.id);
+    this.searchTerm = `${student.fullName} (${student.mobile})`;
+    this.filteredStudents = [];
+  }
+
+  isStudentSelected(term: string): boolean {
+    const selectedId = this.regForm.get('studentId')?.value;
+    if (!selectedId) return false;
+    const selectedStudent = this.students.find(s => s.id === selectedId);
+    if (!selectedStudent) return false;
+    const displayString = `${selectedStudent.fullName} (${selectedStudent.mobile})`;
+    return term.toLowerCase() === displayString.toLowerCase();
+  }
+
+  private timeToMinutes(time: string): number {
+    if (!time) return 0;
+    // Handle both "06:00" and "06:00:00"
+    const parts = time.split(':').map(Number);
+    if (parts.length < 2) return 0;
+    return parts[0] * 60 + parts[1];
+  }
+
+  private isOverlapping(start1: string, end1: string, start2: string, end2: string): boolean {
+    if (!start1 || !end1 || !start2 || !end2) return false;
+    const s1 = this.timeToMinutes(start1);
+    let e1 = this.timeToMinutes(end1);
+    const s2 = this.timeToMinutes(start2);
+    let e2 = this.timeToMinutes(end2);
+    
+    // Avoid marking as overlap if times are essentially missing/invalid
+    if (s1 === 0 && e1 === 0) return false;
+    if (s2 === 0 && e2 === 0) return false;
+
+    // Handle overnight shifts if any (though usually not in library)
+    if (e1 <= s1) e1 += 1440; 
+    if (e2 <= s2) e2 += 1440;
+
+    return s1 < e2 && s2 < e1;
   }
 
   onSubmit(): void {

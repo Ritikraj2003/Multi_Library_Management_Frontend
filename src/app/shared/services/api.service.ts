@@ -16,6 +16,14 @@ export class ApiService {
     return this.http.post<any>(`${this.baseUrl}Auth/Login`, body);
   }
 
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Auth/ForgotPassword`, { email });
+  }
+
+  resetPassword(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Auth/ResetPassword`, body);
+  }
+
   // Library Endpoints
   getAllLibraries(params?: any): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}Library/GetAll`, { params });

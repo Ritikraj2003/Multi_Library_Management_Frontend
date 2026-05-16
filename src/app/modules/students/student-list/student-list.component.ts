@@ -6,6 +6,8 @@ import { finalize } from 'rxjs';
 import { Pagination } from '../../../shared/models/pagination.model';
 import { environment } from '../../../../environments/environment';
 import { StudentFormComponent } from '../student-form/student-form.component';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 declare var bootstrap: any;
 
@@ -25,12 +27,14 @@ export class StudentListComponent implements OnInit {
   isSuperadmin = false;
   pagination: Pagination | null = null;
   viewSelectedStudent: any = null;
-  imageBaseUrl = environment.imageBaseUrl;
+
 
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService,
+    private loaderService: LoaderService
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
   }
@@ -41,7 +45,7 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents(pageNumber: number = 1, pageSize: number = 10): void {
-    this.loading = true;
+    this.loaderService.show();
     const params: any = {
       PageNumber: pageNumber,
       PageSize: pageSize
@@ -52,7 +56,7 @@ export class StudentListComponent implements OnInit {
     }
 
     this.apiService.getAllStudents(params)
-      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .pipe(finalize(() => { this.loaderService.hide(); this.cdr.markForCheck(); }))
       .subscribe({
         next: (res: any) => {
           if (res && res.data) {
@@ -105,7 +109,7 @@ export class StudentListComponent implements OnInit {
 
   getImageUrl(path: string): string {
     if (!path) return 'assets/images/default-avatar.png'; // Placeholder if needed
-    return this.imageBaseUrl + path;
+    return environment.apiUrl.replace('api/', '') + path;
   }
 
   openImageInNewTab(path: string): void {
@@ -116,9 +120,16 @@ export class StudentListComponent implements OnInit {
 
   onDelete(id: number): void {
     if (confirm('Are you sure you want to delete this student?')) {
-      this.apiService.deleteStudent(id).subscribe({
-        next: () => this.loadStudents(this.pagination?.pageNumber || 1),
-        error: (err: any) => console.error('Error deleting student:', err)
+      this.loaderService.show();
+      this.apiService.deleteStudent(id).pipe(finalize(() => this.loaderService.hide())).subscribe({
+        next: () => {
+          this.notificationService.showSuccess('Student deleted successfully');
+          this.loadStudents(this.pagination?.pageNumber || 1);
+        },
+        error: (err: any) => {
+          this.notificationService.showError('Error deleting student');
+          console.error('Error deleting student:', err);
+        }
       });
     }
   }

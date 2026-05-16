@@ -2,10 +2,52 @@
   
   <div class="col-md-12">
     <label class="form-label fw-bold small text-muted">Select Student</label>
-    <select class="form-select rounded-3 shadow-sm" formControlName="studentId" [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid">
-      <option [ngValue]="null">-- Choose Student --</option>
-      <option *ngFor="let s of students" [ngValue]="s.id">{{s.fullName}} ({{s.mobile}})</option>
-    </select>
+    <div class="position-relative">
+      <input 
+        type="text" 
+        class="form-control rounded-3 shadow-sm" 
+        placeholder="Search by Name, ID or Mobile..."
+        [value]="searchTerm"
+        (input)="filterStudents(searchInput.value)"
+        (focus)="filterStudents(searchInput.value)"
+        (blur)="closeDropdown()"
+        #searchInput
+        [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid"
+        [disabled]="isEdit"
+      >
+      <div 
+        *ngIf="searchTerm && filteredStudents.length > 0" 
+        class="dropdown-menu show w-100 shadow-lg border-0 mt-1" 
+        style="max-height: 250px; overflow-y: auto; display: block; z-index: 1060; position: absolute;"
+      >
+        <button 
+          *ngFor="let s of filteredStudents" 
+          type="button"
+          class="dropdown-item py-2 border-bottom" 
+          (click)="selectStudent(s)"
+        >
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">{{s.fullName}}</div>
+              <small class="text-muted">ID: {{s.id}}</small>
+            </div>
+            <div class="text-primary small">
+              <i class="bi bi-telephone me-1"></i>{{s.mobile}}
+            </div>
+          </div>
+        </button>
+      </div>
+      <div 
+        *ngIf="searchTerm && filteredStudents.length === 0 && searchInput.value && !isStudentSelected(searchInput.value)" 
+        class="dropdown-menu show w-100 p-3 text-center text-muted"
+        style="display: block; position: absolute;"
+      >
+        No students found
+      </div>
+    </div>
+    <div class="invalid-feedback" *ngIf="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid">
+      Please select a student.
+    </div>
   </div>
 
   <div class="col-md-6">

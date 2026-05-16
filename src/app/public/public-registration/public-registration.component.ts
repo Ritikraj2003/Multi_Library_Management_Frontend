@@ -104,10 +104,10 @@ export class PublicRegistrationComponent implements OnInit {
       fullName: ['', [Validators.required]],
       fatherName: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      email: ['', [Validators.email]],
       address: ['', [Validators.required]],
       dob: ['', [Validators.required]],
-      documentType: ['', [Validators.required]],
-      rfidCode: ['']
+      documentType: ['', [Validators.required]]
     });
   }
 

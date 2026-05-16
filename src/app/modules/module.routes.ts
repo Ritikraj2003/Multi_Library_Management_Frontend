@@ -8,6 +8,7 @@ import { TableListComponent } from './master/tables/table-list/table-list.compon
 import { StudentListComponent } from './students/student-list/student-list.component';
 import { RegistrationListComponent } from './registrations/registration-list/registration-list.component';
 import { GeneralSettingComponent } from './master/general-setting/general-setting.component';
+import { TableLayoutComponent } from './library/table-layout/table-layout.component';
 
 export const MODULE_ROUTES: Routes = [
     { path: '', component: DashboardComponent },
@@ -20,5 +21,6 @@ export const MODULE_ROUTES: Routes = [
     { path: 'master/general-setting', component: GeneralSettingComponent },
     { path: 'master', component: DashboardComponent }, // Placeholder
     { path: 'library', component: LibraryListComponent },
+    { path: 'table-layout', component: TableLayoutComponent },
 ];
 

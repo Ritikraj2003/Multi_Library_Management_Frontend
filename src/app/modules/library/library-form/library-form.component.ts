@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ApiService } from '../../../shared/services/api.service';
 import { environment } from '../../../../environments/environment';
 import { finalize } from 'rxjs';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-library-form',
@@ -25,11 +26,12 @@ export class LibraryFormComponent implements OnInit {
   documentImageFile: File | null = null;
   libraryIconPreview: string | ArrayBuffer | null = null;
   documentImagePreview: string | ArrayBuffer | null = null;
-  imageBaseUrl = environment.imageBaseUrl;
+
 
   constructor(
     private fb: FormBuilder,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private notificationService: NotificationService
   ) {
     this.libraryForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -56,8 +58,8 @@ export class LibraryFormComponent implements OnInit {
     if (this.libraryData) {
       this.isEdit = true;
       this.libraryForm.patchValue(this.libraryData);
-      this.libraryIconPreview = this.libraryData.libraryIcon ? this.imageBaseUrl + this.libraryData.libraryIcon : null;
-      this.documentImagePreview = this.libraryData.documentImage ? this.imageBaseUrl + this.libraryData.documentImage : null;
+      this.libraryIconPreview = this.libraryData.libraryIcon ? environment.apiUrl.replace('api/', '') + this.libraryData.libraryIcon : null;
+      this.documentImagePreview = this.libraryData.documentImage ? environment.apiUrl.replace('api/', '') + this.libraryData.documentImage : null;
     } else {
       this.isEdit = false;
       this.libraryForm.reset({ isActive: true });
@@ -118,10 +120,14 @@ export class LibraryFormComponent implements OnInit {
       .subscribe({
         next: (res) => {
           if (res.success) {
+            this.notificationService.showSuccess(this.isEdit ? 'Library updated successfully' : 'Library created successfully');
             this.saved.emit();
           }
         },
-        error: (err) => console.error('Error saving library:', err)
+        error: (err) => {
+          this.notificationService.showError('Error saving library');
+          console.error('Error saving library:', err);
+        }
       });
   }
 

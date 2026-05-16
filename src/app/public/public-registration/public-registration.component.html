@@ -29,6 +29,13 @@
               [class.is-invalid]="regForm.get('mobile')?.touched && regForm.get('mobile')?.invalid">
           </div>
 
+          <!-- Email -->
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Email Address</label>
+            <input type="email" formControlName="email" class="form-control" placeholder="Enter your email address"
+              [class.is-invalid]="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+          </div>
+
           <!-- Date of Birth -->
           <div class="col-md-6">
             <label class="form-label fw-bold">Date of Birth <span class="text-danger">*</span></label>
@@ -54,12 +61,6 @@
               <option value="Driving License">Driving License</option>
               <option value="Other">Other</option>
             </select>
-          </div>
-
-          <!-- RFID (Optional) -->
-          <div class="col-md-6">
-            <label class="form-label fw-bold">RFID Code (If any)</label>
-            <input type="text" formControlName="rfidCode" class="form-control" placeholder="Scan or enter RFID">
           </div>
 
           <!-- Photo Upload -->
@@ -116,4 +117,5 @@
       </div>
     </div>
   </div>
+  
 </div>

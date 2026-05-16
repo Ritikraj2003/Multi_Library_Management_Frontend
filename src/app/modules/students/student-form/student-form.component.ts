@@ -5,6 +5,7 @@ import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { finalize } from 'rxjs';
+import { NotificationService } from '../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-student-form',
@@ -26,12 +27,13 @@ export class StudentFormComponent implements OnInit, OnChanges {
   documentImageFile: File | null = null;
   studentImagePreview: string | ArrayBuffer | null = null;
   documentImagePreview: string | ArrayBuffer | null = null;
-  imageBaseUrl = environment.imageBaseUrl;
+
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {
     this.studentForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -64,8 +66,8 @@ export class StudentFormComponent implements OnInit, OnChanges {
         formattedData.dob = new Date(formattedData.dob).toISOString().substring(0, 10);
       }
       this.studentForm.patchValue(formattedData);
-      this.studentImagePreview = formattedData.photo ? this.imageBaseUrl + formattedData.photo : null;
-      this.documentImagePreview = formattedData.documentImage ? this.imageBaseUrl + formattedData.documentImage : null;
+      this.studentImagePreview = formattedData.photo ? environment.apiUrl.replace('api/', '') + formattedData.photo : null;
+      this.documentImagePreview = formattedData.documentImage ? environment.apiUrl.replace('api/', '') + formattedData.documentImage : null;
     } else {
       this.isEdit = false;
       this.studentForm.reset();
@@ -85,7 +87,9 @@ export class StudentFormComponent implements OnInit, OnChanges {
     if (currentUser?.isSuperadmin) {
       this.apiService.getAllLibraries().subscribe({
         next: (res: any) => {
-          this.libraries = res.data.items || (res.data ? [res.data] : []);
+          this.libraries = (res.data.items || (res.data ? [res.data] : [])).sort((a: any, b: any) => 
+            (a.name || a.Name || '').localeCompare(b.name || b.Name || '')
+          );
         }
       });
     } else if (currentUser?.libraryId) {
@@ -150,10 +154,14 @@ export class StudentFormComponent implements OnInit, OnChanges {
       .subscribe({
         next: (res: any) => {
           if (res.success) {
+            this.notificationService.showSuccess(this.isEdit ? 'Student updated successfully' : 'Student created successfully');
             this.saved.emit();
           }
         },
-        error: (err: any) => console.error('Error saving student:', err)
+        error: (err: any) => {
+          this.notificationService.showError('Error saving student');
+          console.error('Error saving student:', err);
+        }
       });
   }
 

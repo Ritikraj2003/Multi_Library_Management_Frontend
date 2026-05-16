@@ -5,6 +5,7 @@ import { ApiService } from '../../../../shared/services/api.service';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { environment } from '../../../../../environments/environment';
 import { finalize } from 'rxjs';
+import { NotificationService } from '../../../../shared/services/notification.service';
 
 @Component({
   selector: 'app-user-form',
@@ -25,7 +26,7 @@ export class UserFormComponent implements OnInit, OnChanges {
   roles: any[] = [];
   profileImagePreview: string | ArrayBuffer | null = null;
   profileImageFile: File | null = null;
-  imageBaseUrl = environment.imageBaseUrl;
+
 
   get isCurrentUserSuperadmin(): boolean {
     return this.authService.currentUserValue?.isSuperadmin || false;
@@ -34,7 +35,8 @@ export class UserFormComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService
   ) {
     this.userForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -73,7 +75,7 @@ export class UserFormComponent implements OnInit, OnChanges {
       this.userForm.get('password')?.updateValueAndValidity();
       
       if (this.userData.profileImage) {
-        this.profileImagePreview = this.imageBaseUrl + this.userData.profileImage;
+        this.profileImagePreview = environment.apiUrl.replace('api/', '') + this.userData.profileImage;
       } else {
         this.profileImagePreview = null;
       }
@@ -104,7 +106,9 @@ export class UserFormComponent implements OnInit, OnChanges {
     if (currentUser?.isSuperadmin) {
       this.apiService.getAllLibraries().subscribe({
         next: (res) => {
-          this.libraries = res.data.items || (res.data ? [res.data] : []);
+          this.libraries = (res.data.items || (res.data ? [res.data] : [])).sort((a: any, b: any) => 
+            (a.name || a.Name || '').localeCompare(b.name || b.Name || '')
+          );
           this.handleLibraryLoaded();
         }
       });
@@ -131,7 +135,9 @@ export class UserFormComponent implements OnInit, OnChanges {
   loadRoles(libraryId: number): void {
     this.apiService.getRolesByLibraryId(libraryId).subscribe({
       next: (res) => {
-        this.roles = res.data || [];
+        this.roles = (res.data || []).sort((a: any, b: any) => 
+          (a.name || a.roleName || a.Name || a.RoleName || '').localeCompare(b.name || b.roleName || b.Name || b.RoleName || '')
+        );
       },
       error: (err) => console.error('Error loading roles:', err)
     });
@@ -169,10 +175,14 @@ export class UserFormComponent implements OnInit, OnChanges {
       .subscribe({
         next: (res) => {
           if (res.success) {
+            this.notificationService.showSuccess(this.isEdit ? 'User updated successfully' : 'User created successfully');
             this.saved.emit();
           }
         },
-        error: (err) => console.error('Error saving user:', err)
+        error: (err) => {
+          this.notificationService.showError('Error saving user');
+          console.error('Error saving user:', err);
+        }
       });
   }
 
