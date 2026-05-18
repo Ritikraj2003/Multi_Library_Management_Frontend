@@ -6,6 +6,9 @@
       <p class="text-muted small">Manage seat assignments and renewal history</p>
     </div>
     <div class="d-flex gap-2">
+      <button class="btn btn-success shadow-sm rounded-3 px-4 animate-fade-in" *ngIf="(activeTab === 'due' || activeTab === 'today') && registrations.length > 0" (click)="openBulkWhatsAppModal()">
+        <i class="bi bi-whatsapp me-2"></i> Send Bulk Due Alerts
+      </button>
       <button class="btn btn-outline-primary shadow-sm rounded-3 px-4" (click)="openQrModal()">
         <i class="bi bi-qr-code me-2"></i> Share QR
       </button>
@@ -98,6 +101,9 @@
                   </button>
                   <button class="btn btn-white btn-sm" title="History" (click)="openHistoryModal(reg)">
                     <i class="bi bi-clock-history text-info"></i>
+                  </button>
+                  <button class="btn btn-white btn-sm" title="Send WhatsApp Alert" (click)="openWhatsAppModal(reg)">
+                    <i class="bi bi-whatsapp text-success"></i>
                   </button>
                   <button class="btn btn-white btn-sm" title="Cancel" *ngIf="getStatusText(reg.status) !== 'Cancelled'" (click)="cancelRegistration(reg)">
                     <i class="bi bi-x-circle text-danger"></i>
@@ -206,6 +212,219 @@
           <i class="bi bi-info-circle me-2"></i>
           Owner can take a screenshot of this QR and share it on social media.
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Single WhatsApp Message Modal -->
+<div class="modal fade" id="whatsappModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+      <div class="modal-header border-0 pt-4 px-4 bg-success text-white">
+        <h5 class="modal-title fw-bold text-white">
+          <i class="bi bi-whatsapp me-2"></i> Send WhatsApp Alert
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted text-uppercase">Recipient</label>
+          <div class="bg-light p-3 rounded-3 border d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold text-dark">{{ whatsappRecipient }}</div>
+              <div class="text-muted small">Number: {{ whatsappPhone }}</div>
+            </div>
+            <span class="badge bg-success rounded-pill px-3">Active</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="whatsappMessageText" class="form-label small fw-bold text-muted text-uppercase">Custom Message</label>
+          <textarea id="whatsappMessageText" class="form-control border-1 rounded-3 small p-3" rows="6" 
+                    [(ngModel)]="whatsappMessage" placeholder="Type your due alert message..."></textarea>
+          <div class="text-muted extra-small mt-2">
+            <i class="bi bi-info-circle me-1"></i> You can customize this message before sending.
+          </div>
+        </div>
+
+        <div class="alert alert-warning border-0 rounded-3 small mt-4 mb-0 d-flex align-items-start gap-2">
+          <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
+          <div>
+            Please ensure your <b>WhatsApp service</b> is running and connected in <b>Master Settings -> General Setting</b>.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">Cancel</button>
+        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2" 
+                [disabled]="whatsappLoading" (click)="sendWhatsAppMessage()">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="whatsappLoading"></span>
+          <i class="bi bi-send-fill" *ngIf="!whatsappLoading"></i>
+          {{ whatsappLoading ? 'Sending...' : 'Send Message' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk WhatsApp Alerts Modal -->
+<div class="modal fade" id="bulkWhatsappModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+      <div class="modal-header border-0 pt-4 px-4 bg-success text-white">
+        <h5 class="modal-title fw-bold text-white">
+          <i class="bi bi-whatsapp me-2"></i> Send Bulk Due Alerts
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        
+        <!-- IDLE / PREPARATION STATE -->
+        <div *ngIf="bulkStatus === 'idle'">
+          <div class="alert alert-info border-0 rounded-3 small d-flex align-items-start gap-3 p-3 mb-4">
+            <i class="bi bi-info-circle-fill fs-4 text-primary flex-shrink-0"></i>
+            <div>
+              You are about to send personalized WhatsApp alerts to <b>{{ bulkRecipientsCount }}</b> students currently in the list. 
+              The system will customize each message dynamically using the placeholders shown below.
+            </div>
+          </div>
+
+          <div class="row g-4">
+            <!-- Left Panel: Template Editor -->
+            <div class="col-md-7">
+              <label for="bulkTemplateText" class="form-label small fw-bold text-muted text-uppercase">Alert Template</label>
+              <textarea id="bulkTemplateText" class="form-control border-1 rounded-3 small p-3" rows="8" 
+                        [(ngModel)]="bulkWhatsappMessageTemplate" placeholder="Type your template..."></textarea>
+              
+              <div class="mt-3 bg-light p-3 rounded-3 border">
+                <div class="small fw-bold text-muted text-uppercase mb-2 extra-small">Available Placeholders</div>
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Student Name">{{ '{name}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Due Amount">{{ '{amount}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Formatted Due Date">{{ '{date}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Seat Number">{{ '{seat}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Batch Name">{{ '{batch}' }}</span>
+                  <span class="badge bg-success text-white rounded-pill px-2 py-1 extra-small" title="Library Name">{{ '{library}' }}</span>
+                </div>
+                <div class="extra-small text-muted mt-2">
+                  Double click placeholders or type them exactly (e.g. <code>&#123;name&#125;</code>) in the message editor.
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Panel: Live Preview -->
+            <div class="col-md-5">
+              <label class="form-label small fw-bold text-muted text-uppercase d-block">Live Message Preview</label>
+              <div class="whatsapp-preview-container bg-white border rounded-3 p-3 shadow-sm d-flex flex-column h-100" style="min-height: 250px;">
+                <div class="d-flex align-items-center gap-2 pb-2 border-bottom mb-2">
+                  <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px;">
+                    <i class="bi bi-person-fill"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold small text-dark" style="font-size: 0.85rem;">Student Alert Preview</div>
+                    <div class="extra-small text-muted" style="font-size: 0.7rem;">Live Rendering</div>
+                  </div>
+                </div>
+                <div class="whatsapp-bubble bg-light rounded-3 p-3 flex-grow-1 border" style="font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4;">
+                  {{ bulkPreviewMessage }}
+                </div>
+                <div class="extra-small text-muted mt-2 text-end" style="font-size: 0.7rem;">
+                  *Actual WhatsApp preview style
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SENDING STATE -->
+        <div *ngIf="bulkStatus === 'sending'" class="text-center py-5">
+          <div class="spinner-grow text-success" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h5 class="fw-bold mt-4 mb-2">Sending Bulk Alerts</h5>
+          <p class="text-muted small px-5">
+            Please keep this window open. The server is dispatching your messages sequentially with a random 2 to 5 seconds delay per message to mimic human behavior and maintain account security.
+          </p>
+          <div class="progress rounded-pill overflow-hidden mt-4 mx-5" style="height: 10px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%"></div>
+          </div>
+          <div class="text-muted small mt-2">Processing messages in the background...</div>
+        </div>
+
+        <!-- COMPLETED STATE -->
+        <div *ngIf="bulkStatus === 'completed'" class="py-3">
+          <div class="text-center mb-4">
+            <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+              <i class="bi bi-check-circle-fill fs-2"></i>
+            </div>
+            <h5 class="fw-bold mb-1">Bulk Alerts Dispatched</h5>
+            <p class="text-muted small">Bulk transmission process has completed.</p>
+          </div>
+
+          <div class="row text-center mb-4 g-3">
+            <div class="col-4">
+              <div class="bg-light p-3 rounded-3 border">
+                <div class="fw-bold fs-4 text-dark">{{ bulkResults?.total }}</div>
+                <div class="text-muted extra-small text-uppercase">Total Recipient</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-success-subtle text-success p-3 rounded-3 border border-success-subtle">
+                <div class="fw-bold fs-4">{{ bulkResults?.success }}</div>
+                <div class="text-success extra-small text-uppercase">Successful</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-danger-subtle text-danger p-3 rounded-3 border border-danger-subtle">
+                <div class="fw-bold fs-4">{{ bulkResults?.failed }}</div>
+                <div class="text-danger extra-small text-uppercase">Failed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border rounded-3 overflow-hidden">
+            <div class="bg-light px-3 py-2 border-bottom fw-bold small text-muted text-uppercase">Transmission Details</div>
+            <div class="p-0 overflow-auto" style="max-height: 200px;">
+              <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                <tbody class="border-0">
+                  <tr *ngFor="let detail of bulkResults?.details">
+                    <td class="ps-3 py-2 border-bottom-0">{{ detail.phone }}</td>
+                    <td class="py-2 border-bottom-0 text-end pe-3">
+                      <span class="badge rounded-pill px-3" [class.bg-success]="detail.status === 'SUCCESS'" [class.bg-danger]="detail.status === 'FAILED'">
+                        {{ detail.status }}
+                      </span>
+                      <span class="text-danger small ms-2" *ngIf="detail.reason">({{ detail.reason }})</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR STATE -->
+        <div *ngIf="bulkStatus === 'error'" class="text-center py-5 text-danger">
+          <i class="bi bi-x-circle-fill fs-1 text-danger d-block mb-3"></i>
+          <h5 class="fw-bold">Bulk Dispatch Failed</h5>
+          <p class="text-muted small px-5">
+            An unexpected error occurred during bulk messaging. Please make sure the WhatsApp API server is running, healthy, and connected.
+          </p>
+        </div>
+
+      </div>
+      <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">
+          {{ bulkStatus === 'completed' ? 'Close' : 'Cancel' }}
+        </button>
+        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2" 
+                *ngIf="bulkStatus === 'idle'" (click)="sendBulkWhatsAppAlerts()">
+          <i class="bi bi-play-fill"></i> Start Dispatch
+        </button>
+        <button type="button" class="btn btn-primary rounded-3 px-4" 
+                *ngIf="bulkStatus === 'completed' || bulkStatus === 'error'" (click)="bulkStatus = 'idle'">
+          Send Again
+        </button>
       </div>
     </div>
   </div>

@@ -216,4 +216,12 @@ export class ApiService {
   getWhatsAppStatus(libraryId: string): Observable<any> {
     return this.http.get<any>(`${environment.whatsAppApiUrl}/status/${libraryId}`);
   }
+
+  sendSingleWhatsAppMessage(body: any): Observable<any> {
+    return this.http.post<any>(`${environment.whatsAppApiUrl}/single-message`, body);
+  }
+
+  sendBulkWhatsAppJson(body: any): Observable<any> {
+    return this.http.post<any>(`${environment.whatsAppApiUrl}/bulk-json`, body);
+  }
 }
