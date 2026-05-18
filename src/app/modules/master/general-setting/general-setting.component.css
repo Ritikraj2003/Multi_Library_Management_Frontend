@@ -60,3 +60,128 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* WhatsApp Connection Card Styles */
+.bg-success-soft {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-success-soft-light {
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.bg-secondary-soft {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+.bg-warning-soft {
+    background-color: rgba(255, 193, 7, 0.1);
+}
+
+.bg-danger-soft {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.badge {
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.icon-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-wrapper {
+    transition: transform 0.3s ease;
+}
+
+.qr-wrapper:hover {
+    transform: scale(1.03);
+}
+
+.btn-success {
+    background-color: #25d366;
+    border-color: #25d366;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.btn-success:hover {
+    background-color: #20ba56;
+    border-color: #20ba56;
+    transform: translateY(-1px);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: simpleFadeIn 0.4s ease-out forwards;
+}
+
+@keyframes simpleFadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.pulse-green {
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+    animation: greenPulse 1.8s infinite;
+}
+
+@keyframes greenPulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(25, 135, 84, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+    }
+}
+
+.pulse-blue {
+    box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7);
+    animation: bluePulse 1.8s infinite;
+}
+
+@keyframes bluePulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(13, 202, 240, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(13, 202, 240, 0);
+    }
+}
+
+.spin-icon {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

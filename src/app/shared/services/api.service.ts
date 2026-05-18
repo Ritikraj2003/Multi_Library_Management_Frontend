@@ -207,4 +207,13 @@ export class ApiService {
   deleteSetting(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}GeneralSetting/Delete/${id}`);
   }
+
+  // WhatsApp Endpoints
+  initWhatsApp(libraryId: string): Observable<any> {
+    return this.http.get<any>(`${environment.whatsAppApiUrl}/init/${libraryId}`);
+  }
+
+  getWhatsAppStatus(libraryId: string): Observable<any> {
+    return this.http.get<any>(`${environment.whatsAppApiUrl}/status/${libraryId}`);
+  }
 }
