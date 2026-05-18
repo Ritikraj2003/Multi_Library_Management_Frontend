@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,7 +11,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-batch-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './batch-list.component.html',
   styleUrls: ['./batch-list.component.css']
 })

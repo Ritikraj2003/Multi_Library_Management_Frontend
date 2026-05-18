@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,7 +10,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 @Component({
   selector: 'app-library-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './library-form.component.html',
   styleUrls: ['./library-form.component.css']
 })

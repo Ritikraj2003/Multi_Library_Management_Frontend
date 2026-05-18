@@ -1,4 +1,12 @@
 <div class="registration-container">
+  <!-- Centralized Loader Overlay -->
+  <div class="loader-overlay" *ngIf="loading">
+    <div class="loader-content">
+      <app-loader size="normal"></app-loader>
+      <p class="loader-text">Submitting your registration...</p>
+    </div>
+  </div>
+
   <div class="form-card" *ngIf="!submitted">
     <div class="form-header">
       <h2 class="mb-0">Join Our Library</h2>
@@ -13,6 +21,9 @@
             <label class="form-label fw-bold">Full Name <span class="text-danger">*</span></label>
             <input type="text" formControlName="fullName" class="form-control" placeholder="Enter your full name"
               [class.is-invalid]="regForm.get('fullName')?.touched && regForm.get('fullName')?.invalid">
+            <div class="invalid-feedback">
+              Full Name is required.
+            </div>
           </div>
 
           <!-- Father's Name -->
@@ -20,6 +31,9 @@
             <label class="form-label fw-bold">Father's Name <span class="text-danger">*</span></label>
             <input type="text" formControlName="fatherName" class="form-control" placeholder="Enter father's name"
               [class.is-invalid]="regForm.get('fatherName')?.touched && regForm.get('fatherName')?.invalid">
+            <div class="invalid-feedback">
+              Father's Name is required.
+            </div>
           </div>
 
           <!-- Mobile -->
@@ -27,6 +41,12 @@
             <label class="form-label fw-bold">Mobile Number <span class="text-danger">*</span></label>
             <input type="tel" formControlName="mobile" class="form-control" placeholder="10-digit mobile number"
               [class.is-invalid]="regForm.get('mobile')?.touched && regForm.get('mobile')?.invalid">
+            <div class="invalid-feedback" *ngIf="regForm.get('mobile')?.errors?.['required']">
+              Mobile Number is required.
+            </div>
+            <div class="invalid-feedback" *ngIf="regForm.get('mobile')?.errors?.['pattern']">
+              Please enter a valid 10-digit mobile number.
+            </div>
           </div>
 
           <!-- Email -->
@@ -34,6 +54,9 @@
             <label class="form-label fw-bold">Email Address</label>
             <input type="email" formControlName="email" class="form-control" placeholder="Enter your email address"
               [class.is-invalid]="regForm.get('email')?.touched && regForm.get('email')?.invalid">
+            <div class="invalid-feedback">
+              Please enter a valid email address.
+            </div>
           </div>
 
           <!-- Date of Birth -->
@@ -41,6 +64,9 @@
             <label class="form-label fw-bold">Date of Birth <span class="text-danger">*</span></label>
             <input type="date" formControlName="dob" class="form-control"
               [class.is-invalid]="regForm.get('dob')?.touched && regForm.get('dob')?.invalid">
+            <div class="invalid-feedback">
+              Date of Birth is required.
+            </div>
           </div>
 
           <!-- Address -->
@@ -48,6 +74,9 @@
             <label class="form-label fw-bold">Full Address <span class="text-danger">*</span></label>
             <textarea formControlName="address" class="form-control" rows="3" placeholder="Enter your complete address"
               [class.is-invalid]="regForm.get('address')?.touched && regForm.get('address')?.invalid"></textarea>
+            <div class="invalid-feedback">
+              Full Address is required.
+            </div>
           </div>
 
           <!-- Document Type -->
@@ -61,6 +90,9 @@
               <option value="Driving License">Driving License</option>
               <option value="Other">Other</option>
             </select>
+            <div class="invalid-feedback">
+              Document Type is required.
+            </div>
           </div>
 
           <!-- Photo Upload -->
@@ -83,7 +115,7 @@
 
           <div class="col-12 mt-5">
             <button type="submit" class="btn btn-submit" [disabled]="loading">
-              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              <app-loader size="small" *ngIf="loading"  class="me-2" ></app-loader>
               {{ loading ? 'Submitting...' : 'Register Now' }}
             </button>
           </div>

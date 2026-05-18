@@ -1,8 +1,10 @@
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
+import { NotificationService } from '../../shared/services/notification.service';
 import { finalize } from 'rxjs';
 
 declare var bootstrap: any;
@@ -10,7 +12,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-public-registration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './public-registration.component.html',
   styles: [`
     .registration-container {
@@ -75,6 +77,50 @@ declare var bootstrap: any;
       color: #48bb78;
       margin-bottom: 1.5rem;
     }
+    .loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .loader-content {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .loader-text {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 1.1rem;
+      margin-top: 1rem !important;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
     @media (max-width: 576px) {
       .registration-container { padding: 1rem 0.5rem; }
       .form-body { padding: 1.5rem; }
@@ -98,7 +144,8 @@ export class PublicRegistrationComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {
     this.regForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -137,6 +184,8 @@ export class PublicRegistrationComponent implements OnInit {
   onSubmit(): void {
     if (this.regForm.invalid) {
       Object.values(this.regForm.controls).forEach(c => c.markAsTouched());
+      this.scrollToFirstInvalid();
+      this.notificationService.showError('Please fill in all the required fields correctly.');
       return;
     }
 
@@ -158,9 +207,9 @@ export class PublicRegistrationComponent implements OnInit {
     }
 
     this.apiService.createStudent(formData)
-      .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: (res: any) => {
+          this.loading = false;
           if (res.success) {
             this.submitted = true;
             
@@ -177,6 +226,7 @@ export class PublicRegistrationComponent implements OnInit {
             
             this.enrollmentNumber = finalId.toString();
             console.log('Assigned ID:', this.enrollmentNumber);
+            this.notificationService.showSuccess('Registration submitted successfully!');
             
             this.cdr.detectChanges(); 
             
@@ -185,12 +235,13 @@ export class PublicRegistrationComponent implements OnInit {
               this.showSuccessModal();
             }, 200);
           } else {
-            alert(res.message || 'Registration failed. Please try again.');
+            this.notificationService.showError(res.message || 'Registration failed. Please try again.');
           }
         },
         error: (err: any) => {
+          this.loading = false;
           console.error('Registration error:', err);
-          alert('Something went wrong. Please check your connection.');
+          this.notificationService.showError('Something went wrong. Please check your connection.');
         }
       });
   }
@@ -205,5 +256,17 @@ export class PublicRegistrationComponent implements OnInit {
 
   resetForm(): void {
     window.location.reload();
+  }
+
+  scrollToFirstInvalid(): void {
+    setTimeout(() => {
+      const firstInvalidControl = document.querySelector('.is-invalid, .ng-invalid[formControlName]');
+      if (firstInvalidControl) {
+        firstInvalidControl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (firstInvalidControl instanceof HTMLElement) {
+          firstInvalidControl.focus();
+        }
+      }
+    }, 100);
   }
 }

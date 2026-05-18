@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../auth/services/auth.service';
@@ -9,7 +10,7 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

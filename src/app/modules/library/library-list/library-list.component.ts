@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
@@ -12,7 +13,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-library-list',
   standalone: true,
-  imports: [CommonModule, LibraryFormComponent],
+  imports: [CommonModule, LibraryFormComponent, LoaderComponent],
   templateUrl: './library-list.component.html',
   styleUrls: ['./library-list.component.css']
 })
@@ -21,7 +22,7 @@ export class LibraryListComponent implements OnInit {
   loading = false;
   isSuperadmin = false;
   pagination: Pagination | null = null;
-  selectedLibrary: any = null;
+  selectedLibrary: any = undefined;
   modal: any;
 
   constructor(

@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -10,7 +11,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 @Component({
   selector: 'app-student-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './student-form.component.html',
   styleUrls: ['./student-form.component.css']
 })
@@ -41,7 +42,6 @@ export class StudentFormComponent implements OnInit, OnChanges {
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.email]],
       address: ['', [Validators.required]],
-      rfidCode: [''],
       documentType: ['', [Validators.required]],
       dob: ['', [Validators.required]],
       libraryId: [null, [Validators.required]]

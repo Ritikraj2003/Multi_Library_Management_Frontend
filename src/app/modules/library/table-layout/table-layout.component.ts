@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,7 +9,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-table-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LoaderComponent],
   templateUrl: './table-layout.component.html',
   styleUrls: ['./table-layout.component.css']
 })
@@ -18,7 +19,7 @@ export class TableLayoutComponent implements OnInit {
   batches: any[] = [];
   registrations: any[] = [];
   selectedFloorId: number | null = null;
-  loading = false;
+  loading = true;
   libraryId!: number;
 
   constructor(

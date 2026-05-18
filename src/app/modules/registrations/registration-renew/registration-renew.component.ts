@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +9,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-registration-renew',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './registration-renew.component.html'
 })
 export class RegistrationRenewComponent implements OnInit {

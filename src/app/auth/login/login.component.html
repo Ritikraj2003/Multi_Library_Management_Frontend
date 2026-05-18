@@ -45,7 +45,7 @@
     </div>
 
     <button [disabled]="loading" class="btn btn-primary w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center">
-      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      <app-loader size="small" *ngIf="loading"  class="me-2"  role="status" aria-hidden="true"></app-loader>
       Login
     </button>
   </form>

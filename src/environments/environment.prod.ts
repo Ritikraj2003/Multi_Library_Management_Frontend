@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://localhost:7098/api/'
+  apiUrl: 'https://api.stayvelle.in/api/',
+  //apiUrl: 'https://localhost:7098/api/',
 };

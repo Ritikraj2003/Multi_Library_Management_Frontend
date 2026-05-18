@@ -16,7 +16,7 @@
         [disabled]="isEdit"
       >
       <div 
-        *ngIf="searchTerm && filteredStudents.length > 0" 
+        *ngIf="!isEdit && searchTerm && filteredStudents.length > 0" 
         class="dropdown-menu show w-100 shadow-lg border-0 mt-1" 
         style="max-height: 250px; overflow-y: auto; display: block; z-index: 1060; position: absolute;"
       >
@@ -104,6 +104,11 @@
   </div>
 
   <div class="col-md-12">
+    <label class="form-label fw-bold small text-muted">RFID Code (Optional)</label>
+    <input type="text" class="form-control rounded-3 shadow-sm" formControlName="rfidCode" placeholder="RFID Tag Code">
+  </div>
+
+  <div class="col-md-12">
     <label class="form-label fw-bold small text-muted">Notes (Optional)</label>
     <textarea class="form-control rounded-3 shadow-sm" formControlName="notes" rows="2" placeholder="Any special requests..."></textarea>
   </div>
@@ -123,7 +128,7 @@
   <div class="col-12 mt-4 text-end">
     <button type="button" class="btn btn-light rounded-3 px-4 me-2" (click)="cancelled.emit()">Cancel</button>
     <button type="submit" class="btn btn-primary rounded-3 px-4 shadow" [disabled]="loading">
-      <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+      <app-loader size="small"  class="me-2"  *ngIf="loading"></app-loader>
       {{ isEdit ? 'Update Registration' : 'Register Student' }}
     </button>
   </div>

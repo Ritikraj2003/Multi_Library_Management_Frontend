@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,7 +12,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-table-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './table-list.component.html',
   styleUrls: ['./table-list.component.css']
 })

@@ -46,10 +46,7 @@
       </select>
     </div>
 
-    <div class="col-md-6">
-      <label class="form-label fw-bold small text-muted">RFID Code</label>
-      <input type="text" formControlName="rfidCode" class="form-control rounded-3" placeholder="RFID Tag Code">
-    </div>
+
 
     <!-- Identity & Images -->
     <div class="col-md-6">
@@ -88,7 +85,7 @@
   <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
     <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()" [disabled]="loading">Cancel</button>
     <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" [disabled]="loading">
-      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      <app-loader size="small" *ngIf="loading"  class="me-2" ></app-loader>
       {{ isEdit ? 'Update Student' : 'Add Student' }}
     </button>
   </div>

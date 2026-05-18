@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, Input, OnInit, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
@@ -5,7 +6,7 @@ import { ApiService } from '../../../shared/services/api.service';
 @Component({
   selector: 'app-payment-history',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LoaderComponent],
   templateUrl: './payment-history.component.html'
 })
 export class PaymentHistoryComponent implements OnInit, OnChanges {

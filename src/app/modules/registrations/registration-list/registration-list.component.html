@@ -46,6 +46,7 @@
             <tr>
               <th class="ps-4 py-3">Student</th>
               <th class="py-3">Contact</th>
+              <th class="py-3">RFID</th>
               <th class="py-3">Seat/Batch</th>
               <th class="py-3">Dates</th>
               <th class="py-3">Amount</th>
@@ -55,12 +56,12 @@
           </thead>
           <tbody class="border-top-0">
             <tr *ngIf="loading">
-              <td colspan="7" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
+              <td colspan="8" class="text-center py-5">
+                <app-loader></app-loader>
               </td>
             </tr>
             <tr *ngIf="!loading && registrations.length === 0">
-              <td colspan="7" class="text-center py-5">
+              <td colspan="8" class="text-center py-5">
                 <i class="bi bi-folder2-open fs-1 text-muted d-block mb-2"></i>
                 <span class="text-muted">No registrations found.</span>
               </td>
@@ -71,6 +72,9 @@
                 <div class="text-muted extra-small">ID: #{{reg.id}}</div>
               </td>
               <td>{{reg.mobile}}</td>
+              <td>
+                <code class="text-primary small">{{reg.rfidCode || 'N/A'}}</code>
+              </td>
               <td>
                 <div class="small fw-bold text-primary">Seat: {{reg.seatNumber}}</div>
                 <div class="small text-muted">{{reg.batchName}}</div>
@@ -125,7 +129,7 @@
 <!-- ===================== Modals ===================== -->
 
 <!-- Registration Form Modal -->
-<div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="selectedRegistration = undefined">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -136,7 +140,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-registration-form [registrationData]="selectedRegistration" (saved)="onSaved()" (cancelled)="hideModal()"></app-registration-form>
+        <app-registration-form *ngIf="selectedRegistration !== undefined" [registrationData]="selectedRegistration" (saved)="onSaved()" (cancelled)="hideModal()"></app-registration-form>
       </div>
     </div>
   </div>

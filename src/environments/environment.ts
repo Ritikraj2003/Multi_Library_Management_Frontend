@@ -1,5 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://api.statvelle.in/api/',
-  //apiUrl: 'http://localhost:3000/api/',
+  apiUrl: 'https://api.stayvelle.in/api/',
+  //apiUrl: 'https://localhost:7098/api/',
 };

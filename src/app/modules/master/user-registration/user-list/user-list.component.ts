@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../../shared/services/api.service';
@@ -12,7 +13,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, UserFormComponent],
+  imports: [CommonModule, UserFormComponent, LoaderComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
@@ -21,7 +22,7 @@ export class UserListComponent implements OnInit {
   loading = false;
   isSuperadmin = false;
   pagination: Pagination | null = null;
-  selectedUser: any = null;
+  selectedUser: any = undefined;
   modal: any;
 
   constructor(

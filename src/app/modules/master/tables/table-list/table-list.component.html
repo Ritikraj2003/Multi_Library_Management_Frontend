@@ -29,9 +29,7 @@
             <!-- Loading State -->
             <tr *ngIf="loading">
               <td colspan="5" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
+                <app-loader></app-loader>
               </td>
             </tr>
 
@@ -200,7 +198,7 @@
           class="btn btn-primary rounded-3 px-4"
           (click)="onSubmit()"
           [disabled]="saving">
-          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <app-loader size="small" *ngIf="saving"  class="me-2"  role="status"></app-loader>
           <i *ngIf="!saving" class="bi bi-check-lg me-2"></i>
           {{ saving ? 'Saving...' : (selectedTable ? 'Update Seating' : 'Create Seating') }}
         </button>

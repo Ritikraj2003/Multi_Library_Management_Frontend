@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -8,7 +9,7 @@ import { finalize } from 'rxjs';
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './registration-form.component.html'
 })
 export class RegistrationFormComponent implements OnInit, OnChanges {
@@ -40,6 +41,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       monthlyAmount: [0, [Validators.required, Validators.min(0)]],
       securityAmount: [0, [Validators.required, Validators.min(0)]],
       notes: [''],
+      rfidCode: [''],
       paymentMode: ['Cash', [Validators.required]],
       isActiveStatus: [true]
     });
@@ -96,6 +98,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
         monthlyAmount: monthlyAmount,
         securityAmount: securityAmount,
         notes: notes,
+        rfidCode: data.rfidCode || data.RfidCode || data.RFIDCode || '',
         isActiveStatus: status === 'Active' || status === 1
       }, { emitEvent: false });
 

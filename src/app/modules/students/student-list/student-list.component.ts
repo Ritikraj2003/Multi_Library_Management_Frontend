@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
@@ -14,14 +15,14 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule, StudentFormComponent],
+  imports: [CommonModule, StudentFormComponent, LoaderComponent],
   templateUrl: './student-list.component.html',
   styleUrls: ['./student-list.component.css']
 })
 export class StudentListComponent implements OnInit {
   students: any[] = [];
   loading = false;
-  selectedStudent: any = null;
+  selectedStudent: any = undefined;
   modal: any;
   libraryId!: number;
   isSuperadmin = false;
@@ -45,7 +46,7 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents(pageNumber: number = 1, pageSize: number = 10): void {
-    this.loaderService.show();
+    this.loading = true;
     const params: any = {
       PageNumber: pageNumber,
       PageSize: pageSize
@@ -56,7 +57,7 @@ export class StudentListComponent implements OnInit {
     }
 
     this.apiService.getAllStudents(params)
-      .pipe(finalize(() => { this.loaderService.hide(); this.cdr.markForCheck(); }))
+      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
       .subscribe({
         next: (res: any) => {
           if (res && res.data) {
@@ -120,7 +121,7 @@ export class StudentListComponent implements OnInit {
 
   onDelete(id: number): void {
     if (confirm('Are you sure you want to delete this student?')) {
-      this.loaderService.show();
+      this.loading = true;
       this.apiService.deleteStudent(id).pipe(finalize(() => this.loaderService.hide())).subscribe({
         next: () => {
           this.notificationService.showSuccess('Student deleted successfully');

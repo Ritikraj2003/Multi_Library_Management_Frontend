@@ -26,9 +26,7 @@
           <tbody class="border-top-0">
             <tr *ngIf="loading">
               <td colspan="6" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
+                <app-loader></app-loader>
               </td>
             </tr>
             <tr *ngIf="!loading && libraries.length === 0">
@@ -91,7 +89,7 @@
 </div>
 
 <!-- Library Modal -->
-<div class="modal fade" id="libraryModal" tabindex="-1" aria-labelledby="libraryModalLabel" aria-hidden="true">
+<div class="modal fade" id="libraryModal" tabindex="-1" aria-labelledby="libraryModalLabel" aria-hidden="true" (hidden.bs.modal)="selectedLibrary = undefined">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -101,7 +99,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="onCancelled()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-library-form [libraryData]="selectedLibrary" (saved)="onSaved()" (cancelled)="onCancelled()"></app-library-form>
+        <app-library-form *ngIf="selectedLibrary !== undefined" [libraryData]="selectedLibrary" (saved)="onSaved()" (cancelled)="onCancelled()"></app-library-form>
       </div>
     </div>
   </div>

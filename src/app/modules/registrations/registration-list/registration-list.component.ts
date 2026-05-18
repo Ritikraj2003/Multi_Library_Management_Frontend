@@ -1,3 +1,4 @@
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
@@ -13,7 +14,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-registration-list',
   standalone: true,
-  imports: [CommonModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent],
+  imports: [CommonModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent, LoaderComponent],
   templateUrl: './registration-list.component.html'
 })
 export class RegistrationListComponent implements OnInit {
@@ -21,7 +22,7 @@ export class RegistrationListComponent implements OnInit {
   loading = false;
   activeTab = 'all';
   pagination: Pagination | null = null;
-  selectedRegistration: any = null;
+  selectedRegistration: any = undefined;
   libraryId!: number;
   isSuperadmin = false;
   modal: any;

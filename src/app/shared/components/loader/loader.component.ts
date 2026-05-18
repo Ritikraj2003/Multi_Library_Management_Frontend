@@ -1,40 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoaderService } from '../../services/loader.service';
 
 @Component({
   selector: 'app-loader',
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="loader-overlay" *ngIf="loaderService.isLoading$ | async">
-      <div class="loader">
-        <div class="dot dot-1"></div>
-        <div class="dot dot-2"></div>
-        <div class="dot dot-3"></div>
-        <div class="dot dot-4"></div>
-        <div class="dot dot-5"></div>
-      </div>
+    <div class="loader" [ngClass]="{'loader-small': size === 'small'}">
+      <div class="dot dot-1"></div>
+      <div class="dot dot-2"></div>
+      <div class="dot dot-3"></div>
+      <div class="dot dot-4"></div>
+      <div class="dot dot-5"></div>
     </div>
   `,
   styles: [`
-    .loader-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10000;
-      backdrop-filter: blur(2px);
-    }
-
-    /* From Uiverse.io by Fadhilmagass */ 
     .loader {
-      display: flex;
+      display: inline-flex;
       justify-content: center;
       align-items: center;
     }
@@ -46,6 +28,12 @@ import { LoaderService } from '../../services/loader.service';
       margin-right: 8px;
       border-radius: 50%;
       animation: dot-pulse2 1.5s ease-in-out infinite;
+    }
+
+    .loader-small .dot {
+      width: 6px;
+      height: 6px;
+      margin-right: 4px;
     }
 
     .dot-1 {
@@ -90,5 +78,5 @@ import { LoaderService } from '../../services/loader.service';
   `]
 })
 export class LoaderComponent {
-  constructor(public loaderService: LoaderService) {}
+  @Input() size: 'normal' | 'small' = 'normal';
 }
