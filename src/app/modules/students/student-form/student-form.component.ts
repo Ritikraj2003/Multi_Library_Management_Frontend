@@ -44,7 +44,8 @@ export class StudentFormComponent implements OnInit, OnChanges {
       address: ['', [Validators.required]],
       documentType: ['', [Validators.required]],
       dob: ['', [Validators.required]],
-      libraryId: [null, [Validators.required]]
+      libraryId: [null, [Validators.required]],
+      isActive: [true]
     });
   }
 
@@ -70,7 +71,7 @@ export class StudentFormComponent implements OnInit, OnChanges {
       this.documentImagePreview = formattedData.documentImage ? environment.apiUrl.replace('api/', '') + formattedData.documentImage : null;
     } else {
       this.isEdit = false;
-      this.studentForm.reset();
+      this.studentForm.reset({ isActive: true });
       this.studentImageFile = null;
       this.documentImageFile = null;
       this.studentImagePreview = null;

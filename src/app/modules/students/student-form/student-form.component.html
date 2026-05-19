@@ -31,6 +31,13 @@
         [class.is-invalid]="studentForm.get('dob')?.touched && studentForm.get('dob')?.invalid">
     </div>
 
+    <div class="col-md-6 d-flex align-items-end pb-2">
+      <div class="form-check form-switch fs-6 mb-2">
+        <input class="form-check-input cursor-pointer" type="checkbox" role="switch" id="isActiveSwitch" formControlName="isActive">
+        <label class="form-check-label fw-bold small text-muted ms-2 cursor-pointer" for="isActiveSwitch" style="transform: translateY(-2px); display: inline-block;">Status: Active</label>
+      </div>
+    </div>
+
     <div class="col-12">
       <label class="form-label fw-bold small text-muted">Address</label>
       <textarea formControlName="address" class="form-control rounded-3" rows="2" placeholder="Residential Address"
