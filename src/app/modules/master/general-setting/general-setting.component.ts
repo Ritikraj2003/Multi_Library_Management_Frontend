@@ -213,6 +213,36 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
     });
   }
 
+  logoutWhatsApp() {
+    this.isWhatsAppLoading = true;
+    this.cdr.detectChanges();
+
+    this.apiService.killSession(this.whatsAppLibraryId).subscribe({
+      next: (res: any) => {
+        this.isWhatsAppLoading = false;
+        console.log('WhatsApp logout response:', res);
+        
+        if (res.message) {
+          this.notificationService.showSuccess(res.message);
+        } else {
+          this.notificationService.showSuccess('WhatsApp session terminated successfully.');
+        }
+
+        this.whatsAppStatus = 'DISCONNECTED';
+        this.qrCodeBase64 = '';
+        this.stopPolling();
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isWhatsAppLoading = false;
+        console.error('WhatsApp logout error:', err);
+        const errMsg = err.error?.message || err.message || 'Failed to logout WhatsApp session';
+        this.notificationService.showError(errMsg);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   checkWhatsAppStatus() {
     this.isWhatsAppLoading = true;
     this.cdr.detectChanges();

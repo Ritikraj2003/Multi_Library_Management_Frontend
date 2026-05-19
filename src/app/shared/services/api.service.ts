@@ -224,4 +224,8 @@ export class ApiService {
   sendBulkWhatsAppJson(body: any): Observable<any> {
     return this.http.post<any>(`${environment.whatsAppApiUrl}/bulk-json`, body);
   }
+
+  killSession(libraryId: string): Observable<any> {
+    return this.http.post<any>(`${environment.whatsAppApiUrl}/kill/${libraryId}`, {});
+  }
 }

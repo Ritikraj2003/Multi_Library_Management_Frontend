@@ -176,10 +176,10 @@
             </div>
           </div>
 
-          <!-- Buttons: Initiate & Status -->
+          <!-- Buttons: Initiate, Status & Logout -->
           <div class="mt-4 pt-2 border-top border-light">
             <div class="row g-2">
-              <div class="col-6">
+              <div class="col-4">
                 <button class="btn btn-success w-100 py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white" 
                         [disabled]="isWhatsAppLoading" 
                         (click)="connectWhatsApp()">
@@ -187,12 +187,20 @@
                   <span>Initiate</span>
                 </button>
               </div>
-              <div class="col-6">
+              <div class="col-4">
                 <button class="btn btn-outline-secondary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center" 
                         [disabled]="isWhatsAppLoading" 
                         (click)="checkWhatsAppStatus()">
                   <i class="bi bi-arrow-repeat me-1.5 fs-5" [class.spin-icon]="isWhatsAppLoading && whatsAppStatus !== 'INITIALIZING'"></i>
                   <span>Status</span>
+                </button>
+              </div>
+              <div class="col-4">
+                <button class="btn btn-outline-danger w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center" 
+                        [disabled]="isWhatsAppLoading" 
+                        (click)="logoutWhatsApp()">
+                  <i class="bi bi-box-arrow-right me-1.5 fs-5"></i>
+                  <span>Logout</span>
                 </button>
               </div>
             </div>
