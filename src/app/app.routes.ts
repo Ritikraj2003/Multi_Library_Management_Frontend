@@ -20,6 +20,10 @@ export const routes: Routes = [
     loadComponent: () => import('./public/public-registration/public-registration.component').then(m => m.PublicRegistrationComponent)
   },
   {
+    path: 'public/attendance/:libraryId',
+    loadComponent: () => import('./public/public-attendance/public-attendance.component').then(m => m.PublicAttendanceComponent)
+  },
+  {
     path: 'dashboard',
     component: MainLayoutComponent,
     canActivate: [authGuard],

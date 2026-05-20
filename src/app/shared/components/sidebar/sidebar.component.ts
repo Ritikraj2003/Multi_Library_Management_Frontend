@@ -21,6 +21,7 @@ export class SidebarComponent {
     { title: 'Dashboard', icon: 'bi-grid-fill', route: '/dashboard' },
     { title: 'Students', icon: 'bi-people-fill', route: '/dashboard/students' },
     { title: 'Registrations', icon: 'bi-journal-check', route: '/dashboard/registrations' },
+    { title: 'Attendance', icon: 'bi-calendar-check', route: '/dashboard/attendance' },
     { title: 'Seating Layout', icon: 'bi-layout-three-columns', route: '/dashboard/table-layout' },
     { 
       title: 'Master', 

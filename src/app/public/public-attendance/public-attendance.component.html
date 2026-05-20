@@ -1,0 +1,86 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light px-3">
+  <div class="card shadow-lg border-0 w-100" style="max-width: 450px;">
+    <div class="card-header bg-primary text-white text-center py-4 rounded-top">
+      <i class="bi bi-clock-history fs-1"></i>
+      <h3 class="mb-0 mt-2 fw-bold">Mark Attendance</h3>
+      <p class="mb-0 text-white-50">Library Check-in / Check-out</p>
+    </div>
+    
+    <div class="card-body p-4">
+      <div *ngIf="locationError" class="alert alert-danger d-flex align-items-center mb-4">
+        <i class="bi bi-geo-alt-fill fs-4 me-3"></i>
+        <div>
+          <strong>Location Error:</strong><br>
+          <small>{{ locationError }}</small>
+        </div>
+      </div>
+
+      <div *ngIf="!locationError && latitude && longitude" class="alert alert-info d-flex align-items-center mb-4">
+        <i class="bi bi-geo-alt fs-4 me-3"></i>
+        <div>
+          <small>Location acquired. You are ready to mark attendance.</small>
+        </div>
+      </div>
+
+      <form (ngSubmit)="submitAttendance()">
+        <div class="mb-4">
+          <label class="form-label fw-bold text-secondary">Enrollment ID</label>
+          <div class="input-group input-group-lg shadow-sm">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="bi bi-person text-primary"></i>
+            </span>
+            <input 
+              type="number" 
+              class="form-control border-start-0 ps-0" 
+              [(ngModel)]="studentId" 
+              name="studentId" 
+              placeholder="Enter your Student ID" 
+              required
+              [disabled]="isLoading || !!locationError"
+            >
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-lg w-100 shadow-sm fw-bold"
+          [disabled]="isLoading || !studentId || !!locationError || latitude === null"
+        >
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+          Submit
+        </button>
+      </form>
+    </div>
+    
+    <div class="card-footer bg-white text-center py-3 rounded-bottom border-top-0">
+      <small class="text-muted">Powered by MBR Library Management</small>
+    </div>
+  </div>
+</div>
+
+<ng-template #alertModal>
+  <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); z-index: 9999;">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header text-white" [ngClass]="isSuccess ? 'bg-success' : 'bg-danger'">
+          <h5 class="modal-title fw-bold">
+            <i class="bi me-2" [ngClass]="isSuccess ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill'"></i>
+            {{ isSuccess ? 'Success!' : 'Attention!' }}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body py-5 text-center">
+          <i class="bi display-1 mb-3 d-block" [ngClass]="isSuccess ? 'bi-check2-circle text-success' : 'bi-x-circle text-danger'"></i>
+          <h5 class="fw-normal">{{ message }}</h5>
+        </div>
+        <div class="modal-footer border-top-0 justify-content-center pb-4">
+          <button type="button" class="btn btn-lg px-5" [ngClass]="isSuccess ? 'btn-success' : 'btn-danger'" (click)="closeModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-container *ngIf="showModal">
+  <ng-container *ngTemplateOutlet="alertModal"></ng-container>
+</ng-container>

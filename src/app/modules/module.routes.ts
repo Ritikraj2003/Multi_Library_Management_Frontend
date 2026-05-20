@@ -22,5 +22,6 @@ export const MODULE_ROUTES: Routes = [
     { path: 'master', component: DashboardComponent }, // Placeholder
     { path: 'library', component: LibraryListComponent },
     { path: 'table-layout', component: TableLayoutComponent },
+    { path: 'attendance', loadComponent: () => import('./attendance/attendance-list/attendance-list.component').then(m => m.AttendanceListComponent) },
 ];
 
