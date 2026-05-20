@@ -30,5 +30,13 @@ export const routes: Routes = [
       }
     ]
   },
+  {
+    path: 'receipt/:registrationId/:libraryId/:paymentId',
+    loadComponent: () => import('./public/public-receipt/public-receipt.component').then(m => m.PublicReceiptComponent)
+  },
+  {
+    path: 'receipt/:id',
+    loadComponent: () => import('./public/public-receipt/public-receipt.component').then(m => m.PublicReceiptComponent)
+  },
   { path: '**', redirectTo: 'auth/login' }
 ];

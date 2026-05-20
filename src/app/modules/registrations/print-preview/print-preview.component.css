@@ -12,18 +12,50 @@
   font-family: 'Courier New', Courier, monospace !important;
 }
 
+.print-preview-container {
+  height: 80vh;
+  max-height: 80vh;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 /* Receipt Workspace */
 .receipt-workspace {
-  background-color: #f4f6f9;
+  background-color: #f0f2f5;
   min-height: 0;
+  padding: 2.5rem 1.5rem !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* Custom Scrollbar Styling for Receipt Workspace */
+.receipt-workspace::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.receipt-workspace::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.receipt-workspace::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.receipt-workspace::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 /* Receipt Base Card */
 .print-receipt-card {
   transition: all 0.3s ease;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
 /* 80mm Thermal Receipt styling */
@@ -97,34 +129,40 @@
   background-color: #fafbfc !important;
 }
 
-/* Print Styles */
+/* Print Styles — triggered only when body.print-bill-only is set */
 @media print {
-  /* Hide all browser components & pages */
+  /* Page margins */
+  @page {
+    margin: 10mm;
+  }
+
+  /* Reset base */
   html, body {
     height: auto !important;
     background: #fff !important;
     color: #000 !important;
     margin: 0 !important;
     padding: 0 !important;
-    font-size: 12pt !important;
   }
 
-  /* Hide everything on the page */
-  body * {
+  /* When body has print-bill-only class: hide everything */
+  body.print-bill-only * {
     visibility: hidden !important;
   }
 
-  /* Make ONLY our print-area visible and absolute */
-  #print-area, #print-area * {
+  /* Show ONLY the bill card and its children */
+  body.print-bill-only #print-area,
+  body.print-bill-only #print-area * {
     visibility: visible !important;
   }
 
-  #print-area {
-    position: absolute !important;
+  /* Position the bill centered on page */
+  body.print-bill-only #print-area {
+    position: fixed !important;
     left: 50% !important;
     top: 0 !important;
     transform: translateX(-50%) !important;
-    width: 320px !important; /* Force receipt size on paper */
+    width: 340px !important;
     max-width: 100% !important;
     border: none !important;
     box-shadow: none !important;
@@ -133,22 +171,20 @@
     background: #fff !important;
   }
 
-  .print-receipt-card.classic {
-    width: 100% !important;
+  /* Classic A5 wider layout on print */
+  body.print-bill-only .print-receipt-card.classic {
+    width: 520px !important;
     max-width: 100% !important;
   }
 
-  /* Suppress browser headers and footers */
-  @page {
-    margin: 0;
-  }
-
+  /* Always hide these */
   .no-print, .no-print * {
     display: none !important;
     visibility: hidden !important;
   }
-  
+
   .receipt-cut-line {
     display: none !important;
   }
 }
+

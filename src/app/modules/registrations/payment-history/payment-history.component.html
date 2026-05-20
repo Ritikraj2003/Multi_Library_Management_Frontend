@@ -7,16 +7,17 @@
         <th class="py-2">Mode</th>
         <th class="py-2">Next Due</th>
         <th class="py-2">Notes</th>
+        <th class="py-2 text-center">Print</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngIf="loading">
-        <td colspan="5" class="text-center py-4">
+        <td colspan="6" class="text-center py-4">
           <app-loader size="small"  class="text-info" ></app-loader>
         </td>
       </tr>
       <tr *ngIf="!loading && payments.length === 0">
-        <td colspan="5" class="text-center py-4 text-muted small">No payment records found.</td>
+        <td colspan="6" class="text-center py-4 text-muted small">No payment records found.</td>
       </tr>
       <tr *ngFor="let p of payments">
         <td class="small">{{(p.paymentDate || p.PaymentDate) | date:'mediumDate'}}</td>
@@ -27,6 +28,11 @@
         <td class="small text-muted">{{(p.nextDueDate || p.NextDueDate) | date:'shortDate'}}</td>
         <td class="small extra-small text-muted" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="p.notes || p.Notes">
           {{(p.notes || p.Notes) || '-'}}
+        </td>
+        <td class="text-center">
+          <button class="btn btn-white btn-sm py-0 px-2" title="Print Receipt" (click)="printPayment.emit(p)">
+            <i class="bi bi-printer text-primary"></i>
+          </button>
         </td>
       </tr>
     </tbody>

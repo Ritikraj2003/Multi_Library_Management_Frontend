@@ -5,7 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { finalize } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { finalize, Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { Pagination } from '../../../shared/models/pagination.model';
 import { RegistrationFormComponent } from '../registration-form/registration-form.component';
 import { RegistrationRenewComponent } from '../registration-renew/registration-renew.component';
@@ -24,6 +25,8 @@ export class RegistrationListComponent implements OnInit {
   registrations: any[] = [];
   loading = false;
   activeTab = 'all';
+  searchTerm = '';
+  private searchSubject = new Subject<string>();
   pagination: Pagination | null = null;
   selectedRegistration: any = undefined;
   libraryId!: number;
@@ -32,6 +35,7 @@ export class RegistrationListComponent implements OnInit {
   modal: any;
   currentModalType?: 'form' | 'renew' | 'history' | 'view' | 'qr' | 'whatsapp' | 'bulk_whatsapp' | 'print';
   qrUrl = '';
+  pendingPrintRegistration: any = null;
 
   // WhatsApp States
   whatsappLoading = false;
@@ -53,7 +57,8 @@ export class RegistrationListComponent implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private route: ActivatedRoute
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
   }
@@ -62,6 +67,30 @@ export class RegistrationListComponent implements OnInit {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
     this.libraryName = this.authService.currentUserValue?.libraryName || 'Library';
     this.loadRegistrations();
+
+    // Debounced search — waits 400ms after user stops typing
+    this.searchSubject.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(term => {
+      this.searchTerm = term;
+      this.loadRegistrations(1);
+    });
+
+    // Auto-open registration form if redirected from Seating Layout
+    this.route.queryParams.subscribe(params => {
+      const seatId = params['seatId'] ? +params['seatId'] : null;
+      const batchId = params['batchId'] ? +params['batchId'] : null;
+      if (seatId && batchId) {
+        this.selectedRegistration = { tableSeatId: seatId, batchId };
+        this.currentModalType = 'form';
+        setTimeout(() => this.showModal('registrationModal'), 300);
+      }
+    });
+  }
+
+  onSearchInput(value: string): void {
+    this.searchSubject.next(value);
   }
 
   setTab(tab: string): void {
@@ -80,6 +109,10 @@ export class RegistrationListComponent implements OnInit {
     
     if (!this.isSuperadmin && this.libraryId) {
       params.LibraryId = this.libraryId;
+    }
+
+    if (this.searchTerm.trim()) {
+      params.SearchTerm = this.searchTerm.trim();
     }
 
     let request;
@@ -202,34 +235,123 @@ export class RegistrationListComponent implements OnInit {
     this.hideModal();
     this.loadRegistrations(this.pagination?.pageNumber || 1);
     if (reg) {
+      this.pendingPrintRegistration = reg;
+    }
+  }
+
+  onModalHidden(): void {
+    this.currentModalType = undefined;
+    this.selectedRegistration = undefined;
+    if (this.pendingPrintRegistration) {
+      const reg = this.pendingPrintRegistration;
+      this.pendingPrintRegistration = null;
       setTimeout(() => {
         this.openPrintPreview(reg);
-      }, 600);
+      }, 100);
     }
+  }
+
+  printHistoricalPayment(p: any): void {
+    if (!p) return;
+    
+    const regId = p.registrationId || p.RegistrationId || this.selectedRegistration?.id;
+    if (!regId) return;
+
+    this.loading = true;
+    this.apiService.getRegistrationById(regId).subscribe({
+      next: (res: any) => {
+        this.loading = false;
+        if (res.success) {
+          const paymentReg = {
+            ...res.data,
+            id: p.id || res.data.id,
+            registrationId: res.data.id,
+            registrationDate: p.paymentDate || p.PaymentDate || res.data.registrationDate,
+            dueDate: p.nextDueDate || p.NextDueDate || res.data.dueDate,
+            monthlyAmount: p.amount || p.Amount || res.data.monthlyAmount,
+            securityAmount: 0,
+            paymentMode: p.paymentMode || p.PaymentMode || res.data.paymentMode,
+            notes: p.notes || p.Notes || res.data.notes,
+            mobile: res.data.mobile || this.selectedRegistration?.mobile,
+            isHistoricalPreview: true
+          };
+          this.pendingPrintRegistration = paymentReg;
+          this.hideModal();
+        } else {
+          alert(res.message || 'Failed to fetch registration details.');
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error fetching detailed registration:', err);
+        alert('Could not retrieve registration details for printing.');
+      }
+    });
   }
 
   openPrintPreview(reg: any): void {
     if (!reg) return;
     
-    // Check if we need to fetch full details (list DTO lacks some detailed receipt fields like TableNumber or SecurityAmount)
-    const hasFullDetails = reg.tableNumber !== undefined && reg.securityAmount !== undefined;
+    const isHistoricalPreview = reg.isHistoricalPreview === true;
     
-    if (reg.id && !hasFullDetails) {
+    if (reg.id && !isHistoricalPreview) {
       this.loading = true;
       this.apiService.getRegistrationById(reg.id).subscribe({
-        next: (res: any) => {
-          this.loading = false;
-          if (res.success) {
-            // Merge mobile number from list item to guarantee it is present
-            const detailedReg = { 
-              ...res.data, 
-              mobile: reg.mobile || res.data.mobile 
-            };
-            this.selectedRegistration = detailedReg;
-            this.currentModalType = 'print';
-            this.showModal('printPreviewModal');
+        next: (regRes: any) => {
+          if (regRes.success) {
+            const detailedReg = regRes.data;
+            this.apiService.getPaymentHistory(reg.id).subscribe({
+              next: (payRes: any) => {
+                this.loading = false;
+                const payments = payRes.data || [];
+                if (payments.length > 0) {
+                  const sortedPayments = [...payments].sort((a: any, b: any) => {
+                    const dateA = new Date(a.nextDueDate || a.NextDueDate || a.paymentDate || a.PaymentDate || 0).getTime();
+                    const dateB = new Date(b.nextDueDate || b.NextDueDate || b.paymentDate || b.PaymentDate || 0).getTime();
+                    return dateB - dateA;
+                  });
+                  
+                  const latestPayment = sortedPayments[0];
+                  const isRenewal = payments.length > 1;
+                  
+                  const paymentReg = {
+                    ...detailedReg,
+                    id: latestPayment.id || detailedReg.id,
+                    registrationId: detailedReg.id,
+                    registrationDate: latestPayment.paymentDate || latestPayment.PaymentDate || detailedReg.registrationDate,
+                    dueDate: latestPayment.nextDueDate || latestPayment.NextDueDate || detailedReg.dueDate,
+                    monthlyAmount: latestPayment.amount || latestPayment.Amount || detailedReg.monthlyAmount,
+                    securityAmount: isRenewal ? 0 : (detailedReg.securityAmount ?? 0),
+                    paymentMode: latestPayment.paymentMode || latestPayment.PaymentMode || detailedReg.paymentMode,
+                    notes: latestPayment.notes || latestPayment.Notes || detailedReg.notes,
+                    mobile: reg.mobile || detailedReg.mobile
+                  };
+                  this.selectedRegistration = paymentReg;
+                } else {
+                  this.selectedRegistration = {
+                    ...detailedReg,
+                    registrationId: detailedReg.id,
+                    mobile: reg.mobile || detailedReg.mobile
+                  };
+                }
+                this.currentModalType = 'print';
+                this.showModal('printPreviewModal');
+              },
+              error: (err) => {
+                console.error('Error fetching payment history for print:', err);
+                this.loading = false;
+                this.selectedRegistration = {
+                  ...detailedReg,
+                  registrationId: detailedReg.id,
+                  mobile: reg.mobile || detailedReg.mobile
+                };
+                this.currentModalType = 'print';
+                this.showModal('printPreviewModal');
+              }
+            });
           } else {
-            alert(res.message || 'Failed to fetch invoice details.');
+            this.loading = false;
+            alert(regRes.message || 'Failed to fetch invoice details.');
           }
         },
         error: (err) => {
@@ -239,7 +361,10 @@ export class RegistrationListComponent implements OnInit {
         }
       });
     } else {
-      this.selectedRegistration = reg;
+      this.selectedRegistration = {
+        ...reg,
+        registrationId: reg.registrationId || reg.id
+      };
       this.currentModalType = 'print';
       this.showModal('printPreviewModal');
     }

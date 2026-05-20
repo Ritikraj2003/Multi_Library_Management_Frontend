@@ -43,3 +43,41 @@ body::-webkit-scrollbar {
   background-color: #5a6fd6;
   border-color: #5a6fd6;
 }
+
+/* ===================== Print Bill Only =====================
+   Applied when user clicks "Print Bill" in the print preview.
+   Hides everything except the #print-area receipt card.
+   ========================================================== */
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  body.print-bill-only * {
+    visibility: hidden !important;
+  }
+
+  body.print-bill-only #print-area,
+  body.print-bill-only #print-area * {
+    visibility: visible !important;
+  }
+
+  body.print-bill-only #print-area {
+    position: fixed !important;
+    left: 50% !important;
+    top: 0 !important;
+    transform: translateX(-50%) !important;
+    width: 340px !important;
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  body.print-bill-only .print-receipt-card.classic {
+    width: 520px !important;
+  }
+}
+

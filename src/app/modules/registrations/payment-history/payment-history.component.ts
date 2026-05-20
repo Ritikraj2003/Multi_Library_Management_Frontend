@@ -1,5 +1,5 @@
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { Component, Input, OnInit, OnChanges, ChangeDetectorRef, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, ChangeDetectorRef, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
 
@@ -11,6 +11,7 @@ import { ApiService } from '../../../shared/services/api.service';
 })
 export class PaymentHistoryComponent implements OnInit, OnChanges {
   @Input() registrationId!: number;
+  @Output() printPayment = new EventEmitter<any>();
   payments: any[] = [];
   loading = false;
 

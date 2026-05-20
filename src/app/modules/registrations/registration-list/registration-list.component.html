@@ -18,6 +18,27 @@
     </div>
   </div>
 
+  <!-- Search Bar -->
+  <div class="mb-3">
+    <div class="input-group input-group-sm" style="max-width: 380px;">
+      <span class="input-group-text bg-white border-end-0 text-muted">
+        <i class="bi bi-search"></i>
+      </span>
+      <input
+        type="text"
+        id="reg-search"
+        class="form-control border-start-0 border-end-0 ps-0"
+        placeholder="Search by name, phone or ID..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput(searchTerm)"
+        autocomplete="off">
+      <button *ngIf="searchTerm" class="btn btn-outline-secondary border-start-0" type="button"
+              (click)="searchTerm = ''; onSearchInput('')">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- Tabs Navigation -->
   <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm">
     <li class="nav-item">
@@ -138,7 +159,7 @@
 <!-- ===================== Modals ===================== -->
 
 <!-- Registration Form Modal -->
-<div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="currentModalType = undefined; selectedRegistration = undefined">
+<div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -156,7 +177,7 @@
 </div>
 
 <!-- Renew Modal -->
-<div class="modal fade" id="renewModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="currentModalType = undefined; selectedRegistration = undefined">
+<div class="modal fade" id="renewModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -164,14 +185,14 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-registration-renew *ngIf="currentModalType === 'renew'" [registrationId]="selectedRegistration?.id" (saved)="onSaved()" (cancelled)="hideModal()"></app-registration-renew>
+        <app-registration-renew *ngIf="currentModalType === 'renew'" [registrationId]="selectedRegistration?.id" (saved)="onSaved({ id: selectedRegistration?.id, mobile: selectedRegistration?.mobile })" (cancelled)="hideModal()"></app-registration-renew>
       </div>
     </div>
   </div>
 </div>
 
 <!-- History Modal -->
-<div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="currentModalType = undefined; selectedRegistration = undefined">
+<div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4">
       <div class="modal-header border-bottom-0 pt-4 px-4">
@@ -179,7 +200,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-payment-history *ngIf="currentModalType === 'history'" [registrationId]="selectedRegistration?.id"></app-payment-history>
+        <app-payment-history *ngIf="currentModalType === 'history'" [registrationId]="selectedRegistration?.id" (printPayment)="printHistoricalPayment($event)"></app-payment-history>
       </div>
     </div>
   </div>
@@ -434,7 +455,7 @@
 </div>
 
 <!-- Print Preview Modal -->
-<div class="modal fade" id="printPreviewModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="currentModalType = undefined; selectedRegistration = undefined">
+<div class="modal fade" id="printPreviewModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
       <div class="modal-body p-0">

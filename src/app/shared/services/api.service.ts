@@ -232,4 +232,11 @@ export class ApiService {
   sendReceiptEmail(body: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}student-registration/send-receipt-email`, body);
   }
+
+  getPublicReceipt(registrationId: number, libraryId?: number, paymentId?: number): Observable<any> {
+    if (libraryId !== undefined && paymentId !== undefined) {
+      return this.http.get<any>(`${this.baseUrl}student-registration/public-receipt/${registrationId}/${libraryId}/${paymentId}`);
+    }
+    return this.http.get<any>(`${this.baseUrl}student-registration/public-receipt/${registrationId}`);
+  }
 }

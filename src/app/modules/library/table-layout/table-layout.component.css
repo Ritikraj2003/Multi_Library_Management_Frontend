@@ -142,3 +142,56 @@
   justify-content: center;
   padding: 100px 0;
 }
+
+/* ---- Time Overlap Styles ---- */
+.chair.overlap {
+  background-color: #e74c3c;
+  animation: pulse-red 1.4s infinite;
+  box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(231,76,60,0.5); }
+  50%       { opacity: 0.75; box-shadow: 0 0 12px rgba(231,76,60,0.9); }
+}
+
+.overlap-label {
+  position: absolute;
+  font-size: 7px;
+  font-weight: 800;
+  color: #e74c3c;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+/* Position overlap-label just outside batch-name-label (top chairs) */
+.chair.pos-0 .overlap-label,
+.chair.pos-4 .overlap-label,
+.chair.pos-5 .overlap-label {
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.chair.pos-1 .overlap-label {
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.chair.pos-2 .overlap-label {
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+}
+
+.chair.pos-3 .overlap-label {
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.legend .bg-danger { background-color: #e74c3c !important; }
+

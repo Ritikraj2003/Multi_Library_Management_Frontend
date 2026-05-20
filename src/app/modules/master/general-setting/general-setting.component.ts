@@ -60,6 +60,9 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadSettings();
+    
+    // Start polling for WhatsApp status after a short delay
+    this.checkWhatsAppStatus();
   }
 
   loadSettings() {

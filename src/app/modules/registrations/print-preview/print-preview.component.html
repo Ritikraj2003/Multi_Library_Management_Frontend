@@ -1,30 +1,30 @@
 <div class="print-preview-container d-flex flex-column h-100 bg-light">
   <!-- Toolbar: Hidden during print -->
-  <div class="toolbar no-print p-2.5 bg-white border-bottom d-flex justify-content-between align-items-center gap-2 shadow-sm">
+  <div class="toolbar no-print py-3 px-4 bg-white border-bottom d-flex justify-content-between align-items-center gap-3 shadow-sm">
     <!-- Group 1: Compact Title & Format Selector -->
     <div class="d-flex align-items-center gap-2">
-      <span class="fw-bold text-dark mb-0 me-1 small">
+      <span class="fw-bold text-dark mb-0 me-2 small">
         <i class="bi bi-printer-fill text-primary me-1"></i> Print
       </span>
       <div class="btn-group btn-group-sm rounded-pill overflow-hidden border shadow-xs" role="group">
-        <button type="button" class="btn btn-sm py-1 px-2" [class.btn-primary]="receiptType === 'thermal'" [class.btn-white]="receiptType !== 'thermal'" (click)="toggleReceiptType()" style="font-size: 0.75rem;">
+        <button type="button" class="btn btn-sm py-1 px-3" [class.btn-primary]="receiptType === 'thermal'" [class.btn-white]="receiptType !== 'thermal'" (click)="toggleReceiptType()" style="font-size: 0.75rem;">
           Thermal (80mm)
         </button>
-        <button type="button" class="btn btn-sm py-1 px-2" [class.btn-primary]="receiptType === 'classic'" [class.btn-white]="receiptType !== 'classic'" (click)="toggleReceiptType()" style="font-size: 0.75rem;">
+        <button type="button" class="btn btn-sm py-1 px-3" [class.btn-primary]="receiptType === 'classic'" [class.btn-white]="receiptType !== 'classic'" (click)="toggleReceiptType()" style="font-size: 0.75rem;">
           Classic (A5)
         </button>
       </div>
     </div>
     
     <!-- Group 2: Option Switches (Centered & Elegant) -->
-    <div class="d-flex align-items-center gap-3 px-3 border-start border-end text-muted" style="font-size: 0.75rem;">
-      <div class="form-check form-switch mb-0 d-flex align-items-center gap-1.5">
-        <input class="form-check-input" type="checkbox" id="toggleTerms" [(ngModel)]="showTerms" style="transform: scale(0.85); margin-top: 0;">
-        <label class="form-check-label fw-semibold" for="toggleTerms" style="cursor: pointer;">Terms</label>
+    <div class="d-flex align-items-center gap-4 px-4 border-start border-end text-muted" style="font-size: 0.75rem;">
+      <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+        <input class="form-check-input" type="checkbox" id="toggleTerms" [(ngModel)]="showTerms" style="transform: scale(0.95); margin-top: 0; cursor: pointer;">
+        <label class="form-check-label fw-semibold ms-1" for="toggleTerms" style="cursor: pointer;">Terms</label>
       </div>
-      <div class="form-check form-switch mb-0 d-flex align-items-center gap-1.5">
-        <input class="form-check-input" type="checkbox" id="toggleSig" [(ngModel)]="showSignature" style="transform: scale(0.85); margin-top: 0;">
-        <label class="form-check-label fw-semibold" for="toggleSig" style="cursor: pointer;">Signature</label>
+      <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
+        <input class="form-check-input" type="checkbox" id="toggleSig" [(ngModel)]="showSignature" style="transform: scale(0.95); margin-top: 0; cursor: pointer;">
+        <label class="form-check-label fw-semibold ms-1" for="toggleSig" style="cursor: pointer;">Signature</label>
       </div>
     </div>
 

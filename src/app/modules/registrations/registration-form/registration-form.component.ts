@@ -68,9 +68,8 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
 
   private updateForm(): void {
     if (this.registrationData) {
-      this.isEdit = true;
       const data = { ...this.registrationData };
-      
+
       // Handle PascalCase vs camelCase from different APIs
       const startDate = data.startDate || data.StartDate;
       const dueDate = data.dueDate || data.DueDate;
@@ -82,36 +81,53 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       const securityAmount = data.securityAmount || data.SecurityAmount;
       const notes = data.notes || data.Notes;
 
-      if (startDate) data.startDate = new Date(startDate).toISOString().substring(0, 10);
-      if (dueDate) data.dueDate = new Date(dueDate).toISOString().substring(0, 10);
-      
-      if (tableSeatId) {
-        this.checkSeatAvailability(tableSeatId, batchId, id);
-      }
-      
-      this.regForm.patchValue({
-        studentId: data.studentId || data.StudentId,
-        tableSeatId: tableSeatId,
-        batchId: batchId,
-        startDate: data.startDate,
-        dueDate: data.dueDate,
-        monthlyAmount: monthlyAmount,
-        securityAmount: securityAmount,
-        notes: notes,
-        rfidCode: data.rfidCode || data.RfidCode || data.RFIDCode || '',
-        isActiveStatus: status === 'Active' || status === 1
-      }, { emitEvent: false });
+      if (id) {
+        // --- EDIT MODE: full existing registration ---
+        this.isEdit = true;
 
-      // Find student and set search term
-      const student = this.students.find(s => s.id === (data.studentId || data.StudentId));
-      if (student) {
-        this.searchTerm = `${student.fullName} (${student.mobile})`;
-      } else if (data.studentName || data.fullName || data.FullName) {
-        this.searchTerm = `${data.studentName || data.fullName || data.FullName} (${data.mobile || data.Mobile || ''})`;
-      }
+        if (startDate) data.startDate = new Date(startDate).toISOString().substring(0, 10);
+        if (dueDate) data.dueDate = new Date(dueDate).toISOString().substring(0, 10);
 
-      this.regForm.get('studentId')?.disable({ emitEvent: false });
-      this.regForm.get('tableSeatId')?.disable({ emitEvent: false });
+        if (tableSeatId) {
+          this.checkSeatAvailability(tableSeatId, batchId, id);
+        }
+
+        this.regForm.patchValue({
+          studentId: data.studentId || data.StudentId,
+          tableSeatId: tableSeatId,
+          batchId: batchId,
+          startDate: data.startDate,
+          dueDate: data.dueDate,
+          monthlyAmount: monthlyAmount,
+          securityAmount: securityAmount,
+          notes: notes,
+          rfidCode: data.rfidCode || data.RfidCode || data.RFIDCode || '',
+          isActiveStatus: status === 'Active' || status === 1
+        }, { emitEvent: false });
+
+        const student = this.students.find(s => s.id === (data.studentId || data.StudentId));
+        if (student) {
+          this.searchTerm = `${student.fullName} (${student.mobile})`;
+        } else if (data.studentName || data.fullName || data.FullName) {
+          this.searchTerm = `${data.studentName || data.fullName || data.FullName} (${data.mobile || data.Mobile || ''})`;
+        }
+
+        this.regForm.get('studentId')?.disable({ emitEvent: false });
+        this.regForm.get('tableSeatId')?.disable({ emitEvent: false });
+
+      } else {
+        // --- NEW FORM with pre-selected seat & batch (from Seating Layout click) ---
+        this.isEdit = false;
+        this.searchTerm = '';
+        this.regForm.enable();
+        this.regForm.reset({ paymentMode: 'Cash', monthlyAmount: 0, securityAmount: 0 });
+
+        // Pre-fill seat & batch, then trigger availability check
+        if (tableSeatId) {
+          this.regForm.patchValue({ tableSeatId, batchId }, { emitEvent: false });
+          this.checkSeatAvailability(tableSeatId, batchId);
+        }
+      }
     } else {
       this.isEdit = false;
       this.searchTerm = '';

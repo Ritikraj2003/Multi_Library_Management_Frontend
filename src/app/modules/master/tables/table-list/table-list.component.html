@@ -2,11 +2,11 @@
   <!-- Page Header -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h3 class="fw-bold mb-0">Tables & Seats</h3>
-      <p class="text-muted small">Manage library tables and seating arrangements</p>
+      <h3 class="fw-bold mb-0">Seats</h3>
+      <p class="text-muted small">Manage library seating arrangements</p>
     </div>
     <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
-      <i class="bi bi-plus-lg me-2"></i> Add Table/Seat
+      <i class="bi bi-plus-lg me-2"></i> Add Seat
     </button>
   </div>
 
@@ -19,7 +19,7 @@
             <tr>
               <th class="ps-4 py-3"># ID</th>
               <th class="py-3">Section / Floor</th>
-              <th class="py-3">Table Number</th>
+              <!-- <th class="py-3">Table Number</th> -->
               <th class="py-3">Seat Number</th>
               <th class="py-3 text-end pe-4">Actions</th>
             </tr>
@@ -52,11 +52,11 @@
                   <div class="fw-semibold text-dark">{{table.floorName || 'Unknown Floor'}}</div>
                 </div>
               </td>
-              <td>
+              <!-- <td>
                 <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 rounded-pill">
                   Table {{table.tableNumber}}
                 </span>
-              </td>
+              </td> -->
               <td>
                 <span class="badge bg-primary-subtle text-primary fw-normal px-3 rounded-pill">
                   Seat {{table.seatNumber}}
@@ -148,7 +148,7 @@
           <!-- Table Number -->
           <div class="mb-3">
             <label for="tableNumber" class="form-label fw-semibold">
-              Table Number <span class="text-danger">*</span>
+              Seat Number <span class="text-danger">*</span>
             </label>
             <div class="input-group">
               <span class="input-group-text bg-light border-end-0">
@@ -160,8 +160,9 @@
                 class="form-control border-start-0"
                 formControlName="tableNumber"
                 placeholder="e.g. T-01, 12, A"
+                (input)="tableForm.patchValue({ seatNumber: tableForm.get('tableNumber')?.value })"
                 [class.is-invalid]="f['tableNumber'].invalid && f['tableNumber'].touched">
-              <div class="invalid-feedback">Table number is required.</div>
+              <div class="invalid-feedback">Seat number is required.</div>
             </div>
           </div>
 

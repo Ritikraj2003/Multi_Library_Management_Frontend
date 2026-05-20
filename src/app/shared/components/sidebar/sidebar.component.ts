@@ -21,7 +21,7 @@ export class SidebarComponent {
     { title: 'Dashboard', icon: 'bi-grid-fill', route: '/dashboard' },
     { title: 'Students', icon: 'bi-people-fill', route: '/dashboard/students' },
     { title: 'Registrations', icon: 'bi-journal-check', route: '/dashboard/registrations' },
-    { title: 'Table Layout', icon: 'bi-layout-three-columns', route: '/dashboard/table-layout' },
+    { title: 'Seating Layout', icon: 'bi-layout-three-columns', route: '/dashboard/table-layout' },
     { 
       title: 'Master', 
       icon: 'bi-database-fill', 
@@ -29,7 +29,7 @@ export class SidebarComponent {
       children: [
         { title: 'Batch', route: '/dashboard/master/batch' },
         { title: 'Section', route: '/dashboard/master/section' },
-        { title: 'Table Master', route: '/dashboard/master/tables' },
+        { title: 'Seat Master', route: '/dashboard/master/tables' },
         { title: 'User Registration', route: '/dashboard/master/user-registration' },
         { title: 'General Setting', route: '/dashboard/master/general-setting' }
       ]
