@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
 })
 export class RegistrationFormComponent implements OnInit, OnChanges {
   @Input() registrationData: any = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<any>();
   @Output() cancelled = new EventEmitter<void>();
 
   regForm: FormGroup;
@@ -169,7 +169,8 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   }
 
   checkSeatAvailability(seatId: number, patchBatchId?: number, registrationId?: number): void {
-    this.apiService.getSeatAvailability(seatId, this.libraryId, registrationId).subscribe(res => {
+    const libId = this.libraryId || this.authService.currentUserValue?.libraryId || 0;
+    this.apiService.getSeatAvailability(seatId, libId, registrationId).subscribe(res => {
       if (res.success) {
         const batchData = res.data.batches || res.data.Batches || [];
         const processedBatches = batchData.map((b: any) => {
@@ -325,7 +326,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       .subscribe({
         next: (res: any) => {
           if (res.success) {
-            this.saved.emit();
+            this.saved.emit(res.data);
           } else {
             alert(res.message);
           }

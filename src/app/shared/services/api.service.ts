@@ -226,6 +226,10 @@ export class ApiService {
   }
 
   killSession(libraryId: string): Observable<any> {
-    return this.http.post<any>(`${environment.whatsAppApiUrl}/kill/${libraryId}`, {});
+    return this.http.post<any>(`${environment.whatsAppApiUrl}/logout/${libraryId}`, {});
+  }
+
+  sendReceiptEmail(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}student-registration/send-receipt-email`, body);
   }
 }

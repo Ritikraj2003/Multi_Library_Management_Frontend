@@ -1,0 +1,154 @@
+/* Toolbar Styles */
+.toolbar {
+  z-index: 1050;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}
+
+.font-monospace {
+  font-family: 'Courier New', Courier, monospace !important;
+}
+
+/* Receipt Workspace */
+.receipt-workspace {
+  background-color: #f4f6f9;
+  min-height: 0;
+}
+
+/* Receipt Base Card */
+.print-receipt-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 80mm Thermal Receipt styling */
+.print-receipt-card.thermal {
+  width: 340px;
+  max-width: 100%;
+  border: 1px solid #e0e0e0;
+}
+
+.print-receipt-card.thermal .receipt-inner {
+  padding: 1.5rem !important;
+}
+
+/* Classic A5 invoice styling */
+.print-receipt-card.classic {
+  width: 560px;
+  max-width: 100%;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+}
+
+.print-receipt-card.classic .receipt-inner {
+  padding: 2.25rem !important;
+}
+
+/* Divider Styles */
+.dashed-divider {
+  border-top: 1px dashed #a0a0a0;
+  height: 0;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #8c8c8c;
+}
+
+/* Cut Line Styling */
+.receipt-cut-line {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+.receipt-cut-line::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dashed #ccc;
+  z-index: 1;
+}
+
+.receipt-cut-line span {
+  position: relative;
+  z-index: 2;
+  background-color: #f4f6f9;
+  padding: 0 10px;
+  font-size: 0.7rem;
+  color: #999;
+  font-family: monospace;
+}
+
+.student-info-block {
+  background-color: #fafbfc !important;
+}
+
+/* Print Styles */
+@media print {
+  /* Hide all browser components & pages */
+  html, body {
+    height: auto !important;
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 12pt !important;
+  }
+
+  /* Hide everything on the page */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Make ONLY our print-area visible and absolute */
+  #print-area, #print-area * {
+    visibility: visible !important;
+  }
+
+  #print-area {
+    position: absolute !important;
+    left: 50% !important;
+    top: 0 !important;
+    transform: translateX(-50%) !important;
+    width: 320px !important; /* Force receipt size on paper */
+    max-width: 100% !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  .print-receipt-card.classic {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Suppress browser headers and footers */
+  @page {
+    margin: 0;
+  }
+
+  .no-print, .no-print * {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  .receipt-cut-line {
+    display: none !important;
+  }
+}

@@ -10,13 +10,14 @@ import { Pagination } from '../../../shared/models/pagination.model';
 import { RegistrationFormComponent } from '../registration-form/registration-form.component';
 import { RegistrationRenewComponent } from '../registration-renew/registration-renew.component';
 import { PaymentHistoryComponent } from '../payment-history/payment-history.component';
+import { PrintPreviewComponent } from '../print-preview/print-preview.component';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-registration-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent, LoaderComponent],
+  imports: [CommonModule, FormsModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent, LoaderComponent, PrintPreviewComponent],
   templateUrl: './registration-list.component.html'
 })
 export class RegistrationListComponent implements OnInit {
@@ -29,7 +30,7 @@ export class RegistrationListComponent implements OnInit {
   libraryName: string = '';
   isSuperadmin = false;
   modal: any;
-  currentModalType: 'form' | 'renew' | 'history' | 'view' | 'qr' | 'whatsapp' | 'bulk_whatsapp' = 'form';
+  currentModalType?: 'form' | 'renew' | 'history' | 'view' | 'qr' | 'whatsapp' | 'bulk_whatsapp' | 'print';
   qrUrl = '';
 
   // WhatsApp States
@@ -181,9 +182,14 @@ export class RegistrationListComponent implements OnInit {
   }
 
   private showModal(id: string): void {
+    this.cdr.detectChanges();
     const el = document.getElementById(id);
     if (el) {
-      this.modal = new bootstrap.Modal(el);
+      let modalInstance = bootstrap.Modal.getInstance(el);
+      if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(el);
+      }
+      this.modal = modalInstance;
       this.modal.show();
     }
   }
@@ -192,9 +198,51 @@ export class RegistrationListComponent implements OnInit {
     if (this.modal) this.modal.hide();
   }
 
-  onSaved(): void {
+  onSaved(reg?: any): void {
     this.hideModal();
     this.loadRegistrations(this.pagination?.pageNumber || 1);
+    if (reg) {
+      setTimeout(() => {
+        this.openPrintPreview(reg);
+      }, 600);
+    }
+  }
+
+  openPrintPreview(reg: any): void {
+    if (!reg) return;
+    
+    // Check if we need to fetch full details (list DTO lacks some detailed receipt fields like TableNumber or SecurityAmount)
+    const hasFullDetails = reg.tableNumber !== undefined && reg.securityAmount !== undefined;
+    
+    if (reg.id && !hasFullDetails) {
+      this.loading = true;
+      this.apiService.getRegistrationById(reg.id).subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          if (res.success) {
+            // Merge mobile number from list item to guarantee it is present
+            const detailedReg = { 
+              ...res.data, 
+              mobile: reg.mobile || res.data.mobile 
+            };
+            this.selectedRegistration = detailedReg;
+            this.currentModalType = 'print';
+            this.showModal('printPreviewModal');
+          } else {
+            alert(res.message || 'Failed to fetch invoice details.');
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          console.error('Error fetching detailed registration:', err);
+          alert('Could not retrieve full receipt details.');
+        }
+      });
+    } else {
+      this.selectedRegistration = reg;
+      this.currentModalType = 'print';
+      this.showModal('printPreviewModal');
+    }
   }
 
   changePage(page: number): void {
@@ -367,3 +415,4 @@ export class RegistrationListComponent implements OnInit {
       .replace(/{library}/g, this.libraryName || '');
   }
 }
+// Touch to trigger clean re-compilation of print-preview features
