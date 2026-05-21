@@ -1,1 +1,65 @@
-/* Styles for attendance list component */
+.card {
+    border-radius: 16px;
+}
+
+.table th {
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.table td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.bg-success-soft {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-danger-soft {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.badge {
+    font-size: 0.75rem;
+    letter-spacing: 0.3px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.modal-content {
+    animation: zoomIn 0.3s ease-out;
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.qr-wrapper {
+    transition: transform 0.3s ease;
+}
+
+.qr-wrapper:hover {
+    transform: scale(1.04);
+}
+
+.btn {
+    letter-spacing: 0.3px;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

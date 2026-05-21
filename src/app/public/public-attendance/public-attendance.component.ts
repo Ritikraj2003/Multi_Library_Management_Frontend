@@ -22,7 +22,7 @@ export class PublicAttendanceComponent implements OnInit {
   studentId: number | null = null;
   latitude: number | null = null;
   longitude: number | null = null;
-  
+
   isLoading: boolean = false;
   message: string = '';
   isSuccess: boolean = false;
@@ -72,6 +72,7 @@ export class PublicAttendanceComponent implements OnInit {
     this.message = '';
 
     const payload = {
+      libraryId: this.libraryId,
       studentId: this.studentId,
       latitude: this.latitude,
       longitude: this.longitude
@@ -80,8 +81,14 @@ export class PublicAttendanceComponent implements OnInit {
     this.http.post<any>(`${environment.apiUrl}Attendance/Mark`, payload).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.isSuccess = res.success;
-        this.message = res.message || 'Attendance Marked successfully!';
+        
+        // 1. Check if success is true or false
+        const success = res && (res.success || res.Success);
+        this.isSuccess = !!success;
+        
+        // 2. Set popup message to whatever message is coming from the API
+        this.message = res ? (res.message || res.Message || 'Attendance Marked successfully!') : 'Attendance Marked successfully!';
+        
         this.showModal = true;
         if (this.isSuccess) {
           this.studentId = null;
@@ -91,7 +98,31 @@ export class PublicAttendanceComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         this.isSuccess = false;
-        this.message = err.error?.message || 'An error occurred while marking attendance.';
+        console.error('Attendance error (after interceptor):', err);
+
+        let errMsg = '';
+
+        // errorInterceptor transforms the error into a plain string: err.error?.message || err.statusText
+        if (typeof err === 'string') {
+          errMsg = err;
+        } else if (err && err.error) {
+          if (err.error.message) {
+            errMsg = err.error.message;
+          } else if (err.error.Message) {
+            errMsg = err.error.Message;
+          } else if (typeof err.error === 'string') {
+            try {
+              const parsed = JSON.parse(err.error);
+              errMsg = parsed.message || parsed.Message || err.error;
+            } catch (e) {
+              errMsg = err.error;
+            }
+          }
+        } else if (err && err.message) {
+          errMsg = err.message;
+        }
+
+        this.message = errMsg || 'Failed to mark attendance.';
         this.showModal = true;
         this.cdr.detectChanges();
       }

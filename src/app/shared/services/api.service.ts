@@ -195,6 +195,12 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}Dashboard/stats/${libraryId}`);
   }
 
+  getAttendanceByBatch(libraryId: number, date?: string): Observable<any> {
+    let params = new HttpParams();
+    if (date) params = params.set('date', date);
+    return this.http.get<any>(`${this.baseUrl}Attendance/BatchStats/${libraryId}`, { params });
+  }
+
   // General Setting Endpoints
   getSettingsByLibraryId(libraryId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}GeneralSetting/GetByLibraryId/${libraryId}`);
@@ -206,6 +212,15 @@ export class ApiService {
 
   deleteSetting(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}GeneralSetting/Delete/${id}`);
+  }
+
+  // Attendance Location Endpoints
+  getAttendanceLocationByLibraryId(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}AttendanceLocation/GetByLibraryId/${libraryId}`);
+  }
+
+  upsertAttendanceLocation(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}AttendanceLocation/Upsert`, body);
   }
 
   // WhatsApp Endpoints

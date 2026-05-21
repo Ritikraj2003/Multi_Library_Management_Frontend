@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService, ToastMessage } from '../../services/notification.service';
 import { Subscription } from 'rxjs';
@@ -38,12 +38,18 @@ export class ToastComponent implements OnInit, OnDestroy {
   toasts: ToastMessage[] = [];
   private subscription!: Subscription;
 
-  constructor(private notificationService: NotificationService) { }
+  constructor(
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.subscription = this.notificationService.toastState$.subscribe(toast => {
       this.toasts.push(toast);
-      setTimeout(() => this.removeToast(toast), 2000);
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.removeToast(toast);
+      }, 3000);
     });
   }
 
@@ -55,6 +61,7 @@ export class ToastComponent implements OnInit, OnDestroy {
 
   removeToast(toast: ToastMessage): void {
     this.toasts = this.toasts.filter(t => t !== toast);
+    this.cdr.detectChanges();
   }
 
   getBgClass(type: string): string {
