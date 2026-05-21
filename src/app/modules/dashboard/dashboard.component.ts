@@ -54,11 +54,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         if (res.success) {
           this.stats = res.data;
-          if (isPlatformBrowser(this.platformId)) {
-            setTimeout(() => this.createCharts(), 100);
-          }
         }
         this.loading = false;
+        if (isPlatformBrowser(this.platformId)) {
+          setTimeout(() => {
+            this.createCharts();
+            this.createAttendanceBatchChart();
+          }, 100);
+        }
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -111,10 +114,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   createAttendanceBatchChart(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
     if (this.attendanceBatchRoot) this.attendanceBatchRoot.dispose();
-    if (!this.batchAttendanceData.length) return;
+    if (!this.batchAttendanceData.length || this.loading || this.attendanceLoading) return;
 
-    const root = am5.Root.new("attendanceBatchChartDiv");
+    const chartEl = document.getElementById('attendanceBatchChartDiv');
+    if (!chartEl) {
+      setTimeout(() => this.createAttendanceBatchChart(), 100);
+      return;
+    }
+
+    const root = am5.Root.new(chartEl);
     root.setThemes([am5themes_Animated.new(root)]);
     this.attendanceBatchRoot = root;
 
