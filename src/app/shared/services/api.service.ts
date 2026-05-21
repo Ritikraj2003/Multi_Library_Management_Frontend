@@ -67,8 +67,45 @@ export class ApiService {
   }
 
   // Role Endpoints
+  getAllRoles(params?: any): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}Role/GetAll`, { params });
+  }
+
   getRolesByLibraryId(libraryId: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}Role/GetByLibraryId/${libraryId}`);
+  }
+
+  createRole(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Role/Create`, body);
+  }
+
+  updateRole(body: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}Role/Update`, body);
+  }
+
+  deleteRole(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}Role/Delete/${id}`);
+  }
+
+  // Permission Endpoints
+  getAllPermissions(params?: any): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}Permission/GetAll`, { params });
+  }
+
+  assignPermissionsToRole(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Permission/AssignToRole`, body);
+  }
+
+  getPermissionsByRole(roleId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}Permission/GetByRole/${roleId}`);
+  }
+
+  assignPermissionsToLibrary(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Permission/AssignToLibrary`, body);
+  }
+
+  getPermissionsByLibrary(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}Permission/GetByLibrary/${libraryId}`);
   }
 
   // Batch Endpoints

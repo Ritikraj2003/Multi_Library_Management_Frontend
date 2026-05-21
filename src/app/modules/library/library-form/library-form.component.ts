@@ -16,7 +16,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 })
 export class LibraryFormComponent implements OnInit {
   @Input() libraryData: any = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<any>();
   @Output() cancelled = new EventEmitter<void>();
 
   libraryForm: FormGroup;
@@ -122,7 +122,7 @@ export class LibraryFormComponent implements OnInit {
         next: (res) => {
           if (res.success) {
             this.notificationService.showSuccess(this.isEdit ? 'Library updated successfully' : 'Library created successfully');
-            this.saved.emit();
+            this.saved.emit(res.data);
           }
         },
         error: (err) => {

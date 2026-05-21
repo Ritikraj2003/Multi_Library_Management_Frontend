@@ -9,6 +9,7 @@ import { StudentListComponent } from './students/student-list/student-list.compo
 import { RegistrationListComponent } from './registrations/registration-list/registration-list.component';
 import { GeneralSettingComponent } from './master/general-setting/general-setting.component';
 import { TableLayoutComponent } from './library/table-layout/table-layout.component';
+import { RolePermission } from './master/role-permission/role-permission';
 
 export const MODULE_ROUTES: Routes = [
     { path: '', component: DashboardComponent },
@@ -19,6 +20,7 @@ export const MODULE_ROUTES: Routes = [
     { path: 'master/section', component: SectionListComponent },
     { path: 'master/tables', component: TableListComponent },
     { path: 'master/general-setting', component: GeneralSettingComponent },
+    { path: 'master/role-permission', component: RolePermission },
     { path: 'master', component: DashboardComponent }, // Placeholder
     { path: 'library', component: LibraryListComponent },
     { path: 'table-layout', component: TableLayoutComponent },

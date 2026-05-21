@@ -32,7 +32,8 @@ export class SidebarComponent {
         { title: 'Section', route: '/dashboard/master/section' },
         { title: 'Seat Master', route: '/dashboard/master/tables' },
         { title: 'User Registration', route: '/dashboard/master/user-registration' },
-        { title: 'General Setting', route: '/dashboard/master/general-setting' }
+        { title: 'General Setting', route: '/dashboard/master/general-setting' },
+        { title: 'Role Permissions', route: '/dashboard/master/role-permission' }
       ]
     },
     { title: 'Library', icon: 'bi-building', route: '/dashboard/library' }

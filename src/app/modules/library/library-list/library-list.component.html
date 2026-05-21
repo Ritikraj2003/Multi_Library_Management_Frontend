@@ -63,7 +63,8 @@
               <td class="text-end pe-4">
                 <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
                   <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(lib)"><i class="bi bi-pencil text-primary"></i></button>
-                  <button class="btn btn-white btn-sm" title="Settings"><i class="bi bi-gear text-secondary"></i></button>
+                  <button class="btn btn-white btn-sm" title="View Permissions" (click)="openViewPermissionModal(lib)"><i class="bi bi-eye text-info"></i></button>
+                  <button *ngIf="isSuperadmin" class="btn btn-white btn-sm" title="Edit Permissions" (click)="openPermissionModal(lib)"><i class="bi bi-gear text-secondary"></i></button>
                   <button *ngIf="isSuperadmin" class="btn btn-white btn-sm" title="Delete" (click)="onDelete(lib.id)"><i class="bi bi-trash text-danger"></i></button>
                 </div>
               </td>
@@ -99,7 +100,118 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="onCancelled()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-library-form *ngIf="selectedLibrary !== undefined" [libraryData]="selectedLibrary" (saved)="onSaved()" (cancelled)="onCancelled()"></app-library-form>
+        <app-library-form *ngIf="selectedLibrary !== undefined" [libraryData]="selectedLibrary" (saved)="onSaved($event)" (cancelled)="onCancelled()"></app-library-form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Permissions Modal -->
+<div class="modal fade show" tabindex="-1" style="display: block; background-color: rgba(0,0,0,0.5);" *ngIf="isPermissionModalOpen">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h4 class="modal-title fw-bold ms-2 mt-2">Library Permissions</h4>
+        <button type="button" class="btn-close me-2 mt-2" (click)="closePermissionModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-muted">Library Modules & Permissions<span class="text-danger">*</span></label>
+          
+          <div class="d-flex align-items-stretch">
+            <!-- Available Permissions Box -->
+            <div class="card border-0 shadow-sm flex-grow-1 border">
+              <div class="card-header bg-white text-primary fw-bold border-bottom-0 pb-0">
+                Available Features
+              </div>
+              <div class="card-body p-2 d-flex flex-column" style="height: 350px;">
+                <input type="text" class="form-control mb-2" placeholder="Search here" [(ngModel)]="availableSearchTerm">
+                <div class="flex-grow-1 overflow-auto pe-2" style="max-height: 250px;">
+                  <div class="list-group list-group-flush">
+                    <button *ngFor="let perm of getFilteredAvailablePermissions()"
+                            type="button" 
+                            class="list-group-item list-group-item-action border-0 px-2 py-1"
+                            [class.active-item]="selectedAvailable.includes(perm)"
+                            (click)="selectAvailable(perm)">
+                      {{ perm.displayName }}
+                    </button>
+                  </div>
+                </div>
+                <div class="text-end mt-2">
+                  <button class="btn btn-link text-primary text-decoration-none p-0 fw-bold" (click)="chooseAll()">Choose All →</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transfer Buttons -->
+            <div class="d-flex flex-column justify-content-center px-3 gap-3">
+              <button class="btn btn-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;" (click)="moveToChosen()" [disabled]="selectedAvailable.length === 0">
+                <i class="bi bi-arrow-right"></i>
+              </button>
+              <button class="btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center shadow-sm bg-primary bg-opacity-25 border-0" style="width: 40px; height: 40px;" (click)="moveToAvailable()" [disabled]="selectedChosen.length === 0">
+                <i class="bi bi-arrow-left"></i>
+              </button>
+            </div>
+
+            <!-- Chosen Permissions Box -->
+            <div class="card border-0 shadow-sm flex-grow-1 border">
+              <div class="card-header bg-primary text-white fw-bold">
+                Assigned Features
+              </div>
+              <div class="card-body p-2 d-flex flex-column" style="height: 350px;">
+                <div class="flex-grow-1 overflow-auto pe-2" style="max-height: 250px;">
+                  <div class="list-group list-group-flush">
+                    <button *ngFor="let perm of chosenPermissions"
+                            type="button" 
+                            class="list-group-item list-group-item-action border-0 px-2 py-1"
+                            [class.active-item]="selectedChosen.includes(perm)"
+                            (click)="selectChosen(perm)">
+                      {{ perm.displayName }}
+                    </button>
+                  </div>
+                </div>
+                <div class="text-end mt-2">
+                  <button class="btn btn-link text-primary text-decoration-none p-0 fw-bold" (click)="removeAll()">← Remove All</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0 pe-4 pb-4">
+        <button type="button" class="btn btn-outline-primary px-4 rounded-3 fw-bold" (click)="closePermissionModal()">Cancel</button>
+        <button type="button" class="btn btn-primary text-white px-4 rounded-3 fw-bold shadow-sm" (click)="savePermissions()">Save Permissions</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Permissions Modal -->
+<div class="modal fade show" tabindex="-1" style="display: block; background-color: rgba(0,0,0,0.5);" *ngIf="isViewPermissionModalOpen">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold ms-2 mt-2">Permissions for {{ viewPermissionLibraryName }}</h5>
+        <button type="button" class="btn-close me-2 mt-2" (click)="closeViewPermissionModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="list-group overflow-auto" style="max-height: 400px;">
+          <div *ngFor="let perm of viewPermissionsList" class="list-group-item border-0 px-3 py-2 bg-light mb-1 rounded-3 d-flex align-items-center">
+            <i class="bi bi-check2-circle text-success me-3 fs-5"></i>
+            <div>
+              <div class="fw-bold text-dark lh-1 mb-1">{{ perm.permissionName }}</div>
+              <div class="text-muted extra-small">{{ perm.module }}</div>
+            </div>
+          </div>
+          <div *ngIf="viewPermissionsList.length === 0" class="text-center text-muted py-4">
+            <i class="bi bi-shield-slash fs-1 text-muted d-block mb-2"></i>
+            No permissions assigned to this library.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0 pe-4 pb-4">
+        <button type="button" class="btn btn-primary px-4 rounded-3 fw-bold shadow-sm" (click)="closeViewPermissionModal()">Close</button>
       </div>
     </div>
   </div>

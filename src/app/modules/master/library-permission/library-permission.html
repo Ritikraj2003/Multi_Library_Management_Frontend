@@ -1,0 +1,46 @@
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">Library Permissions Management</h4>
+      <button class="btn btn-success btn-sm" (click)="savePermissions()" [disabled]="!selectedLibraryId">Save Permissions</button>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label for="librarySelect" class="form-label">Select Library (Super Admin Only)</label>
+          <select id="librarySelect" class="form-select" [(ngModel)]="selectedLibraryId" (change)="onLibraryChange()">
+            <option [ngValue]="null">-- Select a Library --</option>
+            <option *ngFor="let lib of libraries" [value]="lib.id">{{ lib.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="selectedLibraryId">
+        <h5 class="mb-3">Assign Features/Modules</h5>
+        <div class="row">
+          <div class="col-md-4 mb-4" *ngFor="let module of modules">
+            <div class="card h-100 border-primary">
+              <div class="card-header bg-light border-primary">
+                <strong>{{ module }}</strong>
+              </div>
+              <div class="card-body">
+                <div class="form-check" *ngFor="let perm of groupedPermissions[module]">
+                  <input class="form-check-input" type="checkbox" [id]="'perm_' + perm.id"
+                         [checked]="hasPermission(perm.id)"
+                         (change)="togglePermission(perm.id)">
+                  <label class="form-check-label" [for]="'perm_' + perm.id">
+                    {{ perm.name }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="!selectedLibraryId" class="alert alert-info">
+        Please select a library to view and manage its permissions.
+      </div>
+    </div>
+  </div>
+</div>

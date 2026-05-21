@@ -43,4 +43,14 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.currentUserValue;
   }
+
+  hasPermission(permission: string): boolean {
+    const user = this.currentUserValue;
+    if (!user) return false;
+    
+    // Superadmin has all permissions
+    if (user.isSuperadmin) return true;
+    
+    return user.permissions && user.permissions.includes(permission);
+  }
 }
