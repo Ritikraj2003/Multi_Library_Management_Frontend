@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -17,9 +17,12 @@ import { NotificationService } from '../../../shared/services/notification.servi
 export class GeneralSettingComponent implements OnInit, OnDestroy {
   emailForm: FormGroup;
   razorpayForm: FormGroup;
+  attendanceLocationForm: FormGroup;
   libraryId: number = 0;
   savingEmail = false;
   savingRazorpay = false;
+  savingAttendanceLocation = false;
+  fetchingLocation = false;
 
   // WhatsApp Integration State
   whatsAppLibraryId: string = 'LIB001';
@@ -34,7 +37,8 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private notificationService: NotificationService,
     private sanitizer: DomSanitizer,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) {
     this.libraryId = this.authService.currentUserValue?.libraryId || 0;
     
@@ -55,6 +59,12 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
     this.razorpayForm = this.fb.group({
       keyId: ['', Validators.required],
       keySecret: ['', Validators.required]
+    });
+
+    this.attendanceLocationForm = this.fb.group({
+      latitude: [12.8917, [Validators.required]],
+      longitude: [77.5949, [Validators.required]],
+      radiusInMeters: [2.0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -78,6 +88,18 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
               if (s.key === 'port') this.emailForm.patchValue({ port: s.value });
               if (s.key === 'keyId') this.razorpayForm.patchValue({ keyId: s.value });
               if (s.key === 'keySecret') this.razorpayForm.patchValue({ keySecret: s.value });
+            });
+          }
+        }
+      });
+
+      this.apiService.getAttendanceLocationByLibraryId(this.libraryId).subscribe({
+        next: (res: any) => {
+          if (res.success && res.data) {
+            this.attendanceLocationForm.patchValue({
+              latitude: res.data.latitude,
+              longitude: res.data.longitude,
+              radiusInMeters: res.data.radiusInMeters
             });
           }
         }
@@ -109,12 +131,14 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
             completed++;
             if (completed === keys.length) {
               this.savingEmail = false;
-              alert('Email settings saved successfully!');
+              this.notificationService.showSuccess('Email settings saved successfully!');
+              this.cdr.detectChanges();
             }
           },
           error: (err: any) => {
             console.error(`Error for ${key}:`, err);
             this.savingEmail = false;
+            this.cdr.detectChanges();
           }
         });
       });
@@ -151,13 +175,85 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
             completed++;
             if (completed === keys.length) {
               this.savingRazorpay = false;
-              alert('Razorpay settings saved successfully!');
+              this.notificationService.showSuccess('Razorpay settings saved successfully!');
+              this.cdr.detectChanges();
             }
           },
           error: () => {
             this.savingRazorpay = false;
+            this.cdr.detectChanges();
           }
         });
+      });
+    }
+  }
+
+  fetchCurrentLocation() {
+    if (!navigator.geolocation) {
+      this.notificationService.showError('Geolocation is not supported by this browser.');
+      return;
+    }
+    this.fetchingLocation = true;
+    this.cdr.detectChanges();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        this.ngZone.run(() => {
+          this.attendanceLocationForm.patchValue({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+          this.fetchingLocation = false;
+          this.notificationService.showSuccess('Location fetched successfully!');
+          this.cdr.detectChanges();
+        });
+      },
+      (error) => {
+        this.ngZone.run(() => {
+          this.fetchingLocation = false;
+          this.notificationService.showError('Could not fetch location. Please enable location permissions.');
+          this.cdr.detectChanges();
+        });
+      },
+      { enableHighAccuracy: true }
+    );
+  }
+
+  onSaveAttendanceLocation() {
+    if (this.attendanceLocationForm.valid) {
+      this.savingAttendanceLocation = true;
+      this.cdr.detectChanges();
+      const values = this.attendanceLocationForm.value;
+      console.log('Saving attendance location:', { libraryId: this.libraryId, ...values });
+      this.apiService.upsertAttendanceLocation({
+        libraryId: this.libraryId,
+        latitude: parseFloat(values.latitude),
+        longitude: parseFloat(values.longitude),
+        radiusInMeters: parseFloat(values.radiusInMeters)
+      }).subscribe({
+        next: (res: any) => {
+          this.savingAttendanceLocation = false;
+          this.cdr.detectChanges();
+          console.log('Upsert attendance location response:', res);
+
+          // Only treat as success if success field is explicitly true
+          const isSuccess = res && (res.success === true || res.Success === true);
+          const msg = res ? (res.message || res.Message) : '';
+
+          if (isSuccess) {
+            this.notificationService.showSuccess('Location saved successfully!');
+          } else {
+            this.notificationService.showError(msg || 'Failed to save attendance location');
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.savingAttendanceLocation = false;
+          this.cdr.detectChanges();
+          // errorInterceptor transforms err into a plain string
+          const errMsg = typeof err === 'string' ? err : (err?.error?.message || err?.message || 'An error occurred while saving.');
+          this.notificationService.showError(errMsg);
+          this.cdr.detectChanges();
+        }
       });
     }
   }
