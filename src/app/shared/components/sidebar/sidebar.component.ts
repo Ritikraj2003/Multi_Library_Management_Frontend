@@ -1,6 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
@@ -11,8 +12,9 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
   isMasterExpanded = false;
   imageBaseUrl = environment.apiUrl.replace('api/', '');
   currentUser$ = this.authService.currentUser;
@@ -39,6 +41,16 @@ export class SidebarComponent {
     },
     { title: 'Library', icon: 'bi-building', route: '/library' }
   ];
+
+  ngOnInit() {
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      if (!event.urlAfterRedirects.includes('/master/')) {
+        this.isMasterExpanded = false;
+      }
+    });
+  }
 
   toggleMaster() {
     this.isMasterExpanded = !this.isMasterExpanded;

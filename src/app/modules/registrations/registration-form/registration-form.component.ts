@@ -54,6 +54,15 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
         this.regForm.get('batchId')?.setValue(null);
       }
     });
+
+    this.regForm.get('startDate')?.valueChanges.subscribe(startDate => {
+      if (startDate) {
+        const date = new Date(startDate);
+        date.setMonth(date.getMonth() + 1);
+        const dueDateStr = date.toISOString().substring(0, 10);
+        this.regForm.get('dueDate')?.setValue(dueDateStr, { emitEvent: false });
+      }
+    });
   }
 
   ngOnInit(): void {

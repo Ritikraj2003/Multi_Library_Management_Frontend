@@ -24,14 +24,14 @@
 
   <!-- Search Bar -->
   <div class="mb-3">
-    <div class="input-group input-group-sm" style="max-width: 380px;">
-      <span class="input-group-text bg-white border-end-0 text-muted">
+    <div class="input-group shadow-sm rounded-pill bg-white border" style="max-width: 380px; overflow: hidden;">
+      <span class="input-group-text bg-transparent border-0 text-muted ps-3">
         <i class="bi bi-search"></i>
       </span>
-      <input type="text" id="reg-search" class="form-control border-start-0 border-end-0 ps-0"
-        placeholder="Search by name, phone or ID..." [(ngModel)]="searchTerm" (input)="onSearchInput(searchTerm)"
+      <input type="text" id="reg-search" class="form-control border-0 bg-transparent shadow-none ps-1"
+        placeholder="Search by name, ID or phone..." [(ngModel)]="searchTerm" (input)="onSearchInput(searchTerm)"
         autocomplete="off">
-      <button *ngIf="searchTerm" class="btn btn-outline-secondary border-start-0" type="button"
+      <button *ngIf="searchTerm" class="btn btn-link text-muted border-0 text-decoration-none pe-3 shadow-none" type="button"
         (click)="searchTerm = ''; onSearchInput('')">
         <i class="bi bi-x-lg"></i>
       </button>

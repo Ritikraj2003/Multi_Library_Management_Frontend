@@ -17,26 +17,46 @@
   min-height: 100vh;
   transition: all 0.3s;
   z-index: 1001;
+  background: #0f172a;
+  /* Slate 900 */
+  color: #f8fafc;
+  /* Slate 50 */
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
 
 .nav-link {
   transition: all 0.2s;
   border-left: 4px solid transparent;
+  color: #94a3b8;
+  /* Slate 400 */
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff !important;
+  background: rgba(255, 255, 255, 0.03);
+  color: #f8fafc !important;
+  /* Slate 50 */
 }
 
 .nav-link.active {
-  background: rgba(102, 126, 234, 0.1);
-  color: #fff !important;
-  border-left-color: #667eea;
+  background: rgba(39, 193, 187, 0.1);
+  /* Teal tint */
+  color: #27c1bb !important;
+  /* Teal */
+  border-left-color: #27c1bb;
 }
 
 .nav-link.active i {
-  color: #667eea;
+  color: #27c1bb;
+}
+
+.nav-link.active-child {
+  color: #27c1bb !important;
+  font-weight: 600;
 }
 
 .sidebar-content {
@@ -54,6 +74,12 @@
 }
 
 .sidebar-content::-webkit-scrollbar-thumb {
-  background: #444;
+  background: #334155;
+  /* Slate 700 */
   border-radius: 10px;
+}
+
+.sidebar-content::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+  /* Slate 600 */
 }

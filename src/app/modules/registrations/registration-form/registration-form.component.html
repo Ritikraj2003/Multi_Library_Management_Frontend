@@ -3,18 +3,24 @@
   <div class="col-md-12">
     <label class="form-label fw-bold small text-muted">Select Student</label>
     <div class="position-relative">
-      <input 
-        type="text" 
-        class="form-control rounded-3 shadow-sm" 
-        placeholder="Search by Name, ID or Mobile..."
-        [value]="searchTerm"
-        (input)="filterStudents(searchInput.value)"
-        (focus)="filterStudents(searchInput.value)"
-        (blur)="closeDropdown()"
-        #searchInput
-        [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid"
-        [disabled]="isEdit"
-      >
+      <div class="input-group shadow-sm rounded-3">
+        <span class="input-group-text bg-white border-end-0 rounded-start-3 text-muted">
+          <i class="bi bi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control border-start-0 rounded-end-3 ps-0" 
+          placeholder="Search by name, phone or ID..."
+          [value]="searchTerm"
+          (input)="filterStudents(searchInput.value)"
+          (focus)="filterStudents(searchInput.value)"
+          (blur)="closeDropdown()"
+          #searchInput
+          [class.is-invalid]="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid"
+          [disabled]="isEdit"
+          style="box-shadow: none;"
+        >
+      </div>
       <div 
         *ngIf="!isEdit && searchTerm && filteredStudents.length > 0" 
         class="dropdown-menu show w-100 shadow-lg border-0 mt-1" 

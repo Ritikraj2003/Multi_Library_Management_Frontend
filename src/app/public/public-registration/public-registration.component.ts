@@ -17,7 +17,8 @@ declare var bootstrap: any;
   styles: [`
     .registration-container {
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #f0fdfa; /* light teal background */
+      background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
       padding: 2rem 1rem;
       display: flex;
       align-items: center;
@@ -30,9 +31,10 @@ declare var bootstrap: any;
       width: 100%;
       max-width: 800px;
       overflow: hidden;
+      margin: 0 auto;
     }
     .form-header {
-      background: #4a5568;
+      background: linear-gradient(135deg, #27c1bb 0%, #1a9e99 100%);
       color: white;
       padding: 2rem;
       text-align: center;
@@ -44,26 +46,31 @@ declare var bootstrap: any;
       border-radius: 0.75rem;
       padding: 0.75rem 1rem;
       border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
     }
     .form-control:focus {
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
-      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(39, 193, 187, 0.25); /* Teal focus shadow */
+      border-color: #27c1bb;
     }
     .btn-submit {
-      background: #667eea;
+      background: #27c1bb; /* Teal button */
       color: white;
       padding: 1rem 2rem;
       border-radius: 0.75rem;
       font-weight: 600;
       transition: all 0.3s ease;
       width: 100%;
+      border: none;
     }
     .btn-submit:hover {
-      background: #5a67d8;
+      background: #20a7a1;
       transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(39, 193, 187, 0.4);
     }
     .preview-img {
-      max-width: 150px;
+      max-width: 100%;
+      max-height: 150px;
+      object-fit: contain;
       border-radius: 0.75rem;
       margin-top: 1rem;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -74,7 +81,7 @@ declare var bootstrap: any;
     }
     .success-icon {
       font-size: 5rem;
-      color: #48bb78;
+      color: #27c1bb;
       margin-bottom: 1.5rem;
     }
     .loader-overlay {
@@ -83,7 +90,7 @@ declare var bootstrap: any;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(8px);
       z-index: 9999;
       display: flex;
@@ -121,10 +128,18 @@ declare var bootstrap: any;
         opacity: 1;
       }
     }
+    @media (max-width: 768px) {
+      .registration-container { padding: 1rem; }
+      .form-card { border-radius: 1rem; }
+      .form-header { padding: 1.5rem 1rem; }
+      .form-body { padding: 1.5rem 1rem; }
+      .row.g-4 > [class^="col-"] { margin-top: 1rem; }
+    }
     @media (max-width: 576px) {
-      .registration-container { padding: 1rem 0.5rem; }
-      .form-body { padding: 1.5rem; }
-      .form-header { padding: 1.5rem; }
+      .registration-container { padding: 0.5rem; background: white; }
+      .form-card { border-radius: 0; box-shadow: none; border: none; }
+      .form-header { border-radius: 1rem; margin-bottom: 1rem; }
+      .form-body { padding: 1rem 0; }
     }
   `]
 })

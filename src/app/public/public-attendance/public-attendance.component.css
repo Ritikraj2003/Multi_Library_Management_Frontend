@@ -2,17 +2,72 @@
 .min-vh-100 {
   min-height: 100vh;
 }
-.bg-light {
-  background-color: #f8f9fa !important;
+
+.attendance-container {
+  background: #f0fdfa; /* light teal background */
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
 }
+
+.attendance-header {
+  background: linear-gradient(135deg, #27c1bb 0%, #1a9e99 100%);
+  border-top-left-radius: 1.5rem !important;
+  border-top-right-radius: 1.5rem !important;
+}
+
 .card {
-  border-radius: 1rem;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
 }
-.card-header {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
-}
+
 .card-footer {
-  border-bottom-left-radius: 1rem;
-  border-bottom-right-radius: 1rem;
+  border-bottom-left-radius: 1.5rem !important;
+  border-bottom-right-radius: 1.5rem !important;
+}
+
+.btn-submit {
+  background: #27c1bb;
+  color: white;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #20a7a1;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(39, 193, 187, 0.4);
+}
+
+.btn-submit:disabled {
+  background: #94dcd8;
+  color: #fff;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(39, 193, 187, 0.25);
+  border-color: #27c1bb;
+}
+
+@media (max-width: 576px) {
+  .attendance-container {
+    padding: 0 !important;
+    background: white;
+  }
+  .card {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .attendance-header {
+    border-radius: 0 !important;
+    padding: 2.5rem 1rem !important;
+  }
+  .card-body {
+    flex-grow: 1;
+    padding: 2rem 1.5rem !important;
+  }
+  .card-footer {
+    border-radius: 0 !important;
+  }
 }

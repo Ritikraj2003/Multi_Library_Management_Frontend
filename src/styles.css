@@ -2,7 +2,9 @@
 
 body {
   font-family: 'Outfit', sans-serif;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
   color: #333;
 }
 
@@ -27,21 +29,32 @@ body::-webkit-scrollbar {
 }
 
 .text-primary {
-  color: #667eea !important;
+  color: #27c1bb !important;
 }
 
 .bg-primary {
-  background-color: #667eea !important;
+  background-color: #27c1bb !important;
 }
 
 .btn-primary {
-  background-color: #667eea;
-  border-color: #667eea;
+  background-color: #27c1bb;
+  border-color: #27c1bb;
 }
 
 .btn-primary:hover {
-  background-color: #5a6fd6;
-  border-color: #5a6fd6;
+  background-color: #20a7a1;
+  border-color: #20a7a1;
+}
+
+.btn-outline-primary {
+  color: #27c1bb;
+  border-color: #27c1bb;
+}
+
+.btn-outline-primary:hover {
+  color: #fff;
+  background-color: #27c1bb;
+  border-color: #27c1bb;
 }
 
 /* ===================== Print Bill Only =====================
