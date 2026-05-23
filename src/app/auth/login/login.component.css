@@ -8,7 +8,7 @@
 
 .form-control:focus {
   box-shadow: none;
-  border-color: #667eea;
+  border-color: #27c1bb;
 }
 
 .input-group-text {
@@ -16,14 +16,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #27c1bb 0%, #1c9b96 100%);
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(118, 75, 162, 0.4);
+  box-shadow: 0 5px 15px rgba(39, 193, 187, 0.4);
 }
 
 .btn-primary:active {
