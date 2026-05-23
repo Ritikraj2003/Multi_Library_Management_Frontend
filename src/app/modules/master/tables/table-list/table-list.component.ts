@@ -32,7 +32,7 @@ export class TableListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;

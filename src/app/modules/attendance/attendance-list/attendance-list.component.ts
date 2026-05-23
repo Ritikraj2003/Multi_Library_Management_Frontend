@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { AttendanceService } from '../attendance.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { NotificationService } from '../../../shared/services/notification.service';
+
+
 
 @Component({
   selector: 'app-attendance-list',
@@ -14,7 +17,8 @@ import { environment } from '../../../../environments/environment';
 })
 export class AttendanceListComponent implements OnInit {
   private attendanceService = inject(AttendanceService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
   cdr = inject(ChangeDetectorRef);
 
   // Raw data from API
@@ -150,7 +154,11 @@ export class AttendanceListComponent implements OnInit {
   }
 
   showUrlPopup() {
-    window.prompt('Copy this URL to test attendance marking:', this.scanUrl);
+    navigator.clipboard.writeText(this.scanUrl).then(() => {
+      this.notificationService.showSuccess('Link copied to clipboard!');
+    }).catch(err => {
+      console.error('Failed to copy text: ', err);
+    });
   }
 
   openQrModal() {

@@ -3,7 +3,7 @@
     <div class="w-25">
       <input type="text" class="form-control" placeholder="Search" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()">
     </div>
-    <button class="btn btn-primary text-white fw-bold" (click)="openAddModal()">+ Add Role</button>
+    <button class="btn btn-primary text-white fw-bold" (click)="openAddModal()" *ngIf="authService.hasPermission('CREATE_ROLE')">+ Add Role</button>
   </div>
 
   <div class="card shadow-sm border-0 rounded-3">
@@ -33,10 +33,10 @@
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-light border-0 me-2" (click)="openEditModal(role)">
+                <button class="btn btn-sm btn-light border-0 me-2" (click)="openEditModal(role)" *ngIf="authService.hasPermission('EDIT_ROLE')">
                   <i class="bi bi-pencil-fill text-primary"></i>
                 </button>
-                <button class="btn btn-sm btn-light border-0" (click)="deleteRole(role.id)">
+                <button class="btn btn-sm btn-light border-0" (click)="deleteRole(role.id)" *ngIf="authService.hasPermission('DELETE_ROLE')">
                   <i class="bi bi-trash-fill text-secondary"></i>
                 </button>
               </td>
@@ -72,7 +72,7 @@
 
 <!-- Add/Edit Role Modal -->
 <div class="modal fade show" tabindex="-1" style="display: block; background-color: rgba(0,0,0,0.5);" *ngIf="isModalOpen">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content rounded-4 border-0 shadow-lg">
       <div class="modal-header border-0 pb-0">
         <h4 class="modal-title fw-bold ms-2 mt-2">{{ isEditMode ? 'Edit Role' : 'Add Role' }}</h4>
@@ -129,9 +129,10 @@
                 Chosen User Permissions
               </div>
               <div class="card-body p-2 d-flex flex-column" style="height: 250px;">
+                <input type="text" class="form-control mb-2" placeholder="Search chosen features" [(ngModel)]="chosenSearchTerm">
                 <div class="flex-grow-1 overflow-auto pe-2">
                   <div class="list-group list-group-flush">
-                    <button *ngFor="let perm of chosenPermissions"
+                    <button *ngFor="let perm of getFilteredChosenPermissions()"
                             type="button" 
                             class="list-group-item list-group-item-action border-0 px-2 py-1"
                             [class.active-item]="selectedChosen.includes(perm)"

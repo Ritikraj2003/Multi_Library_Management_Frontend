@@ -49,6 +49,14 @@
     </div>
 
     <div class="col-12 mt-3">
+      <div class="form-check form-switch p-3 bg-light rounded-3 d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <label class="form-check-label fw-bold small text-muted mb-0">User Active Status</label>
+          <p class="text-muted extra-small mb-0">Enable or disable this user account</p>
+        </div>
+        <input class="form-check-input mt-0 fs-4" type="checkbox" role="switch" formControlName="isActive">
+      </div>
+
       <label class="form-label fw-bold small text-muted">Profile Image</label>
       <div class="d-flex align-items-start gap-3">
         <div class="rounded-circle border overflow-hidden bg-light shadow-sm" style="width: 80px; height: 80px;" *ngIf="profileImagePreview">

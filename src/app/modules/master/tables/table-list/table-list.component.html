@@ -5,7 +5,7 @@
       <h3 class="fw-bold mb-0">Seats</h3>
       <p class="text-muted small">Manage library seating arrangements</p>
     </div>
-    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()" *ngIf="authService.hasPermission('CREATE_SEAT')">
       <i class="bi bi-plus-lg me-2"></i> Add Seat
     </button>
   </div>
@@ -64,10 +64,10 @@
               </td>
               <td class="text-end pe-4">
                 <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
-                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(table)">
+                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(table)" *ngIf="authService.hasPermission('EDIT_SEAT')">
                     <i class="bi bi-pencil text-primary"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(table.id)">
+                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(table.id)" *ngIf="authService.hasPermission('DELETE_SEAT')">
                     <i class="bi bi-trash text-danger"></i>
                   </button>
                 </div>

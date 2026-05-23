@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
   ) {
     // redirect to home if already logged in
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/']);
     }
     
     this.loginForm = this.formBuilder.group({
@@ -40,8 +40,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    // get return url from route parameters or default to '/dashboard'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    // get return url from route parameters or default to '/'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   // convenience getter for easy access to form fields
@@ -61,7 +61,59 @@ export class LoginComponent implements OnInit {
         next: (res: any) => {
           if (res && res.success) {
             this.notificationService.showSuccess('Login successful!');
-            this.router.navigate([this.returnUrl]);
+            
+            let targetUrl = this.returnUrl;
+            
+            const getFallbackUrl = () => {
+              if (this.authService.hasPermission('VIEW_DASHBOARD')) {
+                return '/dashboard';
+              } else if (this.authService.hasPermission('VIEW_ATTENDANCE') || this.authService.hasPermission('ATTENDANCE_QR')) {
+                return '/attendance';
+              } else if (this.authService.hasPermission('VIEW_REGISTRATION') || this.authService.hasPermission('STUDENT_REGISTRATION_QR')) {
+                return '/registrations';
+              } else if (this.authService.hasPermission('VIEW_STUDENT') || this.authService.hasPermission('CREATE_STUDENT')) {
+                return '/students';
+              } else if (this.authService.hasPermission('VIEW_USER')) {
+                return '/master/user-registration';
+              } else if (this.authService.hasPermission('VIEW_LIBRARY')) {
+                return '/library';
+              } else if (this.authService.hasPermission('VIEW_BATCH')) {
+                return '/master/batch';
+              } else if (this.authService.hasPermission('VIEW_SECTION')) {
+                return '/master/section';
+              } else if (this.authService.hasPermission('VIEW_SEAT')) {
+                return '/master/tables';
+              } else if (this.authService.hasPermission('GENERAL_SETTING_EMAIL_VIEW') || this.authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_VIEW')) {
+                return '/master/general-setting';
+              } else if (this.authService.hasPermission('VIEW_ROLE')) {
+                return '/master/role-permission';
+              } else if (this.authService.hasPermission('VIEW_SEATING_LAYOUT')) {
+                return '/table-layout';
+              }
+              return null;
+            };
+
+            if (targetUrl === '/' || targetUrl === '/dashboard') {
+              targetUrl = getFallbackUrl() || '/';
+            }
+
+            this.router.navigate([targetUrl]).then(success => {
+              if (!success && targetUrl !== getFallbackUrl() && getFallbackUrl() !== null) {
+                // If initial returnUrl navigation fails, try the fallback route
+                const fallbackUrl = getFallbackUrl();
+                if (fallbackUrl) {
+                  this.router.navigate([fallbackUrl]).then(fallbackSuccess => {
+                    if (!fallbackSuccess) {
+                      this.showNoAccessError();
+                    }
+                  });
+                } else {
+                  this.showNoAccessError();
+                }
+              } else if (!success) {
+                this.showNoAccessError();
+              }
+            });
           } else {
             this.error = res?.message || 'Invalid email or password.';
             this.notificationService.showError(this.error);
@@ -76,5 +128,11 @@ export class LoginComponent implements OnInit {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  private showNoAccessError() {
+    this.notificationService.showError('You do not have access to any modules.');
+    this.loading = false;
+    this.cdr.markForCheck();
   }
 }

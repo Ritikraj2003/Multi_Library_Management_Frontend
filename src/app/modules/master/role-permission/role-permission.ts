@@ -15,7 +15,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 })
 export class RolePermission implements OnInit {
   private apiService = inject(ApiService);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
   
   roles: any[] = [];
@@ -44,6 +44,7 @@ export class RolePermission implements OnInit {
   chosenPermissions: any[] = [];
   
   availableSearchTerm: string = '';
+  chosenSearchTerm: string = '';
   
   // Selection state for dual listbox
   selectedAvailable: any[] = [];
@@ -161,6 +162,7 @@ export class RolePermission implements OnInit {
       this.selectedAvailable = [];
       this.selectedChosen = [];
       this.availableSearchTerm = '';
+      this.chosenSearchTerm = '';
       this.isModalOpen = true;
     });
   }
@@ -172,6 +174,7 @@ export class RolePermission implements OnInit {
       this.selectedAvailable = [];
       this.selectedChosen = [];
       this.availableSearchTerm = '';
+      this.chosenSearchTerm = '';
       
       // Fetch role permissions
       this.apiService.getPermissionsByRole(role.id).subscribe((res: any) => {
@@ -195,6 +198,13 @@ export class RolePermission implements OnInit {
     if (!this.availableSearchTerm) return this.availablePermissions;
     return this.availablePermissions.filter(p => 
       p.displayName.toLowerCase().includes(this.availableSearchTerm.toLowerCase())
+    );
+  }
+
+  getFilteredChosenPermissions() {
+    if (!this.chosenSearchTerm) return this.chosenPermissions;
+    return this.chosenPermissions.filter(p => 
+      p.displayName.toLowerCase().includes(this.chosenSearchTerm.toLowerCase())
     );
   }
   
@@ -231,8 +241,9 @@ export class RolePermission implements OnInit {
   }
   
   removeAll() {
-    this.availablePermissions.push(...this.chosenPermissions);
-    this.chosenPermissions = [];
+    const filtered = this.getFilteredChosenPermissions();
+    this.availablePermissions.push(...filtered);
+    this.chosenPermissions = this.chosenPermissions.filter(p => !filtered.includes(p));
     this.selectedChosen = [];
   }
   

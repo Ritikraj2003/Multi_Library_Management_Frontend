@@ -34,7 +34,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private notificationService: NotificationService,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,

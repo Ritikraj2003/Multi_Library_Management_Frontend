@@ -108,7 +108,7 @@
 
 <!-- Permissions Modal -->
 <div class="modal fade show" tabindex="-1" style="display: block; background-color: rgba(0,0,0,0.5);" *ngIf="isPermissionModalOpen">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content rounded-4 border-0 shadow-lg">
       <div class="modal-header border-0 pb-0">
         <h4 class="modal-title fw-bold ms-2 mt-2">Library Permissions</h4>
@@ -160,9 +160,10 @@
                 Assigned Features
               </div>
               <div class="card-body p-2 d-flex flex-column" style="height: 350px;">
+                <input type="text" class="form-control mb-2" placeholder="Search assigned features" [(ngModel)]="chosenSearchTerm">
                 <div class="flex-grow-1 overflow-auto pe-2" style="max-height: 250px;">
                   <div class="list-group list-group-flush">
-                    <button *ngFor="let perm of chosenPermissions"
+                    <button *ngFor="let perm of getFilteredChosenPermissions()"
                             type="button" 
                             class="list-group-item list-group-item-action border-0 px-2 py-1"
                             [class.active-item]="selectedChosen.includes(perm)"

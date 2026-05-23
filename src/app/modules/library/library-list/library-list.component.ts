@@ -35,6 +35,7 @@ export class LibraryListComponent implements OnInit {
   selectedAvailable: any[] = [];
   selectedChosen: any[] = [];
   availableSearchTerm: string = '';
+  chosenSearchTerm: string = '';
   Math = Math;
 
   // View Permissions Modal State
@@ -187,6 +188,7 @@ export class LibraryListComponent implements OnInit {
       this.selectedAvailable = [];
       this.selectedChosen = [];
       this.availableSearchTerm = '';
+      this.chosenSearchTerm = '';
       
       this.apiService.getPermissionsByLibrary(lib.id).subscribe((res: any) => {
         if (res.success) {
@@ -236,6 +238,13 @@ export class LibraryListComponent implements OnInit {
       p.displayName.toLowerCase().includes(this.availableSearchTerm.toLowerCase())
     );
   }
+
+  getFilteredChosenPermissions() {
+    if (!this.chosenSearchTerm) return this.chosenPermissions;
+    return this.chosenPermissions.filter(p => 
+      p.displayName.toLowerCase().includes(this.chosenSearchTerm.toLowerCase())
+    );
+  }
   
   selectAvailable(perm: any) {
     const index = this.selectedAvailable.indexOf(perm);
@@ -269,8 +278,9 @@ export class LibraryListComponent implements OnInit {
   }
   
   removeAll() {
-    this.availablePermissions.push(...this.chosenPermissions);
-    this.chosenPermissions = [];
+    const filtered = this.getFilteredChosenPermissions();
+    this.availablePermissions.push(...filtered);
+    this.chosenPermissions = this.chosenPermissions.filter(p => !filtered.includes(p));
     this.selectedChosen = [];
   }
   

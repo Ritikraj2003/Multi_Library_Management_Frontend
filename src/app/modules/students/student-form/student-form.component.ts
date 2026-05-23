@@ -1,5 +1,5 @@
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
@@ -29,12 +29,12 @@ export class StudentFormComponent implements OnInit, OnChanges {
   studentImagePreview: string | ArrayBuffer | null = null;
   documentImagePreview: string | ArrayBuffer | null = null;
 
-
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.studentForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -117,6 +117,7 @@ export class StudentFormComponent implements OnInit, OnChanges {
           this.documentImageFile = file;
           this.documentImagePreview = reader.result;
         }
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }

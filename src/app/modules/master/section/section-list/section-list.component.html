@@ -5,7 +5,7 @@
       <h3 class="fw-bold mb-0">Sections / Floors</h3>
       <p class="text-muted small">Manage library sections and floors</p>
     </div>
-    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()" *ngIf="authService.hasPermission('CREATE_SECTION')">
       <i class="bi bi-plus-lg me-2"></i> Add Section
     </button>
   </div>
@@ -58,10 +58,10 @@
               </td>
               <td class="text-end pe-4">
                 <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
-                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(floor)">
+                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(floor)" *ngIf="authService.hasPermission('EDIT_SECTION')">
                     <i class="bi bi-pencil text-primary"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(floor.id)">
+                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(floor.id)" *ngIf="authService.hasPermission('DELETE_SECTION')">
                     <i class="bi bi-trash text-danger"></i>
                   </button>
                 </div>

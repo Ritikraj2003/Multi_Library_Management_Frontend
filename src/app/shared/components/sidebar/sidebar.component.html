@@ -11,26 +11,30 @@
 
   <div class="sidebar-content py-3">
     <ul class="nav flex-column">
-      <li class="nav-item mb-1" *ngFor="let item of menuItems">
-        <a *ngIf="!item.isMaster" [routerLink]="item.route" routerLinkActive="active" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center">
-          <i class="bi {{item.icon}} me-3 fs-5"></i>
-          <span>{{item.title}}</span>
-        </a>
+      <ng-container *ngFor="let item of menuItems">
+        <li class="nav-item mb-1" *ngIf="hasMenuPermission(item.title)">
+          <a *ngIf="!item.isMaster" [routerLink]="item.route" routerLinkActive="active" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center">
+            <i class="bi {{item.icon}} me-3 fs-5"></i>
+            <span>{{item.title}}</span>
+          </a>
 
-        <a *ngIf="item.isMaster" (click)="toggleMaster()" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center cursor-pointer" [class.active]="isMasterExpanded">
-          <i class="bi {{item.icon}} me-3 fs-5"></i>
-          <span class="flex-grow-1">{{item.title}}</span>
-          <i class="bi" [ngClass]="isMasterExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-        </a>
+          <a *ngIf="item.isMaster" (click)="toggleMaster()" class="nav-link text-white-50 py-3 px-4 d-flex align-items-center cursor-pointer" [class.active]="isMasterExpanded">
+            <i class="bi {{item.icon}} me-3 fs-5"></i>
+            <span class="flex-grow-1">{{item.title}}</span>
+            <i class="bi" [ngClass]="isMasterExpanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+          </a>
 
-        <ul class="nav flex-column ms-4 small submenu" *ngIf="item.children" [class.show]="item.isMaster && isMasterExpanded">
-          <li class="nav-item" *ngFor="let child of item.children">
-            <a [routerLink]="child.route" routerLinkActive="text-white fw-bold" class="nav-link text-white-50 py-2">
-              {{child.title}}
-            </a>
-          </li>
-        </ul>
-      </li>
+          <ul class="nav flex-column ms-4 small submenu" *ngIf="item.children" [class.show]="item.isMaster && isMasterExpanded">
+            <ng-container *ngFor="let child of item.children">
+              <li class="nav-item" *ngIf="hasMenuPermission(child.title)">
+                <a [routerLink]="child.route" routerLinkActive="text-white fw-bold" class="nav-link text-white-50 py-2">
+                  {{child.title}}
+                </a>
+              </li>
+            </ng-container>
+          </ul>
+        </li>
+      </ng-container>
     </ul>
   </div>
 </div>

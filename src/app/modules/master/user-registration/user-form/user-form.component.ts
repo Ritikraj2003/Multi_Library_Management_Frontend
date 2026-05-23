@@ -1,5 +1,5 @@
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../shared/services/api.service';
@@ -37,7 +37,8 @@ export class UserFormComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private apiService: ApiService,
     private authService: AuthService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.userForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -46,7 +47,8 @@ export class UserFormComponent implements OnInit, OnChanges {
       password: ['', [Validators.required, Validators.minLength(6)]],
       roleId: [2, [Validators.required]], // Default to Admin
       libraryId: [null, [Validators.required]],
-      isSuperadmin: [false]
+      isSuperadmin: [false],
+      isActive: [true]
     });
   }
 
@@ -82,7 +84,7 @@ export class UserFormComponent implements OnInit, OnChanges {
       }
     } else {
       this.isEdit = false;
-      this.userForm.reset({ roleId: 2, isSuperadmin: false });
+      this.userForm.reset({ roleId: 2, isSuperadmin: false, isActive: true });
       this.profileImagePreview = null;
       this.profileImageFile = null;
       this.userForm.get('password')?.setValidators([Validators.required, Validators.minLength(6)]);
@@ -97,6 +99,7 @@ export class UserFormComponent implements OnInit, OnChanges {
       const reader = new FileReader();
       reader.onload = () => {
         this.profileImagePreview = reader.result;
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }
@@ -193,4 +196,3 @@ export class UserFormComponent implements OnInit, OnChanges {
     });
   }
 }
-

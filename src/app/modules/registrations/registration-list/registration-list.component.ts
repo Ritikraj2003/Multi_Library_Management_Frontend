@@ -55,7 +55,7 @@ export class RegistrationListComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
     private route: ActivatedRoute
@@ -186,7 +186,7 @@ export class RegistrationListComponent implements OnInit {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      alert('Link copied to clipboard!');
+      this.notificationService.showSuccess('Link copied to clipboard!');
     });
   }
 

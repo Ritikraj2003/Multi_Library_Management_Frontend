@@ -8,7 +8,7 @@
 
   <div class="row g-4">
     <!-- Email Connection Box -->
-    <div class="col-md-4">
+    <div class="col-md-4" *ngIf="authService.hasPermission('GENERAL_SETTING_EMAIL_VIEW')">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom-0 pt-4 px-4">
           <div class="d-flex align-items-center mb-2">
@@ -25,23 +25,26 @@
               <label class="form-label small fw-semibold text-uppercase">Email Address</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope small"></i></span>
-                <input type="email" class="form-control bg-light border-start-0" formControlName="email" placeholder="example@domain.com">
+                <input type="email" class="form-control bg-light border-start-0" formControlName="email"
+                  placeholder="example@domain.com">
               </div>
             </div>
-            
+
             <div class="row g-2 mb-3">
               <div class="col-8">
                 <label class="form-label small fw-semibold text-uppercase">SMTP Host</label>
                 <div class="input-group">
                   <span class="input-group-text bg-light border-end-0"><i class="bi bi-hdd-network small"></i></span>
-                  <input type="text" class="form-control bg-light border-start-0" formControlName="host" placeholder="smtp.gmail.com">
+                  <input type="text" class="form-control bg-light border-start-0" formControlName="host"
+                    placeholder="smtp.gmail.com">
                 </div>
               </div>
               <div class="col-4">
                 <label class="form-label small fw-semibold text-uppercase">Port</label>
                 <div class="input-group">
                   <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-open small"></i></span>
-                  <input type="text" class="form-control bg-light border-start-0" formControlName="port" placeholder="587">
+                  <input type="text" class="form-control bg-light border-start-0" formControlName="port"
+                    placeholder="587">
                 </div>
               </div>
             </div>
@@ -50,10 +53,12 @@
               <label class="form-label small fw-semibold text-uppercase">Password / App Password</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-key small"></i></span>
-                <input type="password" class="form-control bg-light border-start-0" formControlName="password" placeholder="••••••••••••">
+                <input type="password" class="form-control bg-light border-start-0" formControlName="password"
+                  placeholder="••••••••••••">
               </div>
             </div>
-            <button class="btn btn-primary w-100 py-2 fw-bold shadow-sm" (click)="onSaveEmail()">
+            <button class="btn btn-primary w-100 py-2 fw-bold shadow-sm" (click)="onSaveEmail()"
+              *ngIf="authService.hasPermission('GENERAL_SETTING_EMAIL_EDIT')">
               Save Email Settings
             </button>
           </form>
@@ -62,7 +67,7 @@
     </div>
 
     <!-- Razorpay Connection Box -->
-    <div class="col-md-4">
+    <div class="col-md-4" *ngIf="authService.hasPermission('GENERAL_SETTING_RAZORPAY_VIEW')">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom-0 pt-4 px-4">
           <div class="d-flex align-items-center mb-2">
@@ -79,17 +84,20 @@
               <label class="form-label small fw-semibold text-uppercase">Key ID</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-lock small"></i></span>
-                <input type="text" class="form-control bg-light border-start-0" formControlName="keyId" placeholder="rzp_live_...">
+                <input type="text" class="form-control bg-light border-start-0" formControlName="keyId"
+                  placeholder="rzp_live_...">
               </div>
             </div>
             <div class="mb-4">
               <label class="form-label small fw-semibold text-uppercase">Key Secret</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock small"></i></span>
-                <input type="password" class="form-control bg-light border-start-0" formControlName="keySecret" placeholder="••••••••••••">
+                <input type="password" class="form-control bg-light border-start-0" formControlName="keySecret"
+                  placeholder="••••••••••••">
               </div>
             </div>
-            <button class="btn btn-info text-white w-100 py-2 fw-bold shadow-sm" (click)="onSaveRazorpay()">
+            <button class="btn btn-info text-white w-100 py-2 fw-bold shadow-sm" (click)="onSaveRazorpay()"
+              *ngIf="authService.hasPermission('GENERAL_SETTING_RAZORPAY_EDIT')">
               Save Payment Settings
             </button>
           </form>
@@ -98,7 +106,7 @@
     </div>
 
     <!-- WhatsApp Connection Box -->
-    <div class="col-md-4">
+    <div class="col-md-4" *ngIf="authService.hasPermission('GENERAL_SETTING_WHATSAPP_VIEW')">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom-0 pt-4 px-4">
           <div class="d-flex align-items-center justify-content-between mb-2">
@@ -110,22 +118,28 @@
             </div>
             <!-- Status Badge -->
             <div>
-              <span *ngIf="whatsAppStatus === 'DISCONNECTED'" class="badge bg-secondary-soft text-secondary rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'DISCONNECTED'"
+                class="badge bg-secondary-soft text-secondary rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="status-dot bg-secondary me-2"></span>Disconnected
               </span>
-              <span *ngIf="whatsAppStatus === 'INITIALIZING'" class="badge bg-warning-soft text-warning rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'INITIALIZING'"
+                class="badge bg-warning-soft text-warning rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Initializing
               </span>
-              <span *ngIf="whatsAppStatus === 'QR_RECEIVED'" class="badge bg-info-soft text-info rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'QR_RECEIVED'"
+                class="badge bg-info-soft text-info rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="status-dot bg-info me-2 pulse-blue"></span>Scan QR
               </span>
-              <span *ngIf="whatsAppStatus === 'CONNECTED'" class="badge bg-success-soft text-success rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'CONNECTED'"
+                class="badge bg-success-soft text-success rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="status-dot bg-success me-2 pulse-green"></span>Connected
               </span>
-              <span *ngIf="whatsAppStatus === 'ERROR'" class="badge bg-danger-soft text-danger rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'ERROR'"
+                class="badge bg-danger-soft text-danger rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="status-dot bg-danger me-2"></span>Error
               </span>
-              <span *ngIf="whatsAppStatus === 'UNKNOWN'" class="badge bg-dark-soft text-dark rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
+              <span *ngIf="whatsAppStatus === 'UNKNOWN'"
+                class="badge bg-dark-soft text-dark rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
                 <span class="status-dot bg-dark me-2"></span>Unknown
               </span>
             </div>
@@ -133,72 +147,84 @@
         </div>
         <div class="card-body px-4 d-flex flex-column justify-content-between">
           <div>
-            <p class="small text-muted mb-3">Connect your Node.js WhatsApp Web API to enable automated notifications and messaging.</p>
-            
+            <p class="small text-muted mb-3">Connect your Node.js WhatsApp Web API to enable automated notifications and
+              messaging.</p>
+
             <!-- Library/Session ID Configuration -->
             <div class="mb-3">
               <label class="form-label small fw-semibold text-uppercase">Library / Session ID</label>
               <div class="input-group">
-                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-badge small text-muted"></i></span>
-                <input type="text" class="form-control bg-light border-start-0 text-dark fw-bold" [(ngModel)]="whatsAppLibraryId" placeholder="e.g. LIB001" [disabled]="isWhatsAppLoading || whatsAppStatus === 'QR_RECEIVED'">
+                <span class="input-group-text bg-light border-end-0"><i
+                    class="bi bi-person-badge small text-muted"></i></span>
+                <input type="text" class="form-control bg-light border-start-0 text-dark fw-bold"
+                  [(ngModel)]="whatsAppLibraryId" placeholder="e.g. LIB001"
+                  [disabled]="isWhatsAppLoading || whatsAppStatus === 'QR_RECEIVED'">
               </div>
             </div>
 
             <!-- Loading Spinner / Initializing Status View -->
-            <div *ngIf="whatsAppStatus === 'INITIALIZING'" class="d-flex flex-column align-items-center justify-content-center py-4 my-2 rounded bg-light border-0 animate-fade-in">
+            <div *ngIf="whatsAppStatus === 'INITIALIZING'"
+              class="d-flex flex-column align-items-center justify-content-center py-4 my-2 rounded bg-light border-0 animate-fade-in">
               <div class="spinner-grow text-success mb-3" style="width: 3rem; height: 3rem;" role="status">
                 <span class="visually-hidden">Loading...</span>
               </div>
               <h6 class="fw-bold text-success mb-1">Initializing WhatsApp Session...</h6>
-              <p class="text-muted small px-3 text-center mb-0">Please wait while the Node.js API starts the headless browser...</p>
+              <p class="text-muted small px-3 text-center mb-0">Please wait while the Node.js API starts the headless
+                browser...</p>
             </div>
 
             <!-- QR Code Scan View -->
-            <div *ngIf="whatsAppStatus === 'QR_RECEIVED' && qrCodeBase64" class="d-flex flex-column align-items-center justify-content-center p-3 my-2 rounded bg-light border-0 animate-fade-in text-center">
+            <div *ngIf="whatsAppStatus === 'QR_RECEIVED' && qrCodeBase64"
+              class="d-flex flex-column align-items-center justify-content-center p-3 my-2 rounded bg-light border-0 animate-fade-in text-center">
               <div class="qr-wrapper mb-3 p-2 bg-white rounded shadow-sm border border-light">
                 <img [src]="qrCodeBase64" alt="WhatsApp QR Code" class="img-fluid rounded" style="max-height: 200px;" />
               </div>
               <h6 class="fw-bold text-dark mb-1">Scan the QR Code</h6>
               <p class="text-muted small px-2 mb-2">Open WhatsApp on your phone > Linked Devices > Link a Device.</p>
-              <div class="d-flex align-items-center text-success small bg-success-soft px-3 py-1.5 rounded-pill fw-semibold">
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" style="width: 12px; height: 12px;"></span>
+              <div
+                class="d-flex align-items-center text-success small bg-success-soft px-3 py-1.5 rounded-pill fw-semibold">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"
+                  style="width: 12px; height: 12px;"></span>
                 Polling WhatsApp status...
               </div>
             </div>
 
             <!-- Connected / Success View -->
-            <div *ngIf="whatsAppStatus === 'CONNECTED'" class="d-flex flex-column align-items-center justify-content-center py-4 my-2 rounded bg-success-soft-light border-0 animate-fade-in text-center">
+            <div *ngIf="whatsAppStatus === 'CONNECTED'"
+              class="d-flex flex-column align-items-center justify-content-center py-4 my-2 rounded bg-success-soft-light border-0 animate-fade-in text-center">
               <div class="icon-circle bg-success text-white mb-3 shadow">
                 <i class="bi bi-check-lg fs-3"></i>
               </div>
               <h6 class="fw-bold text-success mb-1">Connected Successfully!</h6>
-              <p class="text-muted small px-4 mb-0">Your WhatsApp session is active. System can now send outbound alerts.</p>
+              <p class="text-muted small px-4 mb-0">Your WhatsApp session is active. System can now send outbound
+                alerts.</p>
             </div>
           </div>
 
           <!-- Buttons: Initiate, Status & Logout -->
           <div class="mt-4 pt-2 border-top border-light">
             <div class="row g-2">
-              <div class="col-4">
-                <button class="btn btn-success w-100 py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white" 
-                        [disabled]="isWhatsAppLoading" 
-                        (click)="connectWhatsApp()">
+              <div class="col-4" *ngIf="authService.hasPermission('GENERAL_SETTING_WHATSAPP_INITIATE')">
+                <button
+                  class="btn btn-success w-100 py-2.5 fw-bold shadow-sm d-flex align-items-center justify-content-center text-white"
+                  [disabled]="isWhatsAppLoading" (click)="connectWhatsApp()">
                   <i class="bi bi-play-fill me-1.5 fs-5"></i>
                   <span>Initiate</span>
                 </button>
               </div>
-              <div class="col-4">
-                <button class="btn btn-outline-secondary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center" 
-                        [disabled]="isWhatsAppLoading" 
-                        (click)="checkWhatsAppStatus()">
-                  <i class="bi bi-arrow-repeat me-1.5 fs-5" [class.spin-icon]="isWhatsAppLoading && whatsAppStatus !== 'INITIALIZING'"></i>
+              <div class="col-4" *ngIf="authService.hasPermission('GENERAL_SETTING_WHATSAPP_STATUS')">
+                <button
+                  class="btn btn-outline-secondary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center"
+                  [disabled]="isWhatsAppLoading" (click)="checkWhatsAppStatus()">
+                  <i class="bi bi-arrow-repeat me-1.5 fs-5"
+                    [class.spin-icon]="isWhatsAppLoading && whatsAppStatus !== 'INITIALIZING'"></i>
                   <span>Status</span>
                 </button>
               </div>
-              <div class="col-4">
-                <button class="btn btn-outline-danger w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center" 
-                        [disabled]="isWhatsAppLoading" 
-                        (click)="logoutWhatsApp()">
+              <div class="col-4" *ngIf="authService.hasPermission('GENERAL_SETTING_WHATSAPP_LOGOUT')">
+                <button
+                  class="btn btn-outline-danger w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center"
+                  [disabled]="isWhatsAppLoading" (click)="logoutWhatsApp()">
                   <i class="bi bi-box-arrow-right me-1.5 fs-5"></i>
                   <span>Logout</span>
                 </button>
@@ -210,7 +236,7 @@
     </div>
 
     <!-- Attendance Location Box -->
-    <div class="col-md-4">
+    <div class="col-md-4" *ngIf="authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_VIEW')">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-header bg-white border-bottom-0 pt-4 px-4">
           <div class="d-flex align-items-center mb-2">
@@ -221,21 +247,24 @@
           </div>
         </div>
         <div class="card-body px-4">
-          <p class="small text-muted mb-4">Set the latitude, longitude, and geofencing radius (in meters) for student check-ins.</p>
+          <p class="small text-muted mb-4">Set the latitude, longitude, and geofencing radius (in meters) for student
+            check-ins.</p>
           <form [formGroup]="attendanceLocationForm">
             <div class="mb-3">
               <label class="form-label small fw-semibold text-uppercase">Latitude</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-compass small"></i></span>
-                <input type="number" step="any" class="form-control bg-light border-start-0" formControlName="latitude" placeholder="e.g. 12.8917">
+                <input type="number" step="any" class="form-control bg-light border-start-0" formControlName="latitude"
+                  placeholder="e.g. 12.8917">
               </div>
             </div>
-            
+
             <div class="mb-3">
               <label class="form-label small fw-semibold text-uppercase">Longitude</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-compass-fill small"></i></span>
-                <input type="number" step="any" class="form-control bg-light border-start-0" formControlName="longitude" placeholder="e.g. 77.5949">
+                <input type="number" step="any" class="form-control bg-light border-start-0" formControlName="longitude"
+                  placeholder="e.g. 77.5949">
               </div>
             </div>
 
@@ -243,25 +272,29 @@
               <label class="form-label small fw-semibold text-uppercase">Radius (in meters)</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-record-circle small"></i></span>
-                <input type="number" step="any" class="form-control bg-light border-start-0" formControlName="radiusInMeters" placeholder="e.g. 2.0">
+                <input type="number" step="any" class="form-control bg-light border-start-0"
+                  formControlName="radiusInMeters" placeholder="e.g. 2.0">
               </div>
             </div>
             <div class="d-flex gap-2">
               <!-- Fetch Location Button -->
-              <button type="button" class="btn btn-outline-secondary flex-fill py-2 fw-bold d-flex align-items-center justify-content-center" 
-                      [disabled]="fetchingLocation || savingAttendanceLocation" 
-                      (click)="fetchCurrentLocation()" 
-                      style="border-radius: 10px;">
-                <span *ngIf="fetchingLocation" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <button type="button"
+                class="btn btn-outline-secondary flex-fill py-2 fw-bold d-flex align-items-center justify-content-center"
+                [disabled]="fetchingLocation || savingAttendanceLocation" (click)="fetchCurrentLocation()"
+                style="border-radius: 10px;"
+                *ngIf="authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_FETCH')">
+                <span *ngIf="fetchingLocation" class="spinner-border spinner-border-sm me-2" role="status"
+                  aria-hidden="true"></span>
                 <i *ngIf="!fetchingLocation" class="bi bi-crosshair me-2"></i>
                 <span>{{ fetchingLocation ? 'Fetching...' : 'Fetch Location' }}</span>
               </button>
 
-              <button class="btn btn-warning text-white flex-fill py-2 fw-bold shadow-sm" 
-                      [disabled]="savingAttendanceLocation || fetchingLocation" 
-                      (click)="onSaveAttendanceLocation()" 
-                      style="border-radius: 10px;">
-                <span *ngIf="savingAttendanceLocation" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <button class="btn btn-warning text-white flex-fill py-2 fw-bold shadow-sm"
+                [disabled]="savingAttendanceLocation || fetchingLocation" (click)="onSaveAttendanceLocation()"
+                style="border-radius: 10px;"
+                *ngIf="authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_UPDATE')">
+                <span *ngIf="savingAttendanceLocation" class="spinner-border spinner-border-sm me-2" role="status"
+                  aria-hidden="true"></span>
                 Save Settings
               </button>
             </div>

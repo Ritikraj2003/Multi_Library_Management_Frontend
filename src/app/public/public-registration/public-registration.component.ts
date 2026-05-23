@@ -176,6 +176,7 @@ export class PublicRegistrationComponent implements OnInit {
           this.documentImageFile = file;
           this.documentImagePreview = reader.result;
         }
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }

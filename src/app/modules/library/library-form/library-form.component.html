@@ -2,7 +2,7 @@
   <div class="row g-3">
     <div class="col-12">
       <label class="form-label fw-bold small text-muted">Library Name</label>
-      <input type="text" formControlName="name" class="form-control rounded-3" placeholder="e.g. Kautaly Library"
+      <input type="text" formControlName="name" class="form-control rounded-3" placeholder="e.g. MBR Library"
         [class.is-invalid]="libraryForm.get('name')?.touched && libraryForm.get('name')?.invalid">
       <div class="invalid-feedback">Name is required</div>
     </div>
@@ -49,7 +49,8 @@
     <div class="col-md-6">
       <label class="form-label fw-bold small text-muted">Library Icon</label>
       <div class="d-flex align-items-start gap-2">
-        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="libraryIconPreview">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;"
+          *ngIf="libraryIconPreview">
           <img [src]="libraryIconPreview" class="img-fluid w-100 h-100 object-fit-cover">
         </div>
         <input type="file" (change)="onFileChange($event, 'icon')" class="form-control rounded-3" accept="image/*">
@@ -70,7 +71,8 @@
     <div class="col-12">
       <label class="form-label fw-bold small text-muted">Document Image</label>
       <div class="d-flex align-items-start gap-2">
-        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;" *ngIf="documentImagePreview">
+        <div class="rounded-3 border overflow-hidden bg-light mb-2" style="width: 60px; height: 60px;"
+          *ngIf="documentImagePreview">
           <img [src]="documentImagePreview" class="img-fluid w-100 h-100 object-fit-cover">
         </div>
         <input type="file" (change)="onFileChange($event, 'document')" class="form-control rounded-3" accept="image/*">
@@ -89,9 +91,10 @@
   </div>
 
   <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
-    <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()" [disabled]="loading">Cancel</button>
+    <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()"
+      [disabled]="loading">Cancel</button>
     <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" [disabled]="loading">
-      <app-loader size="small" *ngIf="loading"  class="me-2" ></app-loader>
+      <app-loader size="small" *ngIf="loading" class="me-2"></app-loader>
       {{ isEdit ? 'Update Library' : 'Create Library' }}
     </button>
   </div>

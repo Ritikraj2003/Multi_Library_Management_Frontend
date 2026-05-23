@@ -18,7 +18,7 @@
                 title="Refresh">
           <i class="bi bi-arrow-clockwise"></i>
         </button>
-        <button class="btn btn-primary fw-bold shadow-sm px-4 py-2 d-flex align-items-center" 
+        <button *ngIf="authService.hasPermission('ATTENDANCE_QR')" class="btn btn-primary fw-bold shadow-sm px-4 py-2 d-flex align-items-center" 
                 (click)="openQrModal()" 
                 style="border-radius: 10px;">
           <i class="bi bi-qr-code me-2"></i>

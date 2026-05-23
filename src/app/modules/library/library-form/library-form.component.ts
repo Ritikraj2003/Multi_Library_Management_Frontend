@@ -1,5 +1,5 @@
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
@@ -14,7 +14,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
   templateUrl: './library-form.component.html',
   styleUrls: ['./library-form.component.css']
 })
-export class LibraryFormComponent implements OnInit {
+export class LibraryFormComponent implements OnInit, OnChanges {
   @Input() libraryData: any = null;
   @Output() saved = new EventEmitter<any>();
   @Output() cancelled = new EventEmitter<void>();
@@ -32,7 +32,8 @@ export class LibraryFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.libraryForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -83,6 +84,7 @@ export class LibraryFormComponent implements OnInit {
           this.documentImageFile = file;
           this.documentImagePreview = reader.result;
         }
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
     }

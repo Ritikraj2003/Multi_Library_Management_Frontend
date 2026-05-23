@@ -4,7 +4,7 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { authGuard } from './auth/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+
   {
     path: 'auth',
     component: AuthLayoutComponent,
@@ -24,7 +24,7 @@ export const routes: Routes = [
     loadComponent: () => import('./public/public-attendance/public-attendance.component').then(m => m.PublicAttendanceComponent)
   },
   {
-    path: 'dashboard',
+    path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [

@@ -10,11 +10,12 @@ import { finalize } from 'rxjs';
   selector: 'app-reset-password',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  styleUrls: ['../login/login.component.css'],
   template: `
     <div class="login-card p-4 shadow-lg animate__animated animate__fadeInDown">
       <div class="text-center mb-4">
         <div class="logo-placeholder mb-3">
-          <i class="bi bi-key text-primary display-4"></i>
+          <img src="assets/images/slm.png" alt="SLM Logo" class="img-fluid" style="max-height: 150px; object-fit: contain;" />
         </div>
         <h3 class="fw-bold">Reset Password</h3>
         <p class="text-muted small">Enter your new password below.</p>

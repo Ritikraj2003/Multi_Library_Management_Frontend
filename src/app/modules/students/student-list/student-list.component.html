@@ -5,7 +5,7 @@
       <h3 class="fw-bold mb-0">Students</h3>
       <p class="text-muted small">Manage student registrations and records</p>
     </div>
-    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+    <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()" *ngIf="authService.hasPermission('CREATE_STUDENT')">
       <i class="bi bi-person-plus-fill me-2"></i> Add Student
     </button>
   </div>
@@ -72,13 +72,13 @@
               </td>
               <td class="text-end pe-4">
                 <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
-                  <button class="btn btn-white btn-sm" title="View" (click)="openViewModal(student)">
+                  <button class="btn btn-white btn-sm" title="View" (click)="openViewModal(student)" *ngIf="authService.hasPermission('VIEW_STUDENT')">
                     <i class="bi bi-eye text-success"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(student)">
+                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(student)" *ngIf="authService.hasPermission('EDIT_STUDENT')">
                     <i class="bi bi-pencil text-primary"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(student.id)">
+                  <button class="btn btn-white btn-sm" title="Delete" (click)="onDelete(student.id)" *ngIf="authService.hasPermission('DELETE_STUDENT')">
                     <i class="bi bi-trash text-danger"></i>
                   </button>
                 </div>

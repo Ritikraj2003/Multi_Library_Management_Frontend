@@ -32,7 +32,7 @@ export class StudentListComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
     private loaderService: LoaderService

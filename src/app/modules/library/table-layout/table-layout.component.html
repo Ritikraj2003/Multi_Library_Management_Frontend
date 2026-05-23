@@ -41,8 +41,8 @@
         <div *ngFor="let b of getTableBatches(table.id); let j = index"
              class="chair"
              [ngClass]="['pos-' + j, b.isOverlap ? 'overlap' : (b.isOccupied ? 'occupied' : 'available')]"
-             [style.cursor]="(!b.isOccupied && !b.isOverlap) ? 'pointer' : 'default'"
-             [title]="b.name + (b.isOverlap ? ' ⚠ Time Overlap — Cannot Book' : (b.isOccupied ? ' (Occupied)' : ' — Click to Register'))"
+             [style.cursor]="(!b.isOccupied && !b.isOverlap && authService.hasPermission('TABLE_REGISTRATION')) ? 'pointer' : 'default'"
+             [title]="b.name + (b.isOverlap ? ' ⚠ Time Overlap — Cannot Book' : (b.isOccupied ? ' (Occupied)' : (!authService.hasPermission('TABLE_REGISTRATION') ? '' : ' — Click to Register')))"
              (click)="onBatchClick(table, b)">
           <span class="batch-name-label">{{ b.name }}</span>
           <span *ngIf="b.isOverlap" class="overlap-label">⚠ Overlap</span>

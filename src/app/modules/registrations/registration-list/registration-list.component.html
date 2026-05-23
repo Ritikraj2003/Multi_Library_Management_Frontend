@@ -6,13 +6,17 @@
       <p class="text-muted small">Manage seat assignments and renewal history</p>
     </div>
     <div class="d-flex gap-2">
-      <button class="btn btn-success shadow-sm rounded-3 px-4 animate-fade-in" *ngIf="(activeTab === 'due' || activeTab === 'today') && registrations.length > 0" (click)="openBulkWhatsAppModal()">
+      <button class="btn btn-success shadow-sm rounded-3 px-4 animate-fade-in"
+        *ngIf="(activeTab === 'due' || activeTab === 'today') && registrations.length > 0 && authService.hasPermission('BULK_WHATSAPP_MESSAGE_REGISTRATION')"
+        (click)="openBulkWhatsAppModal()">
         <i class="bi bi-whatsapp me-2"></i> Send Bulk Due Alerts
       </button>
-      <button class="btn btn-outline-primary shadow-sm rounded-3 px-4" (click)="openQrModal()">
+      <button class="btn btn-outline-primary shadow-sm rounded-3 px-4" (click)="openQrModal()"
+        *ngIf="authService.hasPermission('STUDENT_REGISTRATION_QR')">
         <i class="bi bi-qr-code me-2"></i> Share QR
       </button>
-      <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()">
+      <button class="btn btn-primary shadow-sm rounded-3 px-4" (click)="openAddModal()"
+        *ngIf="authService.hasPermission('CREATE_REGISTRATION')">
         <i class="bi bi-plus-lg me-2"></i> New Registration
       </button>
     </div>
@@ -24,16 +28,11 @@
       <span class="input-group-text bg-white border-end-0 text-muted">
         <i class="bi bi-search"></i>
       </span>
-      <input
-        type="text"
-        id="reg-search"
-        class="form-control border-start-0 border-end-0 ps-0"
-        placeholder="Search by name, phone or ID..."
-        [(ngModel)]="searchTerm"
-        (input)="onSearchInput(searchTerm)"
+      <input type="text" id="reg-search" class="form-control border-start-0 border-end-0 ps-0"
+        placeholder="Search by name, phone or ID..." [(ngModel)]="searchTerm" (input)="onSearchInput(searchTerm)"
         autocomplete="off">
       <button *ngIf="searchTerm" class="btn btn-outline-secondary border-start-0" type="button"
-              (click)="searchTerm = ''; onSearchInput('')">
+        (click)="searchTerm = ''; onSearchInput('')">
         <i class="bi bi-x-lg"></i>
       </button>
     </div>
@@ -45,19 +44,24 @@
       <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'all'" (click)="setTab('all')">All</button>
     </li>
     <li class="nav-item">
-      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'active'" (click)="setTab('active')">Active</button>
+      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'active'"
+        (click)="setTab('active')">Active</button>
     </li>
-    <li class="nav-item">
-      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'due'" (click)="setTab('due')">Due Students</button>
+    <li class="nav-item" *ngIf="authService.hasPermission('DUE_REGISTRATION')">
+      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'due'" (click)="setTab('due')">Due
+        Students</button>
     </li>
-    <li class="nav-item">
-      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'today'" (click)="setTab('today')">Today Due</button>
+    <li class="nav-item" *ngIf="authService.hasPermission('TODAY_DUE_REGISTRATION')">
+      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'today'" (click)="setTab('today')">Today
+        Due</button>
     </li>
-    <li class="nav-item">
-      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'expired'" (click)="setTab('expired')">Expired</button>
+    <li class="nav-item" *ngIf="authService.hasPermission('EXPIRED_REGISTRATION')">
+      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'expired'"
+        (click)="setTab('expired')">Expired</button>
     </li>
-    <li class="nav-item">
-      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'cancelled'" (click)="setTab('cancelled')">Cancelled</button>
+    <li class="nav-item" *ngIf="authService.hasPermission('CANCEL_TAB')">
+      <button class="nav-link rounded-3 px-4" [class.active]="activeTab === 'cancelled'"
+        (click)="setTab('cancelled')">Cancelled</button>
     </li>
   </ul>
 
@@ -105,7 +109,8 @@
               </td>
               <td>
                 <div class="small">Start: {{reg.startDate | date:'shortDate'}}</div>
-                <div class="small fw-bold" [class.text-danger]="activeTab === 'due'">Due: {{reg.dueDate | date:'shortDate'}}</div>
+                <div class="small fw-bold" [class.text-danger]="activeTab === 'due'">Due: {{reg.dueDate |
+                  date:'shortDate'}}</div>
               </td>
               <td>
                 <div class="fw-bold text-dark">₹{{reg.monthlyAmount}}</div>
@@ -117,22 +122,29 @@
               </td>
               <td class="text-end pe-4">
                 <div class="btn-group shadow-sm rounded-3 overflow-hidden border">
-                  <button class="btn btn-white btn-sm" title="Print Bill" (click)="openPrintPreview(reg)">
+                  <button class="btn btn-white btn-sm" title="Print Bill" (click)="openPrintPreview(reg)"
+                    *ngIf="authService.hasPermission('VIEW_REGISTRATION')">
                     <i class="bi bi-printer text-dark"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Renew" (click)="openRenewModal(reg)">
+                  <button class="btn btn-white btn-sm" title="Renew" (click)="openRenewModal(reg)"
+                    *ngIf="authService.hasPermission('RENEWAL_ACTION_TAB')">
                     <i class="bi bi-arrow-repeat text-success"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="History" (click)="openHistoryModal(reg)">
+                  <button class="btn btn-white btn-sm" title="History" (click)="openHistoryModal(reg)"
+                    *ngIf="authService.hasPermission('PAYMENT_HISTORY')">
                     <i class="bi bi-clock-history text-info"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Send WhatsApp Alert" (click)="openWhatsAppModal(reg)">
+                  <button class="btn btn-white btn-sm" title="Send WhatsApp Alert" (click)="openWhatsAppModal(reg)"
+                    *ngIf="authService.hasPermission('INDIVIDUAL_WHATSAPP_MESSAGE')">
                     <i class="bi bi-whatsapp text-success"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Cancel" *ngIf="getStatusText(reg.status) !== 'Cancelled'" (click)="cancelRegistration(reg)">
+                  <button class="btn btn-white btn-sm" title="Cancel"
+                    *ngIf="getStatusText(reg.status) !== 'Cancelled' && authService.hasPermission('CANCEL_REGISTRATION')"
+                    (click)="cancelRegistration(reg)">
                     <i class="bi bi-x-circle text-danger"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(reg)">
+                  <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(reg)"
+                    *ngIf="authService.hasPermission('EDIT_REGISTRATION')">
                     <i class="bi bi-pencil text-primary"></i>
                   </button>
                 </div>
@@ -143,14 +155,18 @@
       </div>
     </div>
     <!-- Footer -->
-    <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center" *ngIf="registrations.length > 0">
+    <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center"
+      *ngIf="registrations.length > 0">
       <div class="text-muted small">
-        Showing <b>{{registrations.length}}</b> items <span *ngIf="pagination">of <b>{{pagination.totalRecords}}</b></span>
+        Showing <b>{{registrations.length}}</b> items <span *ngIf="pagination">of
+          <b>{{pagination.totalRecords}}</b></span>
       </div>
       <div class="d-flex align-items-center gap-2" *ngIf="pagination && pagination.totalPages > 1">
-        <button class="btn btn-sm btn-outline-secondary" [disabled]="pagination.pageNumber === 1" (click)="changePage(pagination.pageNumber - 1)">Prev</button>
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="pagination.pageNumber === 1"
+          (click)="changePage(pagination.pageNumber - 1)">Prev</button>
         <span class="text-muted small px-2">Page {{pagination.pageNumber}} of {{pagination.totalPages}}</span>
-        <button class="btn btn-sm btn-outline-secondary" [disabled]="pagination.pageNumber === pagination.totalPages" (click)="changePage(pagination.pageNumber + 1)">Next</button>
+        <button class="btn btn-sm btn-outline-secondary" [disabled]="pagination.pageNumber === pagination.totalPages"
+          (click)="changePage(pagination.pageNumber + 1)">Next</button>
       </div>
     </div>
   </div>
@@ -170,7 +186,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-registration-form *ngIf="currentModalType === 'form' && selectedRegistration !== undefined" [registrationData]="selectedRegistration" (saved)="onSaved($event)" (cancelled)="hideModal()"></app-registration-form>
+        <app-registration-form *ngIf="currentModalType === 'form' && selectedRegistration !== undefined"
+          [registrationData]="selectedRegistration" (saved)="onSaved($event)"
+          (cancelled)="hideModal()"></app-registration-form>
       </div>
     </div>
   </div>
@@ -185,7 +203,9 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-registration-renew *ngIf="currentModalType === 'renew'" [registrationId]="selectedRegistration?.id" (saved)="onSaved({ id: selectedRegistration?.id, mobile: selectedRegistration?.mobile })" (cancelled)="hideModal()"></app-registration-renew>
+        <app-registration-renew *ngIf="currentModalType === 'renew'" [registrationId]="selectedRegistration?.id"
+          (saved)="onSaved({ id: selectedRegistration?.id, mobile: selectedRegistration?.mobile })"
+          (cancelled)="hideModal()"></app-registration-renew>
       </div>
     </div>
   </div>
@@ -200,7 +220,8 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body px-4 pb-4">
-        <app-payment-history *ngIf="currentModalType === 'history'" [registrationId]="selectedRegistration?.id" (printPayment)="printHistoricalPayment($event)"></app-payment-history>
+        <app-payment-history *ngIf="currentModalType === 'history'" [registrationId]="selectedRegistration?.id"
+          (printPayment)="printHistoricalPayment($event)"></app-payment-history>
       </div>
     </div>
   </div>
@@ -215,11 +236,12 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body p-4 text-center">
-        <p class="text-muted mb-4 small">Students can scan this QR code to register themselves directly from their mobile devices.</p>
-        
+        <p class="text-muted mb-4 small">Students can scan this QR code to register themselves directly from their
+          mobile devices.</p>
+
         <div class="bg-light p-4 rounded-4 mb-4 border d-inline-block shadow-sm">
-          <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + qrUrl" 
-               alt="QR Code" class="img-fluid rounded-3" style="max-width: 250px;">
+          <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + qrUrl" alt="QR Code"
+            class="img-fluid rounded-3" style="max-width: 250px;">
         </div>
 
         <div class="mt-3 text-start">
@@ -264,9 +286,10 @@
         </div>
 
         <div class="mb-3">
-          <label for="whatsappMessageText" class="form-label small fw-bold text-muted text-uppercase">Custom Message</label>
-          <textarea id="whatsappMessageText" class="form-control border-1 rounded-3 small p-3" rows="6" 
-                    [(ngModel)]="whatsappMessage" placeholder="Type your due alert message..."></textarea>
+          <label for="whatsappMessageText" class="form-label small fw-bold text-muted text-uppercase">Custom
+            Message</label>
+          <textarea id="whatsappMessageText" class="form-control border-1 rounded-3 small p-3" rows="6"
+            [(ngModel)]="whatsappMessage" placeholder="Type your due alert message..."></textarea>
           <div class="text-muted extra-small mt-2">
             <i class="bi bi-info-circle me-1"></i> You can customize this message before sending.
           </div>
@@ -275,15 +298,18 @@
         <div class="alert alert-warning border-0 rounded-3 small mt-4 mb-0 d-flex align-items-start gap-2">
           <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
           <div>
-            Please ensure your <b>WhatsApp service</b> is running and connected in <b>Master Settings -> General Setting</b>.
+            Please ensure your <b>WhatsApp service</b> is running and connected in <b>Master Settings -> General
+              Setting</b>.
           </div>
         </div>
       </div>
       <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">Cancel</button>
-        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2" 
-                [disabled]="whatsappLoading" (click)="sendWhatsAppMessage()">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="whatsappLoading"></span>
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal"
+          (click)="hideModal()">Cancel</button>
+        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2"
+          [disabled]="whatsappLoading" (click)="sendWhatsAppMessage()">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+            *ngIf="whatsappLoading"></span>
           <i class="bi bi-send-fill" *ngIf="!whatsappLoading"></i>
           {{ whatsappLoading ? 'Sending...' : 'Send Message' }}
         </button>
@@ -303,13 +329,14 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
       </div>
       <div class="modal-body p-4">
-        
+
         <!-- IDLE / PREPARATION STATE -->
         <div *ngIf="bulkStatus === 'idle'">
           <div class="alert alert-info border-0 rounded-3 small d-flex align-items-start gap-3 p-3 mb-4">
             <i class="bi bi-info-circle-fill fs-4 text-primary flex-shrink-0"></i>
             <div>
-              You are about to send personalized WhatsApp alerts to <b>{{ bulkRecipientsCount }}</b> students currently in the list. 
+              You are about to send personalized WhatsApp alerts to <b>{{ bulkRecipientsCount }}</b> students currently
+              in the list.
               The system will customize each message dynamically using the placeholders shown below.
             </div>
           </div>
@@ -317,22 +344,30 @@
           <div class="row g-4">
             <!-- Left Panel: Template Editor -->
             <div class="col-md-7">
-              <label for="bulkTemplateText" class="form-label small fw-bold text-muted text-uppercase">Alert Template</label>
-              <textarea id="bulkTemplateText" class="form-control border-1 rounded-3 small p-3" rows="8" 
-                        [(ngModel)]="bulkWhatsappMessageTemplate" placeholder="Type your template..."></textarea>
-              
+              <label for="bulkTemplateText" class="form-label small fw-bold text-muted text-uppercase">Alert
+                Template</label>
+              <textarea id="bulkTemplateText" class="form-control border-1 rounded-3 small p-3" rows="8"
+                [(ngModel)]="bulkWhatsappMessageTemplate" placeholder="Type your template..."></textarea>
+
               <div class="mt-3 bg-light p-3 rounded-3 border">
                 <div class="small fw-bold text-muted text-uppercase mb-2 extra-small">Available Placeholders</div>
                 <div class="d-flex flex-wrap gap-2">
-                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Student Name">{{ '{name}' }}</span>
-                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Due Amount">{{ '{amount}' }}</span>
-                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Formatted Due Date">{{ '{date}' }}</span>
-                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Seat Number">{{ '{seat}' }}</span>
-                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Batch Name">{{ '{batch}' }}</span>
-                  <span class="badge bg-success text-white rounded-pill px-2 py-1 extra-small" title="Library Name">{{ '{library}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Student Name">{{
+                    '{name}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Due Amount">{{
+                    '{amount}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small"
+                    title="Formatted Due Date">{{ '{date}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Seat Number">{{
+                    '{seat}' }}</span>
+                  <span class="badge bg-secondary text-white rounded-pill px-2 py-1 extra-small" title="Batch Name">{{
+                    '{batch}' }}</span>
+                  <span class="badge bg-success text-white rounded-pill px-2 py-1 extra-small" title="Library Name">{{
+                    '{library}' }}</span>
                 </div>
                 <div class="extra-small text-muted mt-2">
-                  Double click placeholders or type them exactly (e.g. <code>&#123;name&#125;</code>) in the message editor.
+                  Double click placeholders or type them exactly (e.g. <code>&#123;name&#125;</code>) in the message
+                  editor.
                 </div>
               </div>
             </div>
@@ -340,9 +375,11 @@
             <!-- Right Panel: Live Preview -->
             <div class="col-md-5">
               <label class="form-label small fw-bold text-muted text-uppercase d-block">Live Message Preview</label>
-              <div class="whatsapp-preview-container bg-white border rounded-3 p-3 shadow-sm d-flex flex-column h-100" style="min-height: 250px;">
+              <div class="whatsapp-preview-container bg-white border rounded-3 p-3 shadow-sm d-flex flex-column h-100"
+                style="min-height: 250px;">
                 <div class="d-flex align-items-center gap-2 pb-2 border-bottom mb-2">
-                  <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 32px; height: 32px;">
+                  <div class="bg-success rounded-circle d-flex align-items-center justify-content-center text-white"
+                    style="width: 32px; height: 32px;">
                     <i class="bi bi-person-fill"></i>
                   </div>
                   <div>
@@ -350,7 +387,8 @@
                     <div class="extra-small text-muted" style="font-size: 0.7rem;">Live Rendering</div>
                   </div>
                 </div>
-                <div class="whatsapp-bubble bg-light rounded-3 p-3 flex-grow-1 border" style="font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4;">
+                <div class="whatsapp-bubble bg-light rounded-3 p-3 flex-grow-1 border"
+                  style="font-size: 0.85rem; white-space: pre-wrap; line-height: 1.4;">
                   {{ bulkPreviewMessage }}
                 </div>
                 <div class="extra-small text-muted mt-2 text-end" style="font-size: 0.7rem;">
@@ -368,10 +406,12 @@
           </div>
           <h5 class="fw-bold mt-4 mb-2">Sending Bulk Alerts</h5>
           <p class="text-muted small px-5">
-            Please keep this window open. The server is dispatching your messages sequentially with a random 2 to 5 seconds delay per message to mimic human behavior and maintain account security.
+            Please keep this window open. The server is dispatching your messages sequentially with a random 2 to 5
+            seconds delay per message to mimic human behavior and maintain account security.
           </p>
           <div class="progress rounded-pill overflow-hidden mt-4 mx-5" style="height: 10px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 100%"></div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar"
+              style="width: 100%"></div>
           </div>
           <div class="text-muted small mt-2">Processing messages in the background...</div>
         </div>
@@ -379,7 +419,9 @@
         <!-- COMPLETED STATE -->
         <div *ngIf="bulkStatus === 'completed'" class="py-3">
           <div class="text-center mb-4">
-            <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <div
+              class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+              style="width: 60px; height: 60px;">
               <i class="bi bi-check-circle-fill fs-2"></i>
             </div>
             <h5 class="fw-bold mb-1">Bulk Alerts Dispatched</h5>
@@ -408,14 +450,16 @@
           </div>
 
           <div class="border rounded-3 overflow-hidden">
-            <div class="bg-light px-3 py-2 border-bottom fw-bold small text-muted text-uppercase">Transmission Details</div>
+            <div class="bg-light px-3 py-2 border-bottom fw-bold small text-muted text-uppercase">Transmission Details
+            </div>
             <div class="p-0 overflow-auto" style="max-height: 200px;">
               <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
                 <tbody class="border-0">
                   <tr *ngFor="let detail of bulkResults?.details">
                     <td class="ps-3 py-2 border-bottom-0">{{ detail.phone }}</td>
                     <td class="py-2 border-bottom-0 text-end pe-3">
-                      <span class="badge rounded-pill px-3" [class.bg-success]="detail.status === 'SUCCESS'" [class.bg-danger]="detail.status === 'FAILED'">
+                      <span class="badge rounded-pill px-3" [class.bg-success]="detail.status === 'SUCCESS'"
+                        [class.bg-danger]="detail.status === 'FAILED'">
                         {{ detail.status }}
                       </span>
                       <span class="text-danger small ms-2" *ngIf="detail.reason">({{ detail.reason }})</span>
@@ -432,21 +476,23 @@
           <i class="bi bi-x-circle-fill fs-1 text-danger d-block mb-3"></i>
           <h5 class="fw-bold">Bulk Dispatch Failed</h5>
           <p class="text-muted small px-5">
-            An unexpected error occurred during bulk messaging. Please make sure the WhatsApp API server is running, healthy, and connected.
+            An unexpected error occurred during bulk messaging. Please make sure the WhatsApp API server is running,
+            healthy, and connected.
           </p>
         </div>
 
       </div>
       <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal"
+          (click)="hideModal()">
           {{ bulkStatus === 'completed' ? 'Close' : 'Cancel' }}
         </button>
-        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2" 
-                *ngIf="bulkStatus === 'idle'" (click)="sendBulkWhatsAppAlerts()">
+        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2"
+          *ngIf="bulkStatus === 'idle'" (click)="sendBulkWhatsAppAlerts()">
           <i class="bi bi-play-fill"></i> Start Dispatch
         </button>
-        <button type="button" class="btn btn-primary rounded-3 px-4" 
-                *ngIf="bulkStatus === 'completed' || bulkStatus === 'error'" (click)="bulkStatus = 'idle'">
+        <button type="button" class="btn btn-primary rounded-3 px-4"
+          *ngIf="bulkStatus === 'completed' || bulkStatus === 'error'" (click)="bulkStatus = 'idle'">
           Send Again
         </button>
       </div>
@@ -459,9 +505,9 @@
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
       <div class="modal-body p-0">
-        <app-print-preview *ngIf="currentModalType === 'print' && selectedRegistration" [registration]="selectedRegistration" (close)="hideModal()"></app-print-preview>
+        <app-print-preview *ngIf="currentModalType === 'print' && selectedRegistration"
+          [registration]="selectedRegistration" (close)="hideModal()"></app-print-preview>
       </div>
     </div>
   </div>
 </div>
-

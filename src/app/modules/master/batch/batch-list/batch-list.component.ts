@@ -28,7 +28,7 @@ export class BatchListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {
     this.batchForm = this.fb.group({

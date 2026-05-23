@@ -31,7 +31,7 @@ export class TableLayoutComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -150,6 +150,8 @@ export class TableLayoutComponent implements OnInit {
   }
 
   onBatchClick(table: any, batch: any): void {
+    if (!this.authService.hasPermission('TABLE_REGISTRATION')) return;
+    
     // Only open modal for available (non-occupied, non-overlap) batches
     if (batch.isOccupied || batch.isOverlap) return;
 
