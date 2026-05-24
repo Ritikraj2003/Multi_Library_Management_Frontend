@@ -155,6 +155,10 @@ export class ApiService {
     return this.http.put<any>(`${this.baseUrl}TableSeat/Update`, body);
   }
 
+  updateTablePositions(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}TableSeat/BulkUpdatePositions`, body);
+  }
+
   deleteTable(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}TableSeat/Delete/${id}`);
   }

@@ -1,5 +1,6 @@
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
@@ -29,10 +30,20 @@ export class TableLayoutComponent implements OnInit {
   preselectedRegistration: any = null;
   private regModal: any;
 
+  // Drag and Drop state
+  isEditMode = false;
+  isDragging = false;
+  draggedTableId: number | null = null;
+  dragStartX = 0;
+  dragStartY = 0;
+  initialX = 0;
+  initialY = 0;
+
   constructor(
     private apiService: ApiService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -149,11 +160,19 @@ export class TableLayoutComponent implements OnInit {
     return start1 < end2 && start2 < end1;
   }
 
-  onBatchClick(table: any, batch: any): void {
-    if (!this.authService.hasPermission('TABLE_REGISTRATION')) return;
+  onBatchClick(event: Event, table: any, batch: any): void {
+    event.stopPropagation();
+    
+    if (!this.authService.hasPermission('TABLE_REGISTRATION')) {
+      this.notificationService.showError('You do not have permission to register tables!');
+      return;
+    }
     
     // Only open modal for available (non-occupied, non-overlap) batches
-    if (batch.isOccupied || batch.isOverlap) return;
+    if (batch.isOccupied || batch.isOverlap) {
+      this.notificationService.showWarning('This batch is already occupied or overlapping with another booking.');
+      return;
+    }
 
     // Pre-fill seat and batch for the registration form
     this.preselectedRegistration = {
@@ -164,8 +183,12 @@ export class TableLayoutComponent implements OnInit {
 
     const el = document.getElementById('layoutRegModal');
     if (el) {
-      this.regModal = new bootstrap.Modal(el);
+      if (!this.regModal) {
+        this.regModal = new bootstrap.Modal(el);
+      }
       this.regModal.show();
+    } else {
+      this.notificationService.showError('Registration modal element not found!');
     }
   }
 
@@ -184,5 +207,56 @@ export class TableLayoutComponent implements OnInit {
   getShapeClass(index: number): string {
     const shapes = ['rectangle', 'triangle', 'circle'];
     return shapes[index % shapes.length];
+  }
+
+  toggleEditMode(): void {
+    this.isEditMode = !this.isEditMode;
+  }
+
+  saveLayout(): void {
+    const dtos = this.tables.map(t => ({
+      id: t.id,
+      xAxis: t.xAxis || 0,
+      yAxis: t.yAxis || 0
+    }));
+    this.apiService.updateTablePositions(dtos).subscribe(res => {
+      if (res.success) {
+        this.isEditMode = false;
+        this.notificationService.showSuccess('Layout saved successfully!');
+      } else {
+        this.notificationService.showError('Failed to save layout: ' + res.message);
+      }
+    });
+  }
+
+  onMouseDown(event: MouseEvent, table: any): void {
+    if (!this.isEditMode) return;
+    this.isDragging = true;
+    this.draggedTableId = table.id;
+    this.initialX = table.xAxis || 0;
+    this.initialY = table.yAxis || 0;
+    this.dragStartX = event.clientX;
+    this.dragStartY = event.clientY;
+    event.preventDefault(); // Prevent text selection
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onMouseMove(event: MouseEvent): void {
+    if (!this.isDragging || !this.draggedTableId || !this.isEditMode) return;
+    const dx = event.clientX - this.dragStartX;
+    const dy = event.clientY - this.dragStartY;
+    const table = this.tables.find(t => t.id === this.draggedTableId);
+    if (table) {
+      table.xAxis = this.initialX + dx;
+      table.yAxis = this.initialY + dy;
+    }
+  }
+
+  @HostListener('document:mouseup')
+  onMouseUp(): void {
+    if (this.isDragging) {
+      this.isDragging = false;
+      this.draggedTableId = null;
+    }
   }
 }

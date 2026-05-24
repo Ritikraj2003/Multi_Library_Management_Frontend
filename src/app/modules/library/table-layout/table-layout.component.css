@@ -195,3 +195,57 @@
 
 .legend .bg-danger { background-color: #e74c3c !important; }
 
+/* ---- Drag and Drop Edit Mode Styles ---- */
+.layout-grid.edit-mode .table-item {
+  cursor: grab;
+  z-index: 10;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.layout-grid.edit-mode .table-item.draggable {
+  border: 2px dashed #3498db;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.table-item.draggable .drag-handle {
+  cursor: grab;
+}
+
+.table-item.draggable .drag-handle:active {
+  cursor: grabbing;
+}
+
+.drag-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #dee2e6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  color: #6c757d;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.drag-handle:hover {
+  background: #f8f9fa;
+  color: #0d6efd;
+}
+
+/* Edit mode overrides */
+.layout-grid.edit-mode .table-item:active {
+  cursor: grabbing;
+  z-index: 100;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  transform: scale(1.05);
+}
+
+.layout-grid.edit-mode .chair {
+  pointer-events: none; /* prevent clicking chairs while editing layout */
+}

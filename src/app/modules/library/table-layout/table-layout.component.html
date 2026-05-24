@@ -25,12 +25,32 @@
       <div class="d-flex align-items-center gap-2">
         <span class="dot bg-danger"></span> <span class="text-danger">Time Overlap</span>
       </div>
+      
+      <!-- Edit Controls -->
+      <div class="d-flex align-items-center gap-2 ms-4 border-start ps-4">
+        <button class="btn btn-sm" [ngClass]="isEditMode ? 'btn-danger' : 'btn-outline-primary'" (click)="toggleEditMode()">
+          <i class="bi" [ngClass]="isEditMode ? 'bi-x-circle' : 'bi-pencil-square'"></i> 
+          {{ isEditMode ? 'Cancel Edit' : 'Edit Layout' }}
+        </button>
+        <button *ngIf="isEditMode" class="btn btn-sm btn-success" (click)="saveLayout()">
+          <i class="bi bi-save"></i> Save Layout
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="layout-grid" *ngIf="!loading; else loader">
+  <div class="layout-grid" *ngIf="!loading; else loader" [class.edit-mode]="isEditMode">
     <div *ngFor="let table of tables"
-         class="table-item rectangle">
+         class="table-item rectangle"
+         [class.draggable]="isEditMode"
+         [style.left.px]="table.xAxis || 0"
+         [style.top.px]="table.yAxis || 0">
+         
+      <!-- Drag Handle for Edit Mode -->
+      <div *ngIf="isEditMode" class="drag-handle" (mousedown)="onMouseDown($event, table)">
+        <i class="bi bi-arrows-move"></i>
+      </div>
+
       <div class="table-content">
         <div class="table-id">{{ table.tableNumber }}</div>
         <div class="seat-info">Seat {{ table.seatNumber }}</div>
@@ -43,7 +63,7 @@
              [ngClass]="['pos-' + j, b.isOverlap ? 'overlap' : (b.isOccupied ? 'occupied' : 'available')]"
              [style.cursor]="(!b.isOccupied && !b.isOverlap && authService.hasPermission('TABLE_REGISTRATION')) ? 'pointer' : 'default'"
              [title]="b.name + (b.isOverlap ? ' ⚠ Time Overlap — Cannot Book' : (b.isOccupied ? ' (Occupied)' : (!authService.hasPermission('TABLE_REGISTRATION') ? '' : ' — Click to Register')))"
-             (click)="onBatchClick(table, b)">
+             (click)="onBatchClick($event, table, b)">
           <span class="batch-name-label">{{ b.name }}</span>
           <span *ngIf="b.isOverlap" class="overlap-label">⚠ Overlap</span>
         </div>
