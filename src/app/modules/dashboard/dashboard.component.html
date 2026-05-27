@@ -8,7 +8,7 @@
 
   <div class="row" *ngIf="!loading">
     <!-- Total Students -->
-    <div class="col-md-3 mb-4">
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white h-100">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -22,38 +22,53 @@
       </div>
     </div>
 
-    <!-- Active Registrations -->
-    <div class="col-md-3 mb-4">
+    <!-- Active Students -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-success text-white h-100">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-uppercase small mb-2 opacity-75">Active Registrations</h6>
-            <h2 class="mb-0 fw-bold">{{stats?.activeRegistrations || 0}}</h2>
+            <h6 class="text-uppercase small mb-2 opacity-75">Active Students</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.activeStudents || 0}}</h2>
           </div>
           <div class="bg-white bg-opacity-25 rounded-circle p-3">
-            <i class="bi bi-check-circle fs-3"></i>
+            <i class="bi bi-person-check fs-3"></i>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Total Tables -->
-    <div class="col-md-3 mb-4">
+    <!-- Expired Students -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 bg-danger text-white h-100">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-uppercase small mb-2 opacity-75">Expired Students</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.expiredStudents || 0}}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-circle p-3">
+            <i class="bi bi-person-x fs-3"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today Renewals -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-info text-white h-100">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-uppercase small mb-2 opacity-75">Total Tables</h6>
-            <h2 class="mb-0 fw-bold">{{stats?.totalTables || 0}}</h2>
+            <h6 class="text-uppercase small mb-2 opacity-75">Today Renewals</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.todayRenewals || 0}}</h2>
           </div>
           <div class="bg-white bg-opacity-25 rounded-circle p-3">
-            <i class="bi bi-grid-3x3-gap fs-3"></i>
+            <i class="bi bi-arrow-repeat fs-3"></i>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Total Revenue -->
-    <div class="col-md-3 mb-4">
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 p-4 bg-warning text-white h-100">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -66,10 +81,108 @@
         </div>
       </div>
     </div>
+
+    <!-- Today Collection -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #10b981, #059669);">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-uppercase small mb-2 opacity-75">Today Collection</h6>
+            <h2 class="mb-0 fw-bold">₹{{stats?.todayCollection || 0 | number}}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-circle p-3">
+            <i class="bi bi-cash-stack fs-3"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Seats -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-uppercase small mb-2 opacity-75">Total Seats</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.availableSeats || 0}} <span class="fs-6 fw-normal">/ {{stats?.totalSeats || 0}}</span></h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-circle p-3">
+            <i class="bi bi-grid-3x3-gap fs-3"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Batches -->
+    <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #f43f5e, #be123c);">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="text-uppercase small mb-2 opacity-75">Total Batches</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.batchStats?.length || 0}}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-circle p-3">
+            <i class="bi bi-person-workspace fs-3"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Revenue Analytics & Alerts Row ─────────────────────────────────── -->
+  <div class="row mt-4" *ngIf="!loading">
+    <!-- Revenue Chart -->
+    <div class="col-lg-8 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Monthly Revenue Growth</h5>
+          <p class="text-muted small">Overview of revenue across the last 6 months</p>
+        </div>
+        <div class="card-body">
+          <div id="revenueChartDiv" style="width: 100%; height: 350px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts Widget -->
+    <div class="col-lg-4 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0 text-danger">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Expiring Today
+          </h5>
+          <p class="text-muted small">Students whose subscription ends today</p>
+        </div>
+        <div class="card-body px-4 pb-4 overflow-auto" style="max-height: 350px;">
+           <!-- Empty State -->
+           <div *ngIf="!dashboardAlerts?.expiringToday?.length" class="text-center py-5">
+             <i class="bi bi-check-circle text-success fs-1"></i>
+             <p class="text-muted mt-2 mb-0">No expirations today!</p>
+           </div>
+           
+           <!-- List -->
+           <div class="list-group list-group-flush" *ngIf="dashboardAlerts?.expiringToday?.length">
+              <div *ngFor="let student of dashboardAlerts.expiringToday" class="list-group-item border-bottom-0 px-0 py-3 d-flex justify-content-between align-items-center">
+                 <div class="d-flex align-items-center gap-3">
+                   <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                     <i class="bi bi-person-x fs-5"></i>
+                   </div>
+                   <div>
+                     <h6 class="mb-0 fw-semibold">{{student.name}}</h6>
+                     <small class="text-muted">{{student.plan}} | {{student.phone}}</small>
+                   </div>
+                 </div>
+                 <a [href]="'https://wa.me/' + student.phone + '?text=Hi ' + student.name + ', your library subscription expires today. Please renew to continue your studies.'" target="_blank" class="btn btn-sm btn-outline-success rounded-circle" title="Send WhatsApp Reminder">
+                   <i class="bi bi-whatsapp"></i>
+                 </a>
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Donut Charts Row -->
-  <div class="row mt-4" *ngIf="!loading">
+  <div class="row mt-2" *ngIf="!loading">
     <!-- Payment Mode Donut -->
     <div class="col-lg-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
@@ -92,6 +205,46 @@
         </div>
         <div class="card-body">
           <div id="batchChartDiv" style="width: 100%; height: 350px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Seat Booking Details Row ─────────────────────────────────── -->
+  <div class="row mt-2" *ngIf="!loading">
+    <!-- Seat Booking by Batch -->
+    <div class="col-12 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Seat Booking by Batch</h5>
+          <p class="text-muted small">Booked vs Available seats per batch</p>
+        </div>
+        <div class="card-body px-4 pb-4">
+          <div *ngIf="!stats?.batchStats?.length" class="text-center py-5">
+            <p class="text-muted">No batch data available.</p>
+          </div>
+          <div class="row" *ngIf="stats?.batchStats?.length">
+            <div class="col-md-4 mb-3" *ngFor="let batch of stats.batchStats">
+              <div class="d-flex justify-content-between align-items-end mb-2">
+                <div>
+                  <h6 class="mb-0 fw-semibold">{{batch.batchName}}</h6>
+                  <small class="text-muted">{{batch.studentCount}} Booked / {{stats.totalSeats - batch.studentCount}} Available</small>
+                </div>
+              </div>
+              <div class="progress rounded-pill" style="height: 22px; background-color: #f3f4f6;">
+                <div class="progress-bar rounded-pill fw-bold" 
+                     role="progressbar" 
+                     [style.width.%]="stats.totalSeats > 0 ? (batch.studentCount / stats.totalSeats) * 100 : 0" 
+                     [ngClass]="{
+                       'bg-success': (batch.studentCount / stats.totalSeats) < 0.5,
+                       'bg-warning text-dark': (batch.studentCount / stats.totalSeats) >= 0.5 && (batch.studentCount / stats.totalSeats) < 0.9,
+                       'bg-danger': (batch.studentCount / stats.totalSeats) >= 0.9
+                     }">
+                     {{stats.totalSeats > 0 ? ((batch.studentCount / stats.totalSeats) * 100).toFixed(1) : 0}}%
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

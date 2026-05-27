@@ -8,6 +8,7 @@ import * as am5 from '@amcharts/amcharts5';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import * as am5xy from '@amcharts/amcharts5/xy';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
+import am5themes_Responsive from '@amcharts/amcharts5/themes/Responsive';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,6 +23,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   libraryId!: number;
   userFullName: string | undefined;
 
+  revenueAnalytics: any;
+  dashboardAlerts: any;
+
   // Attendance by batch
   batchAttendanceData: any[] = [];
   selectedDate: string = '';
@@ -30,6 +34,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private paymentRoot: am5.Root | undefined;
   private batchRoot: am5.Root | undefined;
   private attendanceBatchRoot: am5.Root | undefined;
+  private revenueRoot: am5.Root | undefined;
 
   constructor(
     private apiService: ApiService,
@@ -47,6 +52,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadStats();
     this.loadBatchAttendance();
+    this.loadRevenueAnalytics();
+    this.loadDashboardAlerts();
   }
 
   loadStats(): void {
@@ -100,9 +107,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadBatchAttendance();
   }
 
+  loadRevenueAnalytics(): void {
+    if (!this.libraryId) return;
+    this.apiService.getRevenueAnalytics(this.libraryId, 'monthly').subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.revenueAnalytics = res.data;
+          if (isPlatformBrowser(this.platformId)) {
+            setTimeout(() => this.createRevenueChart(), 100);
+          }
+        }
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
+    });
+  }
+
+  loadDashboardAlerts(): void {
+    if (!this.libraryId) return;
+    this.apiService.getDashboardAlerts(this.libraryId).subscribe({
+      next: (res: any) => {
+        if (res.success) {
+          this.dashboardAlerts = res.data;
+        }
+        this.cdr.markForCheck();
+      },
+      error: () => this.cdr.markForCheck()
+    });
+  }
+
   createCharts(): void {
     this.createPaymentChart();
     this.createBatchChart();
+    this.createRevenueChart();
   }
 
   createPaymentChart(): void {
@@ -115,6 +152,87 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.batchRoot) this.batchRoot.dispose();
     if (!this.stats?.batchStats?.length) return;
     this.batchRoot = this.initDonutChart("batchChartDiv", this.stats.batchStats, "studentCount", "batchName", "{value} Students");
+  }
+
+  
+
+  createRevenueChart(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (this.revenueRoot) this.revenueRoot.dispose();
+    if (!this.revenueAnalytics?.monthlyData?.length) return;
+
+    const chartEl = document.getElementById('revenueChartDiv');
+    if (!chartEl) return;
+
+    const root = am5.Root.new(chartEl);
+    root.setThemes([am5themes_Animated.new(root)]);
+    this.revenueRoot = root;
+
+    const chart = root.container.children.push(
+      am5xy.XYChart.new(root, {
+        panX: true,
+        panY: true,
+        wheelX: "panX",
+        wheelY: "zoomX",
+        pinchZoomX: true
+      })
+    );
+
+    const xAxis = chart.xAxes.push(
+      am5xy.CategoryAxis.new(root, {
+        categoryField: "month",
+        renderer: am5xy.AxisRendererX.new(root, {
+          minGridDistance: 30
+        }),
+        tooltip: am5.Tooltip.new(root, {})
+      })
+    );
+
+    xAxis.data.setAll(this.revenueAnalytics.monthlyData);
+
+    const yAxis = chart.yAxes.push(
+      am5xy.ValueAxis.new(root, {
+        renderer: am5xy.AxisRendererY.new(root, {})
+      })
+    );
+
+    const series = chart.series.push(
+      am5xy.SmoothedXLineSeries.new(root, {
+        name: "Revenue",
+        xAxis: xAxis,
+        yAxis: yAxis,
+        valueYField: "revenue",
+        categoryXField: "month",
+        tooltip: am5.Tooltip.new(root, {
+          labelText: "₹{valueY}"
+        })
+      })
+    );
+
+    series.fills.template.setAll({
+      visible: true,
+      fillOpacity: 0.2
+    });
+    
+    series.fills.template.set("fillGradient", am5.LinearGradient.new(root, {
+      stops: [{
+        opacity: 0.6,
+        color: am5.color(0x6366f1)
+      }, {
+        opacity: 0,
+        color: am5.color(0x6366f1)
+      }],
+      rotation: 90
+    }));
+
+    series.strokes.template.setAll({
+      strokeWidth: 3,
+      stroke: am5.color(0x6366f1)
+    });
+
+    series.data.setAll(this.revenueAnalytics.monthlyData);
+    series.appear(1000);
+    chart.appear(1000, 100);
   }
 
   createAttendanceBatchChart(): void {
@@ -249,7 +367,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private initDonutChart(divId: string, data: any[], valueField: string, categoryField: string, labelText: string): am5.Root {
     let root = am5.Root.new(divId);
-    root.setThemes([am5themes_Animated.new(root)]);
+    root.setThemes([
+      am5themes_Animated.new(root),
+      am5themes_Responsive.new(root)
+    ]);
 
     let chart = root.container.children.push(
       am5percent.PieChart.new(root, {
@@ -262,9 +383,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       am5percent.PieSeries.new(root, {
         valueField: valueField,
         categoryField: categoryField,
-        alignLabels: false
+        alignLabels: true
       })
     );
+
+    series.slices.template.set("fillGradient", am5.RadialGradient.new(root, {
+      stops: [
+        { brighten: -0.8 },
+        { brighten: -0.8 },
+        { brighten: -0.5 },
+        { brighten: 0 },
+        { brighten: -0.5 }
+      ]
+    }));
 
     series.slices.template.setAll({
       cornerRadius: 10,
@@ -285,10 +416,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
 
     series.labels.template.setAll({
-      maxWidth: 100,
+      maxWidth: 150,
       oversizedBehavior: "wrap",
       text: `{category}: ${labelText}`
     });
+
+    let legend = chart.children.push(am5.Legend.new(root, {
+      centerX: am5.percent(50),
+      x: am5.percent(50),
+      marginTop: 15,
+      marginBottom: 15,
+      layout: root.horizontalLayout
+    }));
+    
+    // allow wrapping
+    legend.labels.template.setAll({
+      fontSize: 12,
+      fontWeight: "400"
+    });
+    legend.valueLabels.template.setAll({
+      fontSize: 12,
+      fontWeight: "500"
+    });
+
+    legend.data.setAll(series.dataItems);
 
     series.data.setAll(data);
     series.appear(1000, 100);
@@ -299,5 +450,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.paymentRoot) this.paymentRoot.dispose();
     if (this.batchRoot) this.batchRoot.dispose();
     if (this.attendanceBatchRoot) this.attendanceBatchRoot.dispose();
+    if (this.revenueRoot) this.revenueRoot.dispose();
   }
 }

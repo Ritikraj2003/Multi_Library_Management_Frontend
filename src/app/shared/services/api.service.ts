@@ -236,6 +236,15 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}Dashboard/stats/${libraryId}`);
   }
 
+  getRevenueAnalytics(libraryId: number, timeframe: string = 'monthly'): Observable<any> {
+    let params = new HttpParams().set('timeframe', timeframe);
+    return this.http.get<any>(`${this.baseUrl}Dashboard/revenue-analytics/${libraryId}`, { params });
+  }
+
+  getDashboardAlerts(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}Dashboard/alerts/${libraryId}`);
+  }
+
   getAttendanceByBatch(libraryId: number, date?: string): Observable<any> {
     let params = new HttpParams();
     if (date) params = params.set('date', date);
