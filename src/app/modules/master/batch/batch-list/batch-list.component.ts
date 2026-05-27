@@ -1,9 +1,9 @@
-import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../shared/services/api.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import { LoaderService } from '../../../../shared/services/loader.service';
 import { finalize } from 'rxjs';
 
 declare var bootstrap: any;
@@ -11,7 +11,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-batch-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './batch-list.component.html',
   styleUrls: ['./batch-list.component.css']
 })
@@ -29,7 +29,8 @@ export class BatchListComponent implements OnInit {
     private fb: FormBuilder,
     private apiService: ApiService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {
     this.batchForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -47,8 +48,13 @@ export class BatchListComponent implements OnInit {
   loadBatches(): void {
     if (!this.libraryId) return;
     this.loading = true;
+    this.loaderService.show();
     this.apiService.getBatchesByLibraryId(this.libraryId)
-      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.loaderService.hide();
+        this.cdr.markForCheck(); 
+      }))
       .subscribe({
         next: (res) => {
           const data = res?.data || res || [];

@@ -3,24 +3,23 @@
   <div class="card shadow-sm border-0 mb-4 animate-fade-in">
 
     <!-- Card Header -->
-    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom-0 pt-4 px-4">
-      <h5 class="mb-0 text-primary fw-bold d-flex align-items-center">
-        <i class="bi bi-calendar-check-fill me-2 fs-4 text-primary"></i>
+    <div
+      class="card-header bg-white py-3 d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center border-bottom-0 pt-4 px-4 gap-3">
+      <h5 class="mb-0 text-primary fw-bold d-flex align-items-center flex-wrap gap-2">
+        <i class="bi bi-calendar-check-fill fs-4 text-primary"></i>
         <span>Today's Attendance</span>
-        <span class="badge bg-primary-subtle text-primary ms-2 fw-semibold" style="font-size: 0.75rem;">
+        <span class="badge bg-primary-subtle text-primary fw-semibold" style="font-size: 0.75rem;">
           {{ totalRecords }} Records
         </span>
       </h5>
-      <div class="d-flex align-items-center gap-2">
-        <button class="btn btn-outline-primary fw-bold px-3 py-2 d-flex align-items-center" 
-                (click)="loadAttendances()" 
-                style="border-radius: 10px;"
-                title="Refresh">
+      <div class="d-flex align-items-center gap-2 align-self-stretch align-self-sm-auto">
+        <button class="btn btn-outline-primary fw-bold px-3 py-2 d-flex align-items-center" (click)="loadAttendances()"
+          style="border-radius: 10px;" title="Refresh">
           <i class="bi bi-arrow-clockwise"></i>
         </button>
-        <button *ngIf="authService.hasPermission('ATTENDANCE_QR')" class="btn btn-primary fw-bold shadow-sm px-4 py-2 d-flex align-items-center" 
-                (click)="openQrModal()" 
-                style="border-radius: 10px;">
+        <button *ngIf="authService.hasPermission('ATTENDANCE_QR')"
+          class="btn btn-primary fw-bold shadow-sm px-4 py-2 d-flex align-items-center" (click)="openQrModal()"
+          style="border-radius: 10px;">
           <i class="bi bi-qr-code me-2"></i>
           <span>Generate QR</span>
         </button>
@@ -29,22 +28,15 @@
 
     <!-- Search Bar -->
     <div class="px-4 pb-3 pt-1">
-      <div class="input-group" style="max-width: 420px; border-radius: 12px; overflow: hidden; border: 1.5px solid #e0e7ef; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
+      <div class="input-group"
+        style="max-width: 420px; border-radius: 12px; overflow: hidden; border: 1.5px solid #e0e7ef; box-shadow: 0 1px 4px rgba(0,0,0,0.04);">
         <span class="input-group-text bg-white border-0 ps-3">
           <i class="bi bi-search text-muted"></i>
         </span>
-        <input 
-          type="text" 
-          class="form-control border-0 shadow-none py-2"
-          placeholder="Search by name, ID or phone..."
-          [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearchChange()"
-          style="font-size: 0.92rem;"
-        />
-        <button *ngIf="searchTerm" 
-                class="btn btn-link text-muted border-0 pe-3" 
-                (click)="searchTerm=''; onSearchChange()"
-                style="text-decoration: none;">
+        <input type="text" class="form-control border-0 shadow-none py-2" placeholder="Search by name, ID or phone..."
+          [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" style="font-size: 0.92rem;" />
+        <button *ngIf="searchTerm" class="btn btn-link text-muted border-0 pe-3"
+          (click)="searchTerm=''; onSearchChange()" style="text-decoration: none;">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -52,16 +44,9 @@
 
     <div class="card-body px-4 pb-2 pt-0">
 
-      <!-- Loading Spinner -->
-      <div *ngIf="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="text-muted mt-2 small">Loading attendance records...</p>
-      </div>
-
       <!-- Table -->
-      <div *ngIf="!isLoading" class="table-responsive" style="border-radius: 12px; overflow: hidden; border: 1px solid #f0f0f0;">
+      <div class="table-responsive"
+        style="border-radius: 12px; overflow: hidden; border: 1px solid #f0f0f0;">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
@@ -84,21 +69,25 @@
               <td class="text-muted">{{ record.mobile }}</td>
               <td class="fw-semibold text-primary">{{ record.entryTime | date:'hh:mm a' }}</td>
               <td>
-                <span *ngIf="record.exitTime" class="fw-semibold text-success">{{ record.exitTime | date:'hh:mm a' }}</span>
+                <span *ngIf="record.exitTime" class="fw-semibold text-success">{{ record.exitTime | date:'hh:mm a'
+                  }}</span>
                 <span *ngIf="!record.exitTime" class="text-muted small">—</span>
               </td>
               <td class="pe-4">
-                <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center" *ngIf="record.accessGranted">
+                <span
+                  class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center"
+                  *ngIf="record.accessGranted">
                   <span class="status-dot bg-success me-2"></span>Present
                 </span>
-                <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center" *ngIf="!record.accessGranted">
+                <span
+                  class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-bold d-inline-flex align-items-center"
+                  *ngIf="!record.accessGranted">
                   <span class="status-dot bg-danger me-2"></span>Denied
                 </span>
               </td>
               <td class="text-center">
                 <button class="btn btn-sm btn-outline-primary px-3 py-1 fw-semibold"
-                        style="border-radius: 8px; font-size: 0.8rem;"
-                        (click)="openStudentModal(record)">
+                  style="border-radius: 8px; font-size: 0.8rem;" (click)="openStudentModal(record)">
                   <i class="bi bi-eye me-1"></i> View
                 </button>
               </td>
@@ -126,8 +115,8 @@
       </div>
 
       <!-- Pagination -->
-      <div *ngIf="!isLoading && totalPages > 1" 
-           class="d-flex justify-content-between align-items-center pt-3 pb-2 px-1">
+      <div *ngIf="!isLoading && totalPages > 1"
+        class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 pb-2 px-1 gap-3">
         <!-- Info -->
         <span class="text-muted small">
           Showing {{ (currentPage - 1) * pageSize + 1 }}–{{ showingUpTo }} of {{ totalRecords }} records
@@ -171,7 +160,7 @@
         <div class="d-flex align-items-center gap-2">
           <span class="text-muted small">Per page:</span>
           <select class="form-select form-select-sm border-0 shadow-sm" style="width: 70px; border-radius: 8px;"
-                  [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)">
+            [(ngModel)]="pageSize" (ngModelChange)="goToPage(1)">
             <option [value]="10">10</option>
             <option [value]="25">25</option>
             <option [value]="50">50</option>
@@ -184,9 +173,13 @@
 </div>
 
 <!-- QR Code Modal -->
-<div class="modal-backdrop show" *ngIf="showModal" (click)="closeQrModal()" style="background-color: rgba(0,0,0,0.4); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1050;"></div>
-<div class="modal show d-block" tabindex="-1" role="dialog" *ngIf="showModal" (click)="closeQrModal()" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1060; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-  <div class="modal-dialog modal-dialog-centered my-0 mx-auto" role="document" (click)="$event.stopPropagation()" style="max-width: 360px; width: 100%; padding: 15px;">
+<div class="modal-backdrop show" *ngIf="showModal" (click)="closeQrModal()"
+  style="background-color: rgba(0,0,0,0.4); position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1050;">
+</div>
+<div class="modal show d-block" tabindex="-1" role="dialog" *ngIf="showModal" (click)="closeQrModal()"
+  style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1060; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+  <div class="modal-dialog modal-dialog-centered my-0 mx-auto" role="document" (click)="$event.stopPropagation()"
+    style="max-width: 360px; width: 100%; padding: 15px;">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
       <div class="modal-header border-bottom-0 pb-0 px-4 pt-4 d-flex align-items-center justify-content-between">
         <h5 class="modal-title fw-bold text-dark d-flex align-items-center">
@@ -197,14 +190,18 @@
       </div>
       <div class="modal-body text-center p-4">
         <p class="text-muted small mb-4">Point your camera at this QR code to open the attendance check-in portal.</p>
-        <div class="qr-wrapper mb-4 p-3 bg-white rounded shadow-sm border border-light mx-auto" style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 16px;">
-          <img [src]="qrCodeUrl" alt="Attendance QR Code" class="img-fluid rounded" *ngIf="qrCodeUrl" style="max-height: 170px;">
+        <div class="qr-wrapper mb-4 p-3 bg-white rounded shadow-sm border border-light mx-auto"
+          style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; border-radius: 16px;">
+          <img [src]="qrCodeUrl" alt="Attendance QR Code" class="img-fluid rounded" *ngIf="qrCodeUrl"
+            style="max-height: 170px;">
         </div>
-        <button class="btn btn-outline-primary w-100 py-2 fw-bold mb-3 d-flex align-items-center justify-content-center" (click)="showUrlPopup()" style="border-radius: 12px;">
+        <button class="btn btn-outline-primary w-100 py-2 fw-bold mb-3 d-flex align-items-center justify-content-center"
+          (click)="showUrlPopup()" style="border-radius: 12px;">
           <i class="bi bi-link-45deg me-2 fs-5"></i>
           <span>Show URL Link</span>
         </button>
-        <div class="alert alert-info py-2 px-3 small border-0 mb-0 text-start d-flex align-items-start" style="border-radius: 12px; background-color: rgba(13,202,240,0.08);">
+        <div class="alert alert-info py-2 px-3 small border-0 mb-0 text-start d-flex align-items-start"
+          style="border-radius: 12px; background-color: rgba(13,202,240,0.08);">
           <i class="bi bi-info-circle-fill text-info me-2 fs-6"></i>
           <span class="text-dark-soft">Students must be within the geofencing radius to mark their attendance.</span>
         </div>
@@ -217,22 +214,24 @@
 <!-- Student Detail Modal -->
 <!-- ============================================================ -->
 <div class="modal-backdrop show" *ngIf="showStudentModal" (click)="closeStudentModal()"
-     style="background-color: rgba(0,0,0,0.5); position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:2050;"></div>
+  style="background-color: rgba(0,0,0,0.5); position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:2050;">
+</div>
 
 <div class="modal show d-block" *ngIf="showStudentModal && selectedStudent"
-     style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:2060; display:flex; align-items:center; justify-content:center; overflow-y:auto; padding: 12px;">
-  <div class="modal-dialog my-3 mx-auto" role="document" (click)="$event.stopPropagation()" style="max-width:520px; width:100%;">
+  style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:2060; display:flex; align-items:center; justify-content:center; overflow-y:auto; padding: 12px;">
+  <div class="modal-dialog my-3 mx-auto" role="document" (click)="$event.stopPropagation()"
+    style="max-width:520px; width:100%;">
     <div class="modal-content border-0 shadow-lg" style="border-radius:20px; overflow:hidden;">
 
       <!-- Header -->
       <div class="d-flex align-items-center justify-content-between px-4 pt-4 pb-3"
-           style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
+        style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);">
         <div>
           <h5 class="fw-bold text-white mb-0"><i class="bi bi-person-badge me-2"></i>Student Details</h5>
           <small class="text-white" style="opacity:0.8;">Attendance Record #{{ selectedStudent.id }}</small>
         </div>
         <button class="btn btn-sm border-0 text-white" (click)="closeStudentModal()"
-                style="background:rgba(255,255,255,0.18); border-radius:8px; width:34px; height:34px; line-height:1;">
+          style="background:rgba(255,255,255,0.18); border-radius:8px; width:34px; height:34px; line-height:1;">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
@@ -242,21 +241,25 @@
 
         <!-- Photo + Name -->
         <div class="d-flex align-items-center gap-3 mb-4 p-3"
-             style="background:#f8f7ff; border-radius:14px; border:1px solid #ede9fe;">
-          <div style="width:80px; height:80px; border-radius:50%; overflow:hidden; border:3px solid #7c3aed; flex-shrink:0; background:#e9e3ff;">
-            <img [src]="selectedStudent.photo ? getPhotoUrl(selectedStudent.photo) : ('https://ui-avatars.com/api/?name=' + selectedStudent.studentName + '&background=4f46e5&color=fff&size=80&bold=true')"
-                 alt="Student Photo"
-                 style="width:100%; height:100%; object-fit:cover;"
-                 (error)="$any($event.target).src='https://ui-avatars.com/api/?name=' + selectedStudent.studentName + '&background=4f46e5&color=fff&size=80&bold=true'" />
+          style="background:#f8f7ff; border-radius:14px; border:1px solid #ede9fe;">
+          <div
+            style="width:80px; height:80px; border-radius:50%; overflow:hidden; border:3px solid #7c3aed; flex-shrink:0; background:#e9e3ff;">
+            <img
+              [src]="selectedStudent.photo ? getPhotoUrl(selectedStudent.photo) : ('https://ui-avatars.com/api/?name=' + selectedStudent.studentName + '&background=4f46e5&color=fff&size=80&bold=true')"
+              alt="Student Photo" style="width:100%; height:100%; object-fit:cover;"
+              (error)="$any($event.target).src='https://ui-avatars.com/api/?name=' + selectedStudent.studentName + '&background=4f46e5&color=fff&size=80&bold=true'" />
           </div>
           <div>
             <h6 class="fw-bold text-dark mb-1 fs-5">{{ selectedStudent.studentName }}</h6>
-            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-1" style="border-radius:20px;">ID #{{ selectedStudent.studentId }}</span>
+            <span class="badge bg-primary-subtle text-primary fw-semibold px-3 py-1" style="border-radius:20px;">ID #{{
+              selectedStudent.studentId }}</span>
             <div class="mt-2">
-              <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-bold" *ngIf="selectedStudent.accessGranted">
+              <span class="badge bg-success-soft text-success rounded-pill px-3 py-1 fw-bold"
+                *ngIf="selectedStudent.accessGranted">
                 <i class="bi bi-check-circle-fill me-1"></i>Present
               </span>
-              <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-bold" *ngIf="!selectedStudent.accessGranted">
+              <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1 fw-bold"
+                *ngIf="!selectedStudent.accessGranted">
                 <i class="bi bi-x-circle-fill me-1"></i>Denied
               </span>
             </div>
@@ -298,7 +301,8 @@
         </div>
 
         <!-- Attendance Timing -->
-        <div class="p-3" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-radius:12px; border:1px solid #bbf7d0;">
+        <div class="p-3"
+          style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-radius:12px; border:1px solid #bbf7d0;">
           <div class="fw-bold text-success small mb-2"><i class="bi bi-clock-history me-1"></i>Today's Attendance</div>
           <div class="d-flex gap-4">
             <div>
@@ -307,7 +311,8 @@
             </div>
             <div>
               <div class="text-muted small">Exit Time</div>
-              <div class="fw-bold text-dark" *ngIf="selectedStudent.exitTime">{{ selectedStudent.exitTime | date:'hh:mm a' }}</div>
+              <div class="fw-bold text-dark" *ngIf="selectedStudent.exitTime">{{ selectedStudent.exitTime | date:'hh:mm
+                a' }}</div>
               <div class="fw-semibold text-muted" *ngIf="!selectedStudent.exitTime">Not yet</div>
             </div>
           </div>
@@ -316,7 +321,8 @@
       </div>
 
       <div class="modal-footer border-0 px-4 pb-4 pt-0">
-        <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px;" (click)="closeStudentModal()">
+        <button class="btn btn-outline-secondary px-4 fw-semibold" style="border-radius:10px;"
+          (click)="closeStudentModal()">
           Close
         </button>
       </div>

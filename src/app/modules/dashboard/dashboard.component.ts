@@ -1,9 +1,9 @@
-import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, PLATFORM_ID, Inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/services/auth.service';
 import { ApiService } from '../../shared/services/api.service';
+import { LoaderService } from '../../shared/services/loader.service';
 import * as am5 from '@amcharts/amcharts5';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import * as am5xy from '@amcharts/amcharts5/xy';
@@ -12,7 +12,7 @@ import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -35,6 +35,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private apiService: ApiService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.userFullName = this.authService.currentUserValue?.fullName;
@@ -50,12 +51,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadStats(): void {
     if (!this.libraryId) return;
+    this.loaderService.show();
     this.apiService.getDashboardStats(this.libraryId).subscribe({
       next: (res: any) => {
         if (res.success) {
           this.stats = res.data;
         }
         this.loading = false;
+        this.loaderService.hide();
         if (isPlatformBrowser(this.platformId)) {
           setTimeout(() => {
             this.createCharts();
@@ -67,6 +70,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error('Error loading stats:', err);
         this.loading = false;
+        this.loaderService.hide();
         this.cdr.markForCheck();
       }
     });

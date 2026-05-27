@@ -4,6 +4,7 @@ import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { LayoutService } from '../../services/layout.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -15,9 +16,12 @@ import { environment } from '../../../../environments/environment';
 export class SidebarComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  public layoutService = inject(LayoutService);
   isMasterExpanded = false;
   imageBaseUrl = environment.apiUrl.replace('api/', '');
   currentUser$ = this.authService.currentUser;
+  isOpen = false;
+
 
   menuItems = [
     { title: 'Dashboard', icon: 'bi-grid-fill', route: '/dashboard' },
@@ -49,6 +53,13 @@ export class SidebarComponent implements OnInit {
       if (!event.urlAfterRedirects.includes('/master/')) {
         this.isMasterExpanded = false;
       }
+      if (window.innerWidth <= 991) {
+        this.layoutService.closeSidebar();
+      }
+    });
+
+    this.layoutService.sidebarOpen$.subscribe(isOpen => {
+      this.isOpen = isOpen;
     });
   }
 

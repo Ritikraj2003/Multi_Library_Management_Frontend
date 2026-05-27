@@ -5,6 +5,7 @@ import { AttendanceService } from '../attendance.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 
 
@@ -19,6 +20,7 @@ export class AttendanceListComponent implements OnInit {
   private attendanceService = inject(AttendanceService);
   public authService = inject(AuthService);
   private notificationService = inject(NotificationService);
+  private loaderService = inject(LoaderService);
   cdr = inject(ChangeDetectorRef);
 
   // Raw data from API
@@ -54,10 +56,12 @@ export class AttendanceListComponent implements OnInit {
 
   loadAttendances() {
     this.isLoading = true;
+    this.loaderService.show();
     this.attendanceService.getTodayAttendance(this.libraryId).subscribe({
       next: (res: any) => {
         this.allAttendances = (res?.success && Array.isArray(res?.data)) ? res.data : [];
         this.isLoading = false;
+        this.loaderService.hide();
         this.currentPage = 1;
         this.cdr.detectChanges();
       },
@@ -65,6 +69,7 @@ export class AttendanceListComponent implements OnInit {
         console.error('Error fetching today attendance', err);
         this.allAttendances = [];
         this.isLoading = false;
+        this.loaderService.hide();
         this.cdr.detectChanges();
       }
     });

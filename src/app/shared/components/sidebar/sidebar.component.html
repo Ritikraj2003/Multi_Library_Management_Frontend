@@ -1,4 +1,4 @@
-<div class="sidebar shadow">
+<div class="sidebar shadow" [class.open]="isOpen">
   <div class="sidebar-header p-4" *ngIf="currentUser$ | async as user">
     <div class="d-flex align-items-center">
       <img *ngIf="user.libraryIcon" [src]="imageBaseUrl + user.libraryIcon" class="me-2 rounded shadow-sm"
@@ -42,3 +42,5 @@
     </ul>
   </div>
 </div>
+
+<div class="sidebar-overlay d-lg-none" *ngIf="isOpen" (click)="layoutService.closeSidebar()"></div>

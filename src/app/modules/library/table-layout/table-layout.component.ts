@@ -1,4 +1,5 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+
+import { LoaderService } from '../../../shared/services/loader.service';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,7 +14,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-table-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoaderComponent, RegistrationFormComponent],
+  imports: [CommonModule, FormsModule, RegistrationFormComponent],
   templateUrl: './table-layout.component.html',
   styleUrls: ['./table-layout.component.css']
 })
@@ -43,7 +44,8 @@ export class TableLayoutComponent implements OnInit {
     private apiService: ApiService,
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +84,7 @@ export class TableLayoutComponent implements OnInit {
   loadTables(): void {
     if (!this.selectedFloorId) return;
     this.loading = true;
+    this.loaderService.show();
 
     this.apiService.getAllRegistrations({ LibraryId: this.libraryId, PageSize: 1000 }).subscribe((res: any) => {
       const allRegs = res.data?.items || res.data || [];
@@ -94,7 +97,11 @@ export class TableLayoutComponent implements OnInit {
       };
 
       this.apiService.getAllTables(params)
-        .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+        .pipe(finalize(() => { 
+          this.loading = false; 
+          this.loaderService.hide();
+          this.cdr.detectChanges(); 
+        }))
         .subscribe((res: any) => {
           if (res.success && res.data) {
             const allItems = res.data.items || res.data || [];

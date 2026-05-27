@@ -1,9 +1,9 @@
-import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../../shared/services/api.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import { LoaderService } from '../../../../shared/services/loader.service';
 import { finalize } from 'rxjs';
 import { Pagination } from '../../../../shared/models/pagination.model';
 
@@ -12,7 +12,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-section-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './section-list.component.html',
   styleUrls: ['./section-list.component.css']
 })
@@ -32,7 +32,8 @@ export class SectionListComponent implements OnInit {
     private fb: FormBuilder,
     private apiService: ApiService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
     this.floorForm = this.fb.group({
@@ -48,13 +49,18 @@ export class SectionListComponent implements OnInit {
 
   loadFloors(): void {
     this.loading = true;
+    this.loaderService.show();
     const params: any = {};
     if (!this.isSuperadmin && this.libraryId) {
       params.LibraryId = this.libraryId;
     }
 
     this.apiService.getAllFloors(params)
-      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.loaderService.hide();
+        this.cdr.markForCheck(); 
+      }))
       .subscribe({
         next: (res) => {
           if (res && res.data) {

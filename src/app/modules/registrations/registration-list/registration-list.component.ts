@@ -1,4 +1,4 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,10 +15,12 @@ import { PrintPreviewComponent } from '../print-preview/print-preview.component'
 
 declare var bootstrap: any;
 
+import { LoaderService } from '../../../shared/services/loader.service';
+
 @Component({
   selector: 'app-registration-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent, LoaderComponent, PrintPreviewComponent],
+  imports: [CommonModule, FormsModule, RegistrationFormComponent, RegistrationRenewComponent, PaymentHistoryComponent, PrintPreviewComponent],
   templateUrl: './registration-list.component.html'
 })
 export class RegistrationListComponent implements OnInit {
@@ -58,7 +60,8 @@ export class RegistrationListComponent implements OnInit {
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private loaderService: LoaderService
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
   }
@@ -100,6 +103,7 @@ export class RegistrationListComponent implements OnInit {
 
   loadRegistrations(pageNumber: number = 1, pageSize: number = 10): void {
     this.loading = true;
+    this.loaderService.show();
     this.registrations = []; // Clear old data immediately to prevent flash when switching tabs
     this.pagination = null;
     const params: any = {
@@ -128,7 +132,11 @@ export class RegistrationListComponent implements OnInit {
       default: request = this.apiService.getAllRegistrations(params); break;
     }
 
-    request.pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+    request.pipe(finalize(() => { 
+      this.loading = false; 
+      this.loaderService.hide();
+      this.cdr.markForCheck(); 
+    }))
       .subscribe({
         next: (res: any) => {
           if (res && res.data) {

@@ -1,8 +1,8 @@
-import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../../shared/services/api.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import { LoaderService } from '../../../../shared/services/loader.service';
 import { ApiResponse } from '../../../../shared/models/api-response.model';
 import { Pagination } from '../../../../shared/models/pagination.model';
 import { UserFormComponent } from '../user-form/user-form.component';
@@ -13,7 +13,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, UserFormComponent, LoaderComponent],
+  imports: [CommonModule, UserFormComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
@@ -28,7 +28,8 @@ export class UserListComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     public authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
   }
@@ -39,6 +40,7 @@ export class UserListComponent implements OnInit {
 
   loadUsers(): void {
     this.loading = true;
+    this.loaderService.show();
     const params: any = {};
     if (!this.isSuperadmin) {
       params.LibraryId = this.authService.currentUserValue?.libraryId;
@@ -47,6 +49,7 @@ export class UserListComponent implements OnInit {
     this.apiService.getAllUsers(params)
     .pipe(finalize(() => {
       this.loading = false;
+      this.loaderService.hide();
       this.cdr.markForCheck();
     }))
     .subscribe({

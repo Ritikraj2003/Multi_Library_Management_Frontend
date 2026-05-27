@@ -1,6 +1,6 @@
 <div class="layout-container p-4">
-  <div class="header-actions d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded-3 shadow-sm">
-    <div class="d-flex align-items-center gap-3">
+  <div class="header-actions d-flex flex-column flex-lg-row justify-content-between align-items-center mb-4 bg-white p-3 rounded-3 shadow-sm gap-3">
+    <div class="d-flex align-items-center gap-3 text-nowrap">
       <i class="bi bi-compass fs-3 text-primary"></i>
       <h4 class="mb-0 fw-bold">Library Seating Layout</h4>
     </div>
@@ -15,31 +15,31 @@
       </select>
     </div>
 
-    <div class="legend d-flex gap-3 small fw-bold">
-      <div class="d-flex align-items-center gap-2">
+    <div class="legend d-flex flex-wrap justify-content-center align-items-center gap-3 small fw-bold">
+      <div class="d-flex align-items-center gap-2 text-nowrap">
         <span class="dot bg-success"></span> Batch Available
       </div>
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 text-nowrap">
         <span class="dot bg-warning"></span> Batch Occupied
       </div>
-      <div class="d-flex align-items-center gap-2">
+      <div class="d-flex align-items-center gap-2 text-nowrap">
         <span class="dot bg-danger"></span> <span class="text-danger">Time Overlap</span>
       </div>
       
       <!-- Edit Controls -->
-      <div class="d-flex align-items-center gap-2 ms-4 border-start ps-4">
-        <button class="btn btn-sm" [ngClass]="isEditMode ? 'btn-danger' : 'btn-outline-primary'" (click)="toggleEditMode()">
+      <div class="d-flex flex-wrap justify-content-center align-items-center gap-2">
+        <button class="btn btn-sm text-nowrap" [ngClass]="isEditMode ? 'btn-danger' : 'btn-outline-primary'" (click)="toggleEditMode()">
           <i class="bi" [ngClass]="isEditMode ? 'bi-x-circle' : 'bi-pencil-square'"></i> 
           {{ isEditMode ? 'Cancel Edit' : 'Edit Layout' }}
         </button>
-        <button *ngIf="isEditMode" class="btn btn-sm btn-success" (click)="saveLayout()">
+        <button *ngIf="isEditMode" class="btn btn-sm btn-success text-nowrap" (click)="saveLayout()">
           <i class="bi bi-save"></i> Save Layout
         </button>
       </div>
     </div>
   </div>
 
-  <div class="layout-grid" *ngIf="!loading; else loader" [class.edit-mode]="isEditMode">
+  <div class="layout-grid" [class.edit-mode]="isEditMode">
     <div *ngFor="let table of tables"
          class="table-item rectangle"
          [class.draggable]="isEditMode"
@@ -75,12 +75,6 @@
       No tables found for this floor.
     </div>
   </div>
-
-  <ng-template #loader>
-    <div class="text-center py-5">
-      <app-loader></app-loader>
-    </div>
-  </ng-template>
 </div>
 
 <!-- Registration Modal — opened when clicking an available batch chair -->

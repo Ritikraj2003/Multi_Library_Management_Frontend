@@ -6,74 +6,95 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="loader" [ngClass]="{'loader-small': size === 'small'}">
-      <div class="dot dot-1"></div>
-      <div class="dot dot-2"></div>
-      <div class="dot dot-3"></div>
-      <div class="dot dot-4"></div>
-      <div class="dot dot-5"></div>
+    <div class="ring-page" [ngClass]="{'loader-small': size === 'small'}">
+      <div class="ring-container">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring-text">loading</div>
+      </div>
     </div>
   `,
   styles: [`
-    .loader {
-      display: inline-flex;
+    .ring-page {
+      display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    .dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin-right: 8px;
+    .ring-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .ring-text {
+      color: rgb(82, 79, 79);
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .ring {
+      width: 190px;
+      height: 190px;
+      border: 1px solid transparent;
       border-radius: 50%;
-      animation: dot-pulse2 1.5s ease-in-out infinite;
+      position: absolute;
     }
 
-    .loader-small .dot {
-      width: 6px;
-      height: 6px;
-      margin-right: 4px;
+    /* Support for small loader size if used in tables */
+    .loader-small .ring {
+      width: 60px;
+      height: 60px;
+    }
+    .loader-small .ring:nth-child(n) {
+      border-bottom-width: 3px !important;
+    }
+    .loader-small .ring-text {
+      font-size: 10px;
+      display: none; /* Usually hide text for small loaders */
     }
 
-    .dot-1 {
-      background-color: #4285f4;
-      animation-delay: 0s;
+    .ring:nth-child(1) {
+      border-bottom: 8px solid #27c1bb; /* Primary Teal */
+      animation: rotate1 2s linear infinite;
     }
 
-    .dot-2 {
-      background-color: #34a853;
-      animation-delay: 0.3s;
+    @keyframes rotate1 {
+      from { transform: rotateX(50deg) rotateZ(110deg); }
+      to { transform: rotateX(50deg) rotateZ(470deg); }
     }
 
-    .dot-3 {
-      background-color: #fbbc05;
-      animation-delay: 0.6s;
+    .ring:nth-child(2) {
+      border-bottom: 8px solid #0f172a; /* Sidebar Dark Slate */
+      animation: rotate2 2s linear infinite;
     }
 
-    .dot-4 {
-      background-color: #ea4335;
-      animation-delay: 0.9s;
+    @keyframes rotate2 {
+      from { transform: rotateX(20deg) rotateY(50deg) rotateZ(20deg); }
+      to { transform: rotateX(20deg) rotateY(50deg) rotateZ(380deg); }
     }
 
-    .dot-5 {
-      background-color: #4285f4;
-      animation-delay: 1.2s;
+    .ring:nth-child(3) {
+      border-bottom: 8px solid #63d5d1; /* Light Teal */
+      animation: rotate3 2s linear infinite;
     }
 
-    @keyframes dot-pulse2 {
-      0% {
-        transform: scale(0.5);
-        opacity: 0.5;
-      }
-      50% {
-        transform: scale(1.2);
-        opacity: 1;
-      }
-      100% {
-        transform: scale(0.5);
-        opacity: 0.5;
-      }
+    @keyframes rotate3 {
+      from { transform: rotateX(40deg) rotateY(130deg) rotateZ(450deg); }
+      to { transform: rotateX(40deg) rotateY(130deg) rotateZ(90deg); }
+    }
+
+    .ring:nth-child(4) {
+      border-bottom: 8px solid #1a8581; /* Dark Teal */
+      animation: rotate4 2s linear infinite;
+    }
+
+    @keyframes rotate4 {
+      from { transform: rotateX(70deg) rotateZ(270deg); }
+      to { transform: rotateX(70deg) rotateZ(630deg); }
     }
   `]
 })

@@ -1,9 +1,16 @@
 <div class="wrapper">
   <app-sidebar></app-sidebar>
-  <div class="main-panel">
+  <div class="main-panel" style="position: relative;">
     <app-header></app-header>
     <div class="content p-4">
       <router-outlet></router-outlet>
+    </div>
+    
+    <!-- Loader Overlay restricted to main panel -->
+    <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center;" *ngIf="loaderService.isLoading$ | async">
+      <div>
+        <app-loader></app-loader>
+      </div>
     </div>
   </div>
 </div>

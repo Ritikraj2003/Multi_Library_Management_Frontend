@@ -15,14 +15,36 @@
 .sidebar {
   width: 260px;
   min-height: 100vh;
-  transition: all 0.3s;
-  z-index: 1001;
+  transition: all 0.3s ease-in-out;
+  z-index: 1045;
   background: #0f172a;
   /* Slate 900 */
   color: #f8fafc;
   /* Slate 50 */
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    height: 100vh;
+  }
+  .sidebar.open {
+    left: 0;
+  }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
 }
 
 .sidebar-header {

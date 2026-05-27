@@ -4,12 +4,12 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-role-permission',
   standalone: true,
-  imports: [CommonModule, FormsModule, LoaderComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './role-permission.html',
   styleUrl: './role-permission.css'
 })
@@ -17,6 +17,7 @@ export class RolePermission implements OnInit {
   private apiService = inject(ApiService);
   public authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
+  private loaderService = inject(LoaderService);
   
   roles: any[] = [];
   searchTerm: string = '';
@@ -58,6 +59,7 @@ export class RolePermission implements OnInit {
   
   loadRoles() {
     this.loading = true;
+    this.loaderService.show();
     const params = {
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
@@ -70,7 +72,11 @@ export class RolePermission implements OnInit {
       // Assuming getRolesByLibraryId does not paginate, let's just fetch all and filter/paginate client-side for now,
       // OR if the backend supports it, pass params.
       this.apiService.getRolesByLibraryId(this.currentUser.libraryId)
-      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.loaderService.hide();
+        this.cdr.detectChanges(); 
+      }))
       .subscribe((res: any) => {
         if (res.success) {
           let data = res.data;
@@ -84,7 +90,11 @@ export class RolePermission implements OnInit {
       });
     } else {
       this.apiService.getAllRoles(params)
-      .pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+      .pipe(finalize(() => { 
+        this.loading = false; 
+        this.loaderService.hide();
+        this.cdr.detectChanges(); 
+      }))
       .subscribe((res: any) => {
         if (res.success) {
           this.roles = res.data.items || res.data;

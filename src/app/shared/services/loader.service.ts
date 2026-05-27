@@ -8,11 +8,24 @@ export class LoaderService {
   private loaderSubject = new BehaviorSubject<boolean>(false);
   isLoading$ = this.loaderSubject.asObservable();
 
+  private activeRequests = 0;
+
   show() {
-    this.loaderSubject.next(true);
+    setTimeout(() => {
+      this.activeRequests++;
+      if (this.activeRequests === 1) {
+        this.loaderSubject.next(true);
+      }
+    });
   }
 
   hide() {
-    this.loaderSubject.next(false);
+    setTimeout(() => {
+      this.activeRequests--;
+      if (this.activeRequests <= 0) {
+        this.activeRequests = 0;
+        this.loaderSubject.next(false);
+      }
+    });
   }
 }

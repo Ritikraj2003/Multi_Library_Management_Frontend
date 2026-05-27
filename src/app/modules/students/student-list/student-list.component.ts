@@ -1,4 +1,4 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
@@ -15,7 +15,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule, StudentFormComponent, LoaderComponent],
+  imports: [CommonModule, StudentFormComponent],
   templateUrl: './student-list.component.html',
   styleUrls: ['./student-list.component.css']
 })
@@ -46,7 +46,7 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents(pageNumber: number = 1, pageSize: number = 10): void {
-    this.loading = true;
+    this.loaderService.show();
     const params: any = {
       PageNumber: pageNumber,
       PageSize: pageSize
@@ -62,6 +62,7 @@ export class StudentListComponent implements OnInit {
         next: (res: any) => {
           if (res && res.data) {
             this.students = res.data.items || [];
+            this.loaderService.hide();
             if (res.data.totalCount !== undefined) {
                this.pagination = {
                  pageNumber: res.data.pageNumber,
