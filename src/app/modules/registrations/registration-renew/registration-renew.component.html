@@ -32,7 +32,6 @@
   <div class="col-12 mt-4 text-end">
     <button type="button" class="btn btn-light rounded-3 px-4 me-2" (click)="cancelled.emit()">Cancel</button>
     <button type="submit" class="btn btn-success rounded-3 px-4 shadow" [disabled]="loading">
-      <app-loader size="small"  class="me-2"  *ngIf="loading"></app-loader>
       Confirm Renewal
     </button>
   </div>

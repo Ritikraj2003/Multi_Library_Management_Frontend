@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { LoaderService } from '../../shared/services/loader.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -38,7 +39,7 @@ import { finalize } from 'rxjs';
         </div>
 
         <button [disabled]="loading" class="btn btn-primary w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center mb-3">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+
           Send Reset Link
         </button>
 
@@ -60,7 +61,8 @@ export class ForgotPasswordComponent {
     private fb: FormBuilder,
     private apiService: ApiService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private loaderService: LoaderService
   ) {
     this.forgotForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -74,8 +76,12 @@ export class ForgotPasswordComponent {
     if (this.forgotForm.invalid) return;
 
     this.loading = true;
+    this.loaderService.show();
     this.apiService.forgotPassword(this.forgotForm.value.email)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+      }))
       .subscribe({
         next: (res) => {
           if (res.success) {

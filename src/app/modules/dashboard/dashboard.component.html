@@ -9,7 +9,7 @@
   <div class="row" *ngIf="!loading">
     <!-- Total Students -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 bg-primary text-white h-100">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h6 class="text-uppercase small mb-2 opacity-75">Total Students</h6>
@@ -22,13 +22,13 @@
       </div>
     </div>
 
-    <!-- Active Students -->
+    <!-- Active Registrations -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 bg-success text-white h-100">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #10b981, #047857);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-uppercase small mb-2 opacity-75">Active Students</h6>
-            <h2 class="mb-0 fw-bold">{{stats?.activeStudents || 0}}</h2>
+            <h6 class="text-uppercase small mb-2 opacity-75">Active Registrations</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.activeRegistrations || 0}}</h2>
           </div>
           <div class="bg-white bg-opacity-25 rounded-circle p-3">
             <i class="bi bi-person-check fs-3"></i>
@@ -39,7 +39,7 @@
 
     <!-- Expired Students -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 bg-danger text-white h-100">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h6 class="text-uppercase small mb-2 opacity-75">Expired Students</h6>
@@ -54,7 +54,7 @@
 
     <!-- Today Renewals -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 bg-info text-white h-100">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #06b6d4, #0369a1);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h6 class="text-uppercase small mb-2 opacity-75">Today Renewals</h6>
@@ -69,7 +69,7 @@
 
     <!-- Total Revenue -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
-      <div class="card border-0 shadow-sm rounded-4 p-4 bg-warning text-white h-100">
+      <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #f59e0b, #b45309);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h6 class="text-uppercase small mb-2 opacity-75">Total Revenue</h6>
@@ -97,13 +97,13 @@
       </div>
     </div>
 
-    <!-- Total Seats -->
+    <!-- Total Tables -->
     <div class="col-xl-3 col-md-4 col-sm-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 p-4 text-white h-100" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h6 class="text-uppercase small mb-2 opacity-75">Total Seats</h6>
-            <h2 class="mb-0 fw-bold">{{stats?.availableSeats || 0}} <span class="fs-6 fw-normal">/ {{stats?.totalSeats || 0}}</span></h2>
+            <h6 class="text-uppercase small mb-2 opacity-75">Total Tables</h6>
+            <h2 class="mb-0 fw-bold">{{stats?.totalTables || 0}}</h2>
           </div>
           <div class="bg-white bg-opacity-25 rounded-circle p-3">
             <i class="bi bi-grid-3x3-gap fs-3"></i>
@@ -118,7 +118,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h6 class="text-uppercase small mb-2 opacity-75">Total Batches</h6>
-            <h2 class="mb-0 fw-bold">{{stats?.batchStats?.length || 0}}</h2>
+            <h2 class="mb-0 fw-bold">{{stats?.totalBatches || 0}}</h2>
           </div>
           <div class="bg-white bg-opacity-25 rounded-circle p-3">
             <i class="bi bi-person-workspace fs-3"></i>
@@ -185,7 +185,7 @@
     </div>
   </div>
 
-  <!-- Donut Charts Row -->
+  <!-- Donut Charts Row 1 -->
   <div class="row mt-2" *ngIf="!loading">
     <!-- Payment Mode Donut -->
     <div class="col-lg-6 mb-4">
@@ -214,10 +214,23 @@
     </div>
   </div>
 
-  <!-- ─── Seat Booking Details Row ─────────────────────────────────── -->
+  <!-- ─── Gender & Seat Booking Details Row ─────────────────────────────────── -->
   <div class="row mt-2" *ngIf="!loading">
+    <!-- Gender Distribution Donut -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 h-100">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h5 class="fw-bold mb-0">Gender Distribution</h5>
+          <p class="text-muted small">Registered students by gender</p>
+        </div>
+        <div class="card-body">
+          <div id="genderChartDiv" style="width: 100%; height: 350px;"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Seat Booking by Batch -->
-    <div class="col-12 mb-4">
+    <div class="col-lg-6 mb-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-header bg-white border-0 pt-4 px-4">
           <h5 class="fw-bold mb-0">Seat Booking by Batch</h5>
@@ -228,7 +241,7 @@
             <p class="text-muted">No batch data available.</p>
           </div>
           <div class="row" *ngIf="stats?.batchStats?.length">
-            <div class="col-md-4 mb-3" *ngFor="let batch of stats.batchStats">
+            <div class="col-12 mb-4" *ngFor="let batch of stats.batchStats">
               <div class="d-flex justify-content-between align-items-end mb-2">
                 <div>
                   <h6 class="mb-0 fw-semibold">{{batch.batchName}}</h6>
@@ -355,8 +368,6 @@
           (click)="hideModal()">Cancel</button>
         <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2"
           [disabled]="whatsappLoading" (click)="sendExpirationWhatsAppMessage()">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-            *ngIf="whatsappLoading"></span>
           <i class="bi bi-send-fill" *ngIf="!whatsappLoading"></i>
           {{ whatsappLoading ? 'Sending...' : 'Send Reminder' }}
         </button>

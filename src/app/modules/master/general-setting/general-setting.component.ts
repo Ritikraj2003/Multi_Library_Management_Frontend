@@ -6,6 +6,7 @@ import { Subscription, interval } from 'rxjs';
 import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-general-setting',
@@ -38,7 +39,8 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
     private notificationService: NotificationService,
     private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private loaderService: LoaderService
   ) {
     this.libraryId = this.authService.currentUserValue?.libraryId || 0;
     
@@ -115,6 +117,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
 
     if (this.emailForm.valid) {
       this.savingEmail = true;
+      this.loaderService.show();
       const values = this.emailForm.value;
       const keys = Object.keys(values);
       
@@ -131,6 +134,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
             completed++;
             if (completed === keys.length) {
               this.savingEmail = false;
+              this.loaderService.hide();
               this.notificationService.showSuccess('Email settings saved successfully!');
               this.cdr.detectChanges();
             }
@@ -138,6 +142,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
           error: (err: any) => {
             console.error(`Error for ${key}:`, err);
             this.savingEmail = false;
+            this.loaderService.hide();
             this.cdr.detectChanges();
           }
         });
@@ -161,6 +166,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
   onSaveRazorpay() {
     if (this.razorpayForm.valid) {
       this.savingRazorpay = true;
+      this.loaderService.show();
       const values = this.razorpayForm.value;
       const keys = Object.keys(values);
 
@@ -175,12 +181,14 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
             completed++;
             if (completed === keys.length) {
               this.savingRazorpay = false;
+              this.loaderService.hide();
               this.notificationService.showSuccess('Razorpay settings saved successfully!');
               this.cdr.detectChanges();
             }
           },
           error: () => {
             this.savingRazorpay = false;
+            this.loaderService.hide();
             this.cdr.detectChanges();
           }
         });
@@ -194,6 +202,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       return;
     }
     this.fetchingLocation = true;
+    this.loaderService.show();
     this.cdr.detectChanges();
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -203,6 +212,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
             longitude: position.coords.longitude
           });
           this.fetchingLocation = false;
+          this.loaderService.hide();
           this.notificationService.showSuccess('Location fetched successfully!');
           this.cdr.detectChanges();
         });
@@ -210,6 +220,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       (error) => {
         this.ngZone.run(() => {
           this.fetchingLocation = false;
+          this.loaderService.hide();
           this.notificationService.showError('Could not fetch location. Please enable location permissions.');
           this.cdr.detectChanges();
         });
@@ -221,6 +232,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
   onSaveAttendanceLocation() {
     if (this.attendanceLocationForm.valid) {
       this.savingAttendanceLocation = true;
+      this.loaderService.show();
       this.cdr.detectChanges();
       const values = this.attendanceLocationForm.value;
       console.log('Saving attendance location:', { libraryId: this.libraryId, ...values });
@@ -232,6 +244,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       }).subscribe({
         next: (res: any) => {
           this.savingAttendanceLocation = false;
+          this.loaderService.hide();
           this.cdr.detectChanges();
           console.log('Upsert attendance location response:', res);
 
@@ -248,6 +261,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
         },
         error: (err: any) => {
           this.savingAttendanceLocation = false;
+          this.loaderService.hide();
           this.cdr.detectChanges();
           // errorInterceptor transforms err into a plain string
           const errMsg = typeof err === 'string' ? err : (err?.error?.message || err?.message || 'An error occurred while saving.');

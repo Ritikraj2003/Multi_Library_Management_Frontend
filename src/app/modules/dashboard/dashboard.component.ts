@@ -46,6 +46,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private batchRoot: am5.Root | undefined;
   private attendanceBatchRoot: am5.Root | undefined;
   private revenueRoot: am5.Root | undefined;
+  private genderRoot: am5.Root | undefined;
 
   constructor(
     private apiService: ApiService,
@@ -175,11 +176,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
 
     this.whatsappLoading = true;
+    this.loaderService.show();
     this.cdr.markForCheck();
 
     this.apiService.sendSingleWhatsAppMessage(body)
       .pipe(finalize(() => {
         this.whatsappLoading = false;
+        this.loaderService.hide();
         this.cdr.markForCheck();
       }))
       .subscribe({
@@ -218,6 +221,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   createCharts(): void {
     this.createPaymentChart();
     this.createBatchChart();
+    this.createGenderChart();
     this.createRevenueChart();
   }
 
@@ -233,7 +237,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.batchRoot = this.initDonutChart("batchChartDiv", this.stats.batchStats, "studentCount", "batchName", "{value} Students");
   }
 
-  
+  createGenderChart(): void {
+    if (this.genderRoot) this.genderRoot.dispose();
+    if (!this.stats?.genderStats?.length) return;
+    this.genderRoot = this.initDonutChart("genderChartDiv", this.stats.genderStats, "count", "gender", "{value} Students");
+  }
 
   createRevenueChart(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -257,12 +265,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
       })
     );
 
+    const xRenderer = am5xy.AxisRendererX.new(root, {
+      minGridDistance: 70
+    });
+
+    xRenderer.labels.template.setAll({
+      fontSize: 12,
+      fill: am5.color(0x64748b)
+    });
+
     const xAxis = chart.xAxes.push(
       am5xy.CategoryAxis.new(root, {
         categoryField: "month",
-        renderer: am5xy.AxisRendererX.new(root, {
-          minGridDistance: 30
-        }),
+        renderer: xRenderer,
         tooltip: am5.Tooltip.new(root, {})
       })
     );
@@ -292,7 +307,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       visible: true,
       fillOpacity: 0.2
     });
-    
+
     series.fills.template.set("fillGradient", am5.LinearGradient.new(root, {
       stops: [{
         opacity: 0.6,
@@ -507,7 +522,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       marginBottom: 15,
       layout: root.horizontalLayout
     }));
-    
+
     // allow wrapping
     legend.labels.template.setAll({
       fontSize: 12,
@@ -530,5 +545,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.batchRoot) this.batchRoot.dispose();
     if (this.attendanceBatchRoot) this.attendanceBatchRoot.dispose();
     if (this.revenueRoot) this.revenueRoot.dispose();
+    if (this.genderRoot) this.genderRoot.dispose();
   }
 }

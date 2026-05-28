@@ -1,15 +1,15 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-registration-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './registration-form.component.html'
 })
 export class RegistrationFormComponent implements OnInit, OnChanges {
@@ -30,7 +30,8 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private loaderService: LoaderService
   ) {
     this.regForm = this.fb.group({
       studentId: [null, [Validators.required]],
@@ -332,6 +333,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
+    this.loaderService.show();
     const body = { 
       ...this.regForm.getRawValue(), 
       libraryId: this.libraryId,
@@ -347,7 +349,10 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       ? this.apiService.updateRegistration(this.registrationData.id, body)
       : this.apiService.createRegistration(body);
 
-    request.pipe(finalize(() => this.loading = false))
+    request.pipe(finalize(() => {
+      this.loading = false;
+      this.loaderService.hide();
+    }))
       .subscribe({
         next: (res: any) => {
           if (res.success) {

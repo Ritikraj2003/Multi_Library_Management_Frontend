@@ -1,12 +1,12 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, Input, OnInit, OnChanges, ChangeDetectorRef, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../shared/services/api.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-payment-history',
   standalone: true,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule],
   templateUrl: './payment-history.component.html'
 })
 export class PaymentHistoryComponent implements OnInit, OnChanges {
@@ -17,7 +17,8 @@ export class PaymentHistoryComponent implements OnInit, OnChanges {
 
   constructor(
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {}
@@ -30,17 +31,20 @@ export class PaymentHistoryComponent implements OnInit, OnChanges {
 
   loadHistory(): void {
     this.loading = true;
+    this.loaderService.show();
     this.cdr.detectChanges();
     this.apiService.getPaymentHistory(this.registrationId)
       .subscribe({
         next: (res: any) => {
           this.payments = res.data || [];
           this.loading = false;
+          this.loaderService.hide();
           this.cdr.detectChanges();
         },
         error: (err: any) => {
           console.error('Error loading history:', err);
           this.loading = false;
+          this.loaderService.hide();
           this.cdr.detectChanges();
         }
       });

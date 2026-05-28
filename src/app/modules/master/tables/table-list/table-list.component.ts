@@ -157,6 +157,7 @@ export class TableListComponent implements OnInit {
     }
 
     this.saving = true;
+    this.loaderService.show();
     const formValue = this.tableForm.value;
     const body = { ...formValue, libraryId: this.libraryId };
 
@@ -168,7 +169,10 @@ export class TableListComponent implements OnInit {
       ? this.apiService.updateTable(body)
       : this.apiService.createTable(body);
 
-    request.pipe(finalize(() => this.saving = false))
+    request.pipe(finalize(() => {
+      this.saving = false;
+      this.loaderService.hide();
+    }))
       .subscribe({
         next: (res) => {
           if (res.success !== false) {

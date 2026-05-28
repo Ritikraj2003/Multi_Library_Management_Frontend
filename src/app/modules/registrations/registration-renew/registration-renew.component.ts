@@ -1,15 +1,15 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-registration-renew',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './registration-renew.component.html'
 })
 export class RegistrationRenewComponent implements OnInit {
@@ -24,7 +24,8 @@ export class RegistrationRenewComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private loaderService: LoaderService
   ) {
     this.renewForm = this.fb.group({
       months: [1, [Validators.required, Validators.min(1)]],
@@ -42,6 +43,7 @@ export class RegistrationRenewComponent implements OnInit {
     if (this.renewForm.invalid) return;
 
     this.loading = true;
+    this.loaderService.show();
     const body = { 
       ...this.renewForm.value, 
       registrationId: this.registrationId,
@@ -50,7 +52,10 @@ export class RegistrationRenewComponent implements OnInit {
     };
 
     this.apiService.renewRegistration(body)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+      }))
       .subscribe({
         next: (res: any) => {
           if (res.success) {

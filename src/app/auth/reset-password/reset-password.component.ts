@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { LoaderService } from '../../shared/services/loader.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -59,7 +60,7 @@ import { finalize } from 'rxjs';
         </div>
 
         <button [disabled]="loading" class="btn btn-primary w-100 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center">
-          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+
           Reset Password
         </button>
       </form>
@@ -78,7 +79,8 @@ export class ResetPasswordComponent implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private loaderService: LoaderService
   ) {
     this.resetForm = this.fb.group({
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -118,13 +120,17 @@ export class ResetPasswordComponent implements OnInit {
     if (this.resetForm.invalid) return;
 
     this.loading = true;
+    this.loaderService.show();
     const body = {
       token: this.token,
       newPassword: this.resetForm.value.password
     };
 
     this.apiService.resetPassword(body)
-      .pipe(finalize(() => this.loading = false))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+      }))
       .subscribe({
         next: (res) => {
           if (res.success) {

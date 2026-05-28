@@ -408,6 +408,23 @@ export class RegistrationListComponent implements OnInit {
     }
   }
 
+  canRenew(reg: any): boolean {
+    if (!reg) return false;
+    const s = String(reg.status).toLowerCase();
+    if (s === 'expired' || s === '2' || s === 'due' || s === '4') return true;
+    
+    // Allow renewal if due date is within the next 3 days (or has already passed)
+    if (reg.dueDate) {
+      const due = new Date(reg.dueDate).getTime();
+      const now = new Date().getTime();
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+      if (due - now <= threeDaysMs) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // ===================== WhatsApp Methods =====================
 
   openWhatsAppModal(reg: any): void {
@@ -437,11 +454,13 @@ export class RegistrationListComponent implements OnInit {
     };
 
     this.whatsappLoading = true;
+    this.loaderService.show();
     this.cdr.markForCheck();
 
     this.apiService.sendSingleWhatsAppMessage(body)
       .pipe(finalize(() => {
         this.whatsappLoading = false;
+        this.loaderService.hide();
         this.cdr.markForCheck();
       }))
       .subscribe({

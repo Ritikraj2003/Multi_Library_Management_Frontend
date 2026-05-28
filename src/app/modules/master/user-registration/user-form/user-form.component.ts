@@ -6,6 +6,7 @@ import { AuthService } from '../../../../auth/services/auth.service';
 import { environment } from '../../../../../environments/environment';
 import { finalize } from 'rxjs';
 import { NotificationService } from '../../../../shared/services/notification.service';
+import { LoaderService } from '../../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-user-form',
@@ -37,6 +38,7 @@ export class UserFormComponent implements OnInit, OnChanges {
     private apiService: ApiService,
     private authService: AuthService,
     private notificationService: NotificationService,
+    private loaderService: LoaderService,
     private cdr: ChangeDetectorRef
   ) {
     this.userForm = this.fb.group({
@@ -153,6 +155,7 @@ export class UserFormComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
+    this.loaderService.show();
     const formData = new FormData();
     const formValues = this.userForm.value;
 
@@ -174,7 +177,10 @@ export class UserFormComponent implements OnInit, OnChanges {
       ? this.apiService.updateUser(formData)
       : this.apiService.createUser(formData);
 
-    request.pipe(finalize(() => this.loading = false))
+    request.pipe(finalize(() => {
+      this.loading = false;
+      this.loaderService.hide();
+    }))
       .subscribe({
         next: (res) => {
           if (res.success) {

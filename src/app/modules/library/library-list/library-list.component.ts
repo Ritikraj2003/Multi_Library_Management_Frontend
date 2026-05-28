@@ -1,4 +1,3 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +6,7 @@ import { AuthService } from '../../../auth/services/auth.service';
 import { ApiResponse } from '../../../shared/models/api-response.model';
 import { Pagination } from '../../../shared/models/pagination.model';
 import { LibraryFormComponent } from '../library-form/library-form.component';
+import { LoaderService } from '../../../shared/services/loader.service';
 import { finalize } from 'rxjs';
 
 declare var bootstrap: any;
@@ -14,7 +14,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-library-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, LibraryFormComponent, LoaderComponent],
+  imports: [CommonModule, FormsModule, LibraryFormComponent],
   templateUrl: './library-list.component.html',
   styleUrls: ['./library-list.component.css']
 })
@@ -46,7 +46,8 @@ export class LibraryListComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {
     this.isSuperadmin = this.authService.currentUserValue?.isSuperadmin || false;
   }
@@ -126,11 +127,13 @@ export class LibraryListComponent implements OnInit {
 
   loadLibraries(): void {
     this.loading = true;
+    this.loaderService.show();
     if (this.isSuperadmin) {
       // Call get all for superadmin
       this.apiService.getAllLibraries()
       .pipe(finalize(() => {
         this.loading = false;
+        this.loaderService.hide();
         this.cdr.markForCheck();
       }))
       .subscribe({
@@ -158,6 +161,7 @@ export class LibraryListComponent implements OnInit {
         this.apiService.getLibraryById(libraryId)
         .pipe(finalize(() => {
           this.loading = false;
+          this.loaderService.hide();
           this.cdr.markForCheck();
         }))
         .subscribe({
@@ -177,6 +181,7 @@ export class LibraryListComponent implements OnInit {
       } else {
         console.warn('No libraryId found for current user');
         this.loading = false;
+        this.loaderService.hide();
       }
     }
   }

@@ -105,8 +105,7 @@
     <button type="submit"
       class="btn btn-primary rounded-3 px-4 shadow-sm d-inline-flex align-items-center justify-content-center gap-2"
       [disabled]="loading" style="min-width: 140px;">
-      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="loading"></span>
-      {{ loading ? (isEdit ? 'Updating...' : 'Adding...') : (isEdit ? 'Update Student' : 'Add Student') }}
+      {{ isEdit ? 'Update Student' : 'Add Student' }}
     </button>
   </div>
 </form>

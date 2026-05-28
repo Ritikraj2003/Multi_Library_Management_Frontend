@@ -1,4 +1,3 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -6,11 +5,12 @@ import { ApiService } from '../../../shared/services/api.service';
 import { environment } from '../../../../environments/environment';
 import { finalize } from 'rxjs';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-library-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './library-form.component.html',
   styleUrls: ['./library-form.component.css']
 })
@@ -33,6 +33,7 @@ export class LibraryFormComponent implements OnInit, OnChanges {
     private fb: FormBuilder,
     private apiService: ApiService,
     private notificationService: NotificationService,
+    private loaderService: LoaderService,
     private cdr: ChangeDetectorRef
   ) {
     this.libraryForm = this.fb.group({
@@ -97,6 +98,7 @@ export class LibraryFormComponent implements OnInit, OnChanges {
     }
 
     this.loading = true;
+    this.loaderService.show();
     const formData = new FormData();
     const formValue = this.libraryForm.value;
 
@@ -119,7 +121,10 @@ export class LibraryFormComponent implements OnInit, OnChanges {
       ? this.apiService.updateLibrary(formData)
       : this.apiService.createLibrary(formData);
 
-    request.pipe(finalize(() => this.loading = false))
+    request.pipe(finalize(() => {
+      this.loading = false;
+      this.loaderService.hide();
+    }))
       .subscribe({
         next: (res) => {
           if (res.success) {

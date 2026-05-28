@@ -11,11 +11,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngIf="loading">
-        <td colspan="6" class="text-center py-4">
-          <app-loader size="small"  class="text-info" ></app-loader>
-        </td>
-      </tr>
+
       <tr *ngIf="!loading && payments.length === 0">
         <td colspan="6" class="text-center py-4 text-muted small">No payment records found.</td>
       </tr>

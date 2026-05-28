@@ -124,7 +124,7 @@
               </span>
               <span *ngIf="whatsAppStatus === 'INITIALIZING'"
                 class="badge bg-warning-soft text-warning rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Initializing
+                Initializing
               </span>
               <span *ngIf="whatsAppStatus === 'QR_RECEIVED'"
                 class="badge bg-info-soft text-info rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center">
@@ -183,8 +183,6 @@
               <p class="text-muted small px-2 mb-2">Open WhatsApp on your phone > Linked Devices > Link a Device.</p>
               <div
                 class="d-flex align-items-center text-success small bg-success-soft px-3 py-1.5 rounded-pill fw-semibold">
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"
-                  style="width: 12px; height: 12px;"></span>
                 Polling WhatsApp status...
               </div>
             </div>
@@ -283,8 +281,6 @@
                 [disabled]="fetchingLocation || savingAttendanceLocation" (click)="fetchCurrentLocation()"
                 style="border-radius: 10px;"
                 *ngIf="authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_FETCH')">
-                <span *ngIf="fetchingLocation" class="spinner-border spinner-border-sm me-2" role="status"
-                  aria-hidden="true"></span>
                 <i *ngIf="!fetchingLocation" class="bi bi-crosshair me-2"></i>
                 <span>{{ fetchingLocation ? 'Fetching...' : 'Fetch Location' }}</span>
               </button>
@@ -293,8 +289,6 @@
                 [disabled]="savingAttendanceLocation || fetchingLocation" (click)="onSaveAttendanceLocation()"
                 style="border-radius: 10px;"
                 *ngIf="authService.hasPermission('GENERAL_SETTING_ATTENDANCE_LOCATION_UPDATE')">
-                <span *ngIf="savingAttendanceLocation" class="spinner-border spinner-border-sm me-2" role="status"
-                  aria-hidden="true"></span>
                 Save Settings
               </button>
             </div>

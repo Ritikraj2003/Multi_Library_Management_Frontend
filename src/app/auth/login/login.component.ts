@@ -1,15 +1,16 @@
-import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs';
+import { LoaderService } from '../../shared/services/loader.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -26,6 +27,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private notificationService: NotificationService,
+    private loaderService: LoaderService,
     private cdr: ChangeDetectorRef
   ) {
     // redirect to home if already logged in
@@ -56,7 +58,13 @@ export class LoginComponent implements OnInit {
     }
 
     this.loading = true;
+    this.loaderService.show();
     this.authService.login(this.loginForm.value)
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+        this.cdr.markForCheck();
+      }))
       .subscribe({
         next: (res: any) => {
           if (res && res.success) {
@@ -117,22 +125,16 @@ export class LoginComponent implements OnInit {
           } else {
             this.error = res?.message || 'Invalid email or password.';
             this.notificationService.showError(this.error);
-            this.loading = false;
-            this.cdr.markForCheck();
           }
         },
         error: (error: any) => {
           this.error = error?.error?.message || error?.message || error || 'An error occurred during login.';
           this.notificationService.showError(this.error);
-          this.loading = false;
-          this.cdr.markForCheck();
         }
       });
   }
 
   private showNoAccessError() {
     this.notificationService.showError('You do not have access to any modules.');
-    this.loading = false;
-    this.cdr.markForCheck();
   }
 }

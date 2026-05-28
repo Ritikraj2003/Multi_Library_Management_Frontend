@@ -192,9 +192,8 @@
           class="btn btn-primary rounded-3 px-4"
           (click)="onSubmit()"
           [disabled]="saving">
-          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          <i *ngIf="!saving" class="bi bi-check-lg me-2"></i>
-          {{ saving ? 'Saving...' : (selectedTable ? 'Update Seating' : 'Create Seating') }}
+          <i class="bi bi-check-lg me-2"></i>
+          {{ selectedTable ? 'Update Seating' : 'Create Seating' }}
         </button>
       </div>
 

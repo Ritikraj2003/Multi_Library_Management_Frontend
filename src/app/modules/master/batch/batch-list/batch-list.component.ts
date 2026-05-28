@@ -107,6 +107,7 @@ export class BatchListComponent implements OnInit {
     }
 
     this.saving = true;
+    this.loaderService.show();
     const formValue = this.batchForm.value;
     const body = { ...formValue, libraryId: this.libraryId };
 
@@ -114,7 +115,10 @@ export class BatchListComponent implements OnInit {
       ? this.apiService.updateBatch(this.selectedBatch.id, body)
       : this.apiService.createBatch(body);
 
-    request.pipe(finalize(() => this.saving = false))
+    request.pipe(finalize(() => {
+      this.saving = false;
+      this.loaderService.hide();
+    }))
       .subscribe({
         next: (res) => {
           this.hideModal();

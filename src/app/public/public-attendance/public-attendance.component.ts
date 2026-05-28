@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
 import { environment } from '../../../environments/environment';
+import { LoaderService } from '../../shared/services/loader.service';
 
 @Component({
   selector: 'app-public-attendance',
@@ -17,6 +18,7 @@ export class PublicAttendanceComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
+  private loaderService = inject(LoaderService);
 
   libraryId: number = 0;
   studentId: number | null = null;
@@ -69,6 +71,7 @@ export class PublicAttendanceComponent implements OnInit {
     }
 
     this.isLoading = true;
+    this.loaderService.show();
     this.message = '';
 
     const payload = {
@@ -81,6 +84,7 @@ export class PublicAttendanceComponent implements OnInit {
     this.http.post<any>(`${environment.apiUrl}Attendance/Mark`, payload).subscribe({
       next: (res) => {
         this.isLoading = false;
+        this.loaderService.hide();
         
         // 1. Check if success is true or false
         const success = res && (res.success || res.Success);
@@ -97,6 +101,7 @@ export class PublicAttendanceComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
+        this.loaderService.hide();
         this.isSuccess = false;
         console.error('Attendance error (after interceptor):', err);
 

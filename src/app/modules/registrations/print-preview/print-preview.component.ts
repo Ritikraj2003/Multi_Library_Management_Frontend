@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../auth/services/auth.service';
 import { ApiService } from '../../../shared/services/api.service';
 import { NotificationService } from '../../../shared/services/notification.service';
+import { LoaderService } from '../../../shared/services/loader.service';
 
 @Component({
   selector: 'app-print-preview',
@@ -64,7 +65,8 @@ export class PrintPreviewComponent implements OnInit {
     private authService: AuthService,
     private apiService: ApiService,
     private notificationService: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private loaderService: LoaderService
   ) {}
 
   libraryId: number = 0;
@@ -188,11 +190,13 @@ export class PrintPreviewComponent implements OnInit {
     };
 
     this.sharingWhatsApp = true;
+    this.loaderService.show();
     this.cdr.detectChanges();
 
     this.apiService.sendSingleWhatsAppMessage(body).subscribe({
       next: (res: any) => {
         this.sharingWhatsApp = false;
+        this.loaderService.hide();
         if (res && res.success) {
           this.notificationService.showSuccess('WhatsApp message sent successfully!');
         } else {
@@ -202,6 +206,7 @@ export class PrintPreviewComponent implements OnInit {
       },
       error: (err: any) => {
         this.sharingWhatsApp = false;
+        this.loaderService.hide();
         console.error(err);
         this.notificationService.showError(err.error?.message || err.message || 'Failed to send WhatsApp message.');
         this.cdr.detectChanges();
@@ -227,6 +232,7 @@ export class PrintPreviewComponent implements OnInit {
     }
 
     this.sharingEmail = true;
+    this.loaderService.show();
     this.cdr.detectChanges();
 
     const payload = {
@@ -238,6 +244,7 @@ export class PrintPreviewComponent implements OnInit {
     this.apiService.sendReceiptEmail(payload).subscribe({
       next: (res: any) => {
         this.sharingEmail = false;
+        this.loaderService.hide();
         if (res && res.success) {
           this.notificationService.showSuccess('Payment receipt PDF generated and sent to email successfully!');
         } else {
@@ -247,6 +254,7 @@ export class PrintPreviewComponent implements OnInit {
       },
       error: (err: any) => {
         this.sharingEmail = false;
+        this.loaderService.hide();
         console.error(err);
         this.notificationService.showError(err.error?.message || err.message || 'Failed to send receipt email.');
         this.cdr.detectChanges();

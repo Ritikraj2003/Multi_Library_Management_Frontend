@@ -24,11 +24,6 @@
             </tr>
           </thead>
           <tbody class="border-top-0">
-            <tr *ngIf="loading">
-              <td colspan="6" class="text-center py-5">
-                <app-loader></app-loader>
-              </td>
-            </tr>
             <tr *ngIf="!loading && libraries.length === 0">
               <td colspan="6" class="text-center py-5">
                 <i class="bi bi-inbox fs-1 text-muted d-block mb-2"></i>

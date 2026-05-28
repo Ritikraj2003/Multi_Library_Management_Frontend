@@ -121,8 +121,9 @@
                     *ngIf="authService.hasPermission('VIEW_REGISTRATION')">
                     <i class="bi bi-printer text-dark"></i>
                   </button>
-                  <button class="btn btn-white btn-sm" title="Renew" (click)="openRenewModal(reg)"
-                    *ngIf="authService.hasPermission('RENEWAL_ACTION_TAB')">
+                  <button class="btn btn-white btn-sm border-0" title="Renew" (click)="openRenewModal(reg)"
+                    *ngIf="authService.hasPermission('RENEWAL_ACTION_TAB')" [disabled]="!canRenew(reg)"
+                    [ngClass]="{'opacity-50': !canRenew(reg)}">
                     <i class="bi bi-arrow-repeat text-success"></i>
                   </button>
                   <button class="btn btn-white btn-sm" title="History" (click)="openHistoryModal(reg)"
@@ -139,7 +140,7 @@
                     <i class="bi bi-x-circle text-danger"></i>
                   </button>
                   <button class="btn btn-white btn-sm" title="Edit" (click)="openEditModal(reg)"
-                    *ngIf="authService.hasPermission('EDIT_REGISTRATION')">
+                    *ngIf="getStatusText(reg.status) !== 'Cancelled' && authService.hasPermission('EDIT_REGISTRATION')">
                     <i class="bi bi-pencil text-primary"></i>
                   </button>
                 </div>
@@ -303,8 +304,6 @@
           (click)="hideModal()">Cancel</button>
         <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2"
           [disabled]="whatsappLoading" (click)="sendWhatsAppMessage()">
-          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
-            *ngIf="whatsappLoading"></span>
           <i class="bi bi-send-fill" *ngIf="!whatsappLoading"></i>
           {{ whatsappLoading ? 'Sending...' : 'Send Message' }}
         </button>

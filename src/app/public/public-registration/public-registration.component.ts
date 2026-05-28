@@ -1,4 +1,3 @@
-import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -6,13 +5,14 @@ import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { finalize } from 'rxjs';
+import { LoaderService } from '../../shared/services/loader.service';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-public-registration',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './public-registration.component.html',
   styles: [`
     .registration-container {
@@ -160,7 +160,8 @@ export class PublicRegistrationComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private loaderService: LoaderService
   ) {
     this.regForm = this.fb.group({
       fullName: ['', [Validators.required]],
@@ -206,6 +207,7 @@ export class PublicRegistrationComponent implements OnInit {
     }
 
     this.loading = true;
+    this.loaderService.show();
     const formData = new FormData();
     const formValue = this.regForm.value;
 
@@ -223,9 +225,12 @@ export class PublicRegistrationComponent implements OnInit {
     }
 
     this.apiService.createStudent(formData)
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+      }))
       .subscribe({
         next: (res: any) => {
-          this.loading = false;
           if (res.success) {
             this.submitted = true;
             
@@ -255,7 +260,6 @@ export class PublicRegistrationComponent implements OnInit {
           }
         },
         error: (err: any) => {
-          this.loading = false;
           console.error('Registration error:', err);
           this.notificationService.showError('Something went wrong. Please check your connection.');
         }

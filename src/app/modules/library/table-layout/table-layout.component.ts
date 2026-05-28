@@ -1,7 +1,7 @@
 
 import { LoaderService } from '../../../shared/services/loader.service';
 import { NotificationService } from '../../../shared/services/notification.service';
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
@@ -41,13 +41,24 @@ export class TableLayoutComponent implements OnInit {
   initialX = 0;
   initialY = 0;
 
+  @ViewChild('floorArea') floorAreaRef!: ElementRef;
+
+  // Floor boundaries
+  get floorWidth(): number {
+    return this.floorAreaRef ? Math.max(1200, this.floorAreaRef.nativeElement.offsetWidth) : 1200;
+  }
+
+  get floorHeight(): number {
+    return this.floorAreaRef ? Math.max(800, this.floorAreaRef.nativeElement.offsetHeight) : 800;
+  }
+
   constructor(
     private apiService: ApiService,
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
     private loaderService: LoaderService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
@@ -106,15 +117,34 @@ export class TableLayoutComponent implements OnInit {
       };
 
       this.apiService.getAllTables(params)
-        .pipe(finalize(() => { 
-          this.loading = false; 
+        .pipe(finalize(() => {
+          this.loading = false;
           this.loaderService.hide();
-          this.cdr.detectChanges(); 
+          this.cdr.detectChanges();
         }))
         .subscribe((res: any) => {
           if (res.success && res.data) {
             const allItems = res.data.items || res.data || [];
             this.tables = allItems.filter((t: any) => (t.floorId ?? t.FloorId) == this.selectedFloorId);
+
+            let currentX = 20;
+            let currentY = 20;
+            this.tables.forEach(t => {
+              const tableWidth = 150;
+              const tableHeight = 130;
+              const isInvalid = !t.xAxis && !t.yAxis;
+              const isOutside = t.xAxis < 0 || t.yAxis < 0 || t.xAxis > this.floorWidth - tableWidth || t.yAxis > this.floorHeight - tableHeight;
+
+              if (isInvalid || isOutside) {
+                t.xAxis = currentX;
+                t.yAxis = currentY;
+                currentX += 180;
+                if (currentX > this.floorWidth - 160) {
+                  currentX = 20;
+                  currentY += 150;
+                }
+              }
+            });
           }
         });
     });
@@ -166,11 +196,11 @@ export class TableLayoutComponent implements OnInit {
   getStatusIcon(status: 'available' | 'occupied' | 'overlap'): string {
     switch (status) {
       case 'occupied':
-        return 'assets/images/occupied-removebg-preview.png';
+        return 'assets/images/Occupied_Chair.svg';
       case 'overlap':
-        return 'assets/images/timeoverlap-removebg-preview.png';
+        return 'assets/images/Time_Overlap_Chair.svg';
       default:
-        return 'assets/images/Avaialble-removebg-preview.png';
+        return 'assets/images/Available_Chair.svg';
     }
   }
 
@@ -192,12 +222,12 @@ export class TableLayoutComponent implements OnInit {
 
   onBatchClick(event: Event, table: any, batch: any): void {
     event.stopPropagation();
-    
+
     if (!this.authService.hasPermission('TABLE_REGISTRATION')) {
       this.notificationService.showError('You do not have permission to register tables!');
       return;
     }
-    
+
     // Only open modal for available (non-occupied, non-overlap) batches
     if (batch.isOccupied || batch.isOverlap) {
       this.notificationService.showWarning('This batch is already occupied or overlapping with another booking.');
@@ -299,31 +329,77 @@ export class TableLayoutComponent implements OnInit {
     });
   }
 
+  // --- Mouse Events ---
   onMouseDown(event: MouseEvent, table: any): void {
     if (!this.isEditMode) return;
-    this.isDragging = true;
-    this.draggedTableId = table.id;
-    this.initialX = table.xAxis || 0;
-    this.initialY = table.yAxis || 0;
-    this.dragStartX = event.clientX;
-    this.dragStartY = event.clientY;
+    this.startDrag(event.clientX, event.clientY, table);
     event.preventDefault(); // Prevent text selection
   }
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(event: MouseEvent): void {
-    if (!this.isDragging || !this.draggedTableId || !this.isEditMode) return;
-    const dx = event.clientX - this.dragStartX;
-    const dy = event.clientY - this.dragStartY;
-    const table = this.tables.find(t => t.id === this.draggedTableId);
-    if (table) {
-      table.xAxis = this.initialX + dx;
-      table.yAxis = this.initialY + dy;
-    }
+    this.handleDrag(event.clientX, event.clientY);
   }
 
   @HostListener('document:mouseup')
   onMouseUp(): void {
+    this.stopDrag();
+  }
+
+  // --- Touch Events ---
+  onTouchStart(event: TouchEvent, table: any): void {
+    if (!this.isEditMode || event.touches.length === 0) return;
+    this.startDrag(event.touches[0].clientX, event.touches[0].clientY, table);
+    // Prevent default to avoid scrolling/zooming while trying to drag
+    event.preventDefault();
+  }
+
+  @HostListener('document:touchmove', ['$event'])
+  onTouchMove(event: TouchEvent): void {
+    if (this.isDragging && event.touches.length > 0) {
+      this.handleDrag(event.touches[0].clientX, event.touches[0].clientY);
+    }
+  }
+
+  @HostListener('document:touchend')
+  onTouchEnd(): void {
+    this.stopDrag();
+  }
+
+  // --- Common Drag Logic ---
+  private startDrag(clientX: number, clientY: number, table: any): void {
+    this.isDragging = true;
+    this.draggedTableId = table.id;
+    this.initialX = table.xAxis || 0;
+    this.initialY = table.yAxis || 0;
+    this.dragStartX = clientX;
+    this.dragStartY = clientY;
+  }
+
+  private handleDrag(clientX: number, clientY: number): void {
+    if (!this.isDragging || !this.draggedTableId || !this.isEditMode) return;
+    const dx = clientX - this.dragStartX;
+    const dy = clientY - this.dragStartY;
+    const table = this.tables.find(t => t.id === this.draggedTableId);
+    if (table) {
+      let newX = this.initialX + dx;
+      let newY = this.initialY + dy;
+
+      // Table width is approx 150px, height 130px
+      const tableWidth = 150;
+      const tableHeight = 130;
+
+      if (newX < 0) newX = 0;
+      if (newY < 0) newY = 0;
+      if (newX > this.floorWidth - tableWidth) newX = this.floorWidth - tableWidth;
+      if (newY > this.floorHeight - tableHeight) newY = this.floorHeight - tableHeight;
+
+      table.xAxis = newX;
+      table.yAxis = newY;
+    }
+  }
+
+  private stopDrag(): void {
     if (this.isDragging) {
       this.isDragging = false;
       this.draggedTableId = null;
