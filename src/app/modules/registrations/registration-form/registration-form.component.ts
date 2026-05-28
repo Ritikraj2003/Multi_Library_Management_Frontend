@@ -1,3 +1,4 @@
+declare var Razorpay: any;
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -26,6 +27,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   seats: any[] = [];
   batches: any[] = [];
   libraryId!: number;
+  isRazorpayVerified: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -66,8 +68,16 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnInit(): void {
+    ngOnInit(): void {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
+    this.apiService.getSettingsByLibraryId(this.libraryId).subscribe(res => {
+      if (res.success && res.data) {
+        const razorpaySetting = res.data.find((s: any) => s.key === 'isRazorpayVerified');
+        if (razorpaySetting && razorpaySetting.value === 'true') {
+          this.isRazorpayVerified = true;
+        }
+      }
+    });
     this.loadDropdowns();
     this.updateForm();
   }
@@ -326,7 +336,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     return s1 < e2 && s2 < e1;
   }
 
-  onSubmit(): void {
+    onSubmit(): void {
     if (this.regForm.invalid) {
       Object.values(this.regForm.controls).forEach(c => c.markAsTouched());
       return;
@@ -341,10 +351,75 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     };
 
     if (this.isEdit) {
-      body.status = body.isActiveStatus ? 1 : 3; // 1: Active, 3: Cancelled
+      body.status = body.isActiveStatus ? 1 : 3;
     }
     delete body.isActiveStatus;
 
+    if (!this.isEdit && body.paymentMode === 'Razorpay') {
+      const totalAmount = Number(body.monthlyAmount) + Number(body.securityAmount);
+      const orderReq = {
+        libraryId: this.libraryId,
+        amount: totalAmount,
+        currency: 'INR'
+      };
+
+      this.apiService.createRazorpayOrder(orderReq).subscribe({
+        next: (orderRes: any) => {
+          this.loaderService.hide();
+          if (orderRes.success) {
+            const options = {
+              key: orderRes.key,
+              amount: orderRes.amount,
+              currency: orderRes.currency,
+              name: 'Jesses Library',
+              description: 'Student Registration Fee',
+              order_id: orderRes.orderId,
+              handler: (response: any) => {
+                this.loaderService.show();
+                const verifyReq = {
+                  libraryId: this.libraryId,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpaySignature: response.razorpay_signature
+                };
+                this.apiService.verifyRazorpayPayment(verifyReq).subscribe({
+                  next: (verifyRes: any) => {
+                    if (verifyRes.success) {
+                      this.saveRegistration(body);
+                    } else {
+                      this.loaderService.hide();
+                      this.loading = false;
+                      alert('Payment verification failed!');
+                    }
+                  },
+                  error: () => {
+                    this.loaderService.hide();
+                    this.loading = false;
+                    alert('Error verifying payment.');
+                  }
+                });
+              },
+              theme: { color: '#3399cc' }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } else {
+            this.loading = false;
+            alert('Failed to create Razorpay order.');
+          }
+        },
+        error: () => {
+          this.loaderService.hide();
+          this.loading = false;
+          alert('Error initializing Razorpay.');
+        }
+      });
+    } else {
+      this.saveRegistration(body);
+    }
+  }
+
+  private saveRegistration(body: any): void {
     const request = this.isEdit 
       ? this.apiService.updateRegistration(this.registrationData.id, body)
       : this.apiService.createRegistration(body);

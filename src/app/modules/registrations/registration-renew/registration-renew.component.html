@@ -10,17 +10,18 @@
   <div class="col-md-6">
     <label class="form-label fw-bold small text-muted">Renewal Amount</label>
     <div class="input-group">
-      <span class="input-group-text bg-light border-end-0 rounded-start-3">₹</span>
+      <span class="input-group-text bg-light border-end-0 rounded-start-3">â‚¹</span>
       <input type="number" class="form-control rounded-end-3 shadow-sm border-start-0" formControlName="amount">
     </div>
   </div>
 
   <div class="col-md-6">
-    <label class="form-label fw-bold small text-muted">Payment Mode</label>
-    <select class="form-select rounded-3 shadow-sm" formControlName="paymentMode">
+        <label class="form-label fw-bold small text-muted">Payment Mode</label>
+    <select class="form-select border-1 form-select-sm" formControlName="paymentMode" style="height: 38px; border-radius: 8px;">
       <option value="Cash">Cash</option>
       <option value="Online">Online</option>
       <option value="Cheque">Cheque</option>
+      <option *ngIf="isRazorpayVerified" value="Razorpay">Razorpay</option>
     </select>
   </div>
 

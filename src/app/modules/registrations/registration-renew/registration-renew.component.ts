@@ -1,3 +1,4 @@
+declare var Razorpay: any;
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -20,6 +21,7 @@ export class RegistrationRenewComponent implements OnInit {
   renewForm: FormGroup;
   loading = false;
   libraryId!: number;
+  isRazorpayVerified: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +39,14 @@ export class RegistrationRenewComponent implements OnInit {
 
   ngOnInit(): void {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
+    this.apiService.getSettingsByLibraryId(this.libraryId).subscribe(res => {
+      if (res.success && res.data) {
+        const razorpaySetting = res.data.find((s: any) => s.key === 'isRazorpayVerified');
+        if (razorpaySetting && razorpaySetting.value === 'true') {
+          this.isRazorpayVerified = true;
+        }
+      }
+    });
   }
 
   onSubmit(): void {
@@ -51,6 +61,70 @@ export class RegistrationRenewComponent implements OnInit {
       createdBy: this.authService.currentUserValue?.userId 
     };
 
+    if (body.paymentMode === 'Razorpay') {
+      const orderReq = {
+        libraryId: this.libraryId,
+        amount: Number(body.amount),
+        currency: 'INR'
+      };
+
+      this.apiService.createRazorpayOrder(orderReq).subscribe({
+        next: (orderRes: any) => {
+          this.loaderService.hide();
+          if (orderRes.success) {
+            const options = {
+              key: orderRes.key,
+              amount: orderRes.amount,
+              currency: orderRes.currency,
+              name: 'Jesses Library',
+              description: 'Student Renewal Fee',
+              order_id: orderRes.orderId,
+              handler: (response: any) => {
+                this.loaderService.show();
+                const verifyReq = {
+                  libraryId: this.libraryId,
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  razorpayOrderId: response.razorpay_order_id,
+                  razorpaySignature: response.razorpay_signature
+                };
+                this.apiService.verifyRazorpayPayment(verifyReq).subscribe({
+                  next: (verifyRes: any) => {
+                    if (verifyRes.success) {
+                      this.saveRenewal(body);
+                    } else {
+                      this.loaderService.hide();
+                      this.loading = false;
+                      alert('Payment verification failed!');
+                    }
+                  },
+                  error: () => {
+                    this.loaderService.hide();
+                    this.loading = false;
+                    alert('Error verifying payment.');
+                  }
+                });
+              },
+              theme: { color: '#3399cc' }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+          } else {
+            this.loading = false;
+            alert('Failed to create Razorpay order.');
+          }
+        },
+        error: () => {
+          this.loaderService.hide();
+          this.loading = false;
+          alert('Error initializing Razorpay.');
+        }
+      });
+    } else {
+      this.saveRenewal(body);
+    }
+  }
+
+  private saveRenewal(body: any): void {
     this.apiService.renewRegistration(body)
       .pipe(finalize(() => {
         this.loading = false;

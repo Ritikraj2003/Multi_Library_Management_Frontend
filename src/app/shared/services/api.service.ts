@@ -260,6 +260,18 @@ export class ApiService {
     return this.http.post<any>(`${this.baseUrl}GeneralSetting/Upsert`, body);
   }
 
+  upsertSettingList(body: any[]): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}GeneralSetting/UpsertList`, body);
+  }
+
+  createRazorpayOrder(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Payment/CreateOrder`, body);
+  }
+
+  verifyRazorpayPayment(body: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Payment/VerifyPayment`, body);
+  }
+
   deleteSetting(id: number): Observable<any> {
     return this.http.delete<any>(`${this.baseUrl}GeneralSetting/Delete/${id}`);
   }

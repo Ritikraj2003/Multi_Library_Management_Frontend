@@ -121,31 +121,24 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       const values = this.emailForm.value;
       const keys = Object.keys(values);
       
-      let completed = 0;
-      keys.forEach(key => {
-        console.log(`Upserting ${key}: ${values[key]}`);
-        this.apiService.upsertSetting({
-          libraryId: this.libraryId,
-          key: key,
-          value: values[key]
-        }).subscribe({
-          next: (res: any) => {
-            console.log(`Response for ${key}:`, res);
-            completed++;
-            if (completed === keys.length) {
-              this.savingEmail = false;
-              this.loaderService.hide();
-              this.notificationService.showSuccess('Email settings saved successfully!');
-              this.cdr.detectChanges();
-            }
-          },
-          error: (err: any) => {
-            console.error(`Error for ${key}:`, err);
-            this.savingEmail = false;
-            this.loaderService.hide();
-            this.cdr.detectChanges();
-          }
-        });
+      const list = keys.map(key => ({
+        libraryId: this.libraryId,
+        key: key,
+        value: values[key]
+      }));
+
+      this.apiService.upsertSettingList(list).subscribe({
+        next: (res: any) => {
+          this.savingEmail = false;
+          this.loaderService.hide();
+          this.notificationService.showSuccess('Email settings saved successfully!');
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          this.savingEmail = false;
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }
       });
     } else {
       console.warn('Form is invalid. Errors:', this.getFormErrors(this.emailForm));
@@ -170,28 +163,24 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       const values = this.razorpayForm.value;
       const keys = Object.keys(values);
 
-      let completed = 0;
-      keys.forEach(key => {
-        this.apiService.upsertSetting({
-          libraryId: this.libraryId,
-          key: key,
-          value: values[key]
-        }).subscribe({
-          next: () => {
-            completed++;
-            if (completed === keys.length) {
-              this.savingRazorpay = false;
-              this.loaderService.hide();
-              this.notificationService.showSuccess('Razorpay settings saved successfully!');
-              this.cdr.detectChanges();
-            }
-          },
-          error: () => {
-            this.savingRazorpay = false;
-            this.loaderService.hide();
-            this.cdr.detectChanges();
-          }
-        });
+      const list = keys.map(key => ({
+        libraryId: this.libraryId,
+        key: key,
+        value: values[key]
+      }));
+
+      this.apiService.upsertSettingList(list).subscribe({
+        next: () => {
+          this.savingRazorpay = false;
+          this.loaderService.hide();
+          this.notificationService.showSuccess('Razorpay settings saved successfully!');
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.savingRazorpay = false;
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }
       });
     }
   }
