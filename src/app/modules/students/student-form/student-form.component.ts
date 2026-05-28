@@ -1,4 +1,3 @@
-import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,7 +10,7 @@ import { NotificationService } from '../../../shared/services/notification.servi
 @Component({
   selector: 'app-student-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './student-form.component.html',
   styleUrls: ['./student-form.component.css']
 })
@@ -41,6 +40,7 @@ export class StudentFormComponent implements OnInit, OnChanges {
       fatherName: ['', [Validators.required]],
       mobile: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
       email: ['', [Validators.email]],
+      gender: ['', [Validators.required]],
       address: ['', [Validators.required]],
       documentType: ['', [Validators.required]],
       dob: ['', [Validators.required]],
@@ -66,12 +66,13 @@ export class StudentFormComponent implements OnInit, OnChanges {
       if (formattedData.dob) {
         formattedData.dob = new Date(formattedData.dob).toISOString().substring(0, 10);
       }
+      formattedData.gender = formattedData.gender ?? formattedData.Gender ?? '';
       this.studentForm.patchValue(formattedData);
       this.studentImagePreview = formattedData.photo ? environment.apiUrl.replace('api/', '') + formattedData.photo : null;
       this.documentImagePreview = formattedData.documentImage ? environment.apiUrl.replace('api/', '') + formattedData.documentImage : null;
     } else {
       this.isEdit = false;
-      this.studentForm.reset({ isActive: true });
+      this.studentForm.reset({ isActive: true, gender: '' });
       this.studentImageFile = null;
       this.documentImageFile = null;
       this.studentImagePreview = null;
@@ -152,16 +153,22 @@ export class StudentFormComponent implements OnInit, OnChanges {
       ? this.apiService.updateStudent(formData)
       : this.apiService.createStudent(formData);
 
-    request.pipe(finalize(() => this.loading = false))
+    request.pipe(finalize(() => {
+      this.loading = false;
+      this.cdr.markForCheck();
+    }))
       .subscribe({
         next: (res: any) => {
-          if (res.success) {
+          if (res?.success) {
             this.notificationService.showSuccess(this.isEdit ? 'Student updated successfully' : 'Student created successfully');
             this.saved.emit();
+          } else {
+            this.notificationService.showError(res?.message || 'Failed to save student');
           }
         },
         error: (err: any) => {
-          this.notificationService.showError('Error saving student');
+          const errMsg = err?.error?.message || err?.message || 'Error saving student';
+          this.notificationService.showError(errMsg);
           console.error('Error saving student:', err);
         }
       });

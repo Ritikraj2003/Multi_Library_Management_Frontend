@@ -11,6 +11,22 @@
     </button>
   </div>
 
+  <!-- Search Bar -->
+  <div class="mb-3">
+    <div class="input-group shadow-sm rounded-pill bg-white border" style="max-width: 420px; overflow: hidden;">
+      <span class="input-group-text bg-transparent border-0 text-muted ps-3">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control border-0 bg-transparent shadow-none ps-1"
+        placeholder="Search by name, ID, phone or email..."
+        [(ngModel)]="searchTerm" (keydown.enter)="onSearch()" autocomplete="off">
+      <button *ngIf="searchTerm" class="btn btn-link text-muted border-0 text-decoration-none pe-3 shadow-none" type="button"
+        (click)="clearSearch()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- Table Card -->
   <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
     <div class="card-body p-0">
@@ -20,6 +36,7 @@
             <tr>
               <th class="ps-4 py-3"># ID</th>
               <th class="py-3">Student Name</th>
+              <th class="py-3">Gender</th>
               <th class="py-3">Contact</th>
               <th class="py-3">Library</th>
               <th class="py-3 text-end pe-4">Actions</th>
@@ -29,7 +46,7 @@
 
             <!-- Empty State -->
             <tr *ngIf="students.length === 0">
-              <td colspan="5" class="text-center py-5">
+              <td colspan="6" class="text-center py-5">
                 <i class="bi bi-people fs-1 text-muted d-block mb-2"></i>
                 <span class="text-muted">No students found. Register your first student!</span>
               </td>
@@ -61,7 +78,12 @@
                 </div>
               </td>
               <td>
+                <span class="badge bg-light text-dark fw-normal px-3 rounded-pill" *ngIf="student.gender">{{ student.gender }}</span>
+                <span class="text-muted small" *ngIf="!student.gender">—</span>
+              </td>
+              <td>
                 <div class="small mb-1"><i class="bi bi-telephone text-muted me-2"></i> {{student.mobile}}</div>
+                <div class="small text-muted" *ngIf="student.email"><i class="bi bi-envelope text-muted me-2"></i> {{student.email}}</div>
                 <div class="small text-muted"><i class="bi bi-geo-alt text-muted me-2"></i> {{student.address |
                   slice:0:30}}...</div>
               </td>
@@ -165,6 +187,14 @@
           <div class="col-6">
             <label class="text-muted small fw-bold text-uppercase d-block">Mobile</label>
             <span class="fw-semibold">{{viewSelectedStudent.mobile}}</span>
+          </div>
+          <div class="col-6">
+            <label class="text-muted small fw-bold text-uppercase d-block">Email</label>
+            <span class="fw-semibold">{{viewSelectedStudent.email || 'N/A'}}</span>
+          </div>
+          <div class="col-6">
+            <label class="text-muted small fw-bold text-uppercase d-block">Gender</label>
+            <span class="fw-semibold">{{viewSelectedStudent.gender || 'N/A'}}</span>
           </div>
 
           <div class="col-12 border-top pt-3">

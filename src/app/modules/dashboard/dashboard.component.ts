@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/services/auth.service';
 import { ApiService } from '../../shared/services/api.service';
 import { LoaderService } from '../../shared/services/loader.service';
+import { NotificationService } from '../../shared/services/notification.service';
+import { finalize } from 'rxjs';
+
+declare var bootstrap: any;
 import * as am5 from '@amcharts/amcharts5';
 import * as am5percent from '@amcharts/amcharts5/percent';
 import * as am5xy from '@amcharts/amcharts5/xy';
@@ -21,10 +25,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   stats: any;
   loading = true;
   libraryId!: number;
+  libraryName = 'Library';
   userFullName: string | undefined;
 
   revenueAnalytics: any;
   dashboardAlerts: any;
+
+  private modal: any;
+  whatsappLoading = false;
+  whatsappMessage = '';
+  whatsappRecipient = '';
+  whatsappPhone = '';
 
   // Attendance by batch
   batchAttendanceData: any[] = [];
@@ -38,13 +49,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService,
+    public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private loaderService: LoaderService,
+    private notificationService: NotificationService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.userFullName = this.authService.currentUserValue?.fullName;
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
+    this.libraryName = this.authService.currentUserValue?.libraryName || 'Library';
     // Default to today's date in YYYY-MM-DD format
     this.selectedDate = new Date().toISOString().split('T')[0];
   }
@@ -134,6 +147,72 @@ export class DashboardComponent implements OnInit, OnDestroy {
       },
       error: () => this.cdr.markForCheck()
     });
+  }
+
+  openExpirationWhatsAppModal(student: { name: string; phone: string; plan?: string }): void {
+    this.whatsappRecipient = student.name;
+    this.whatsappPhone = student.phone;
+    const planInfo = student.plan ? ` (${student.plan} batch)` : '';
+    this.whatsappMessage =
+      `Hello ${student.name},\n\n` +
+      `This is a friendly reminder that your library subscription is going to expire *today*${planInfo}.\n\n` +
+      `*Please renew your subscription as soon as possible* to continue your studies.\n\n` +
+      `🏛️ *${this.libraryName}*\nThank you!`;
+    this.showModal('dashboardWhatsappModal');
+  }
+
+  sendExpirationWhatsAppMessage(): void {
+    if (!this.whatsappPhone) {
+      this.notificationService.showError('Recipient phone number is required.');
+      return;
+    }
+
+    const whatsAppLibId = 'LIB' + String(this.libraryId).padStart(3, '0');
+    const body = {
+      libraryId: whatsAppLibId,
+      number: this.whatsappPhone,
+      message: this.whatsappMessage
+    };
+
+    this.whatsappLoading = true;
+    this.cdr.markForCheck();
+
+    this.apiService.sendSingleWhatsAppMessage(body)
+      .pipe(finalize(() => {
+        this.whatsappLoading = false;
+        this.cdr.markForCheck();
+      }))
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            this.notificationService.showSuccess('WhatsApp reminder sent successfully!');
+            this.hideModal();
+          } else {
+            this.notificationService.showError(res.message || 'Failed to send WhatsApp reminder.');
+          }
+        },
+        error: (err: any) => {
+          const errMsg = err.error?.message || err.message || 'Error occurred. Make sure WhatsApp is connected in settings.';
+          this.notificationService.showError(errMsg);
+        }
+      });
+  }
+
+  private showModal(id: string): void {
+    this.cdr.detectChanges();
+    const el = document.getElementById(id);
+    if (el) {
+      let modalInstance = bootstrap.Modal.getInstance(el);
+      if (!modalInstance) {
+        modalInstance = new bootstrap.Modal(el);
+      }
+      this.modal = modalInstance;
+      this.modal.show();
+    }
+  }
+
+  hideModal(): void {
+    if (this.modal) this.modal.hide();
   }
 
   createCharts(): void {

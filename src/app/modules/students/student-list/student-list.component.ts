@@ -1,6 +1,7 @@
 
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
@@ -15,13 +16,14 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-student-list',
   standalone: true,
-  imports: [CommonModule, StudentFormComponent],
+  imports: [CommonModule, FormsModule, StudentFormComponent],
   templateUrl: './student-list.component.html',
   styleUrls: ['./student-list.component.css']
 })
 export class StudentListComponent implements OnInit {
   students: any[] = [];
   loading = false;
+  searchTerm = '';
   selectedStudent: any = undefined;
   modal: any;
   libraryId!: number;
@@ -45,6 +47,15 @@ export class StudentListComponent implements OnInit {
     this.loadStudents();
   }
 
+  onSearch(): void {
+    this.loadStudents(1);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.loadStudents(1);
+  }
+
   loadStudents(pageNumber: number = 1, pageSize: number = 10): void {
     this.loaderService.show();
     const params: any = {
@@ -56,24 +67,36 @@ export class StudentListComponent implements OnInit {
       params.LibraryId = this.libraryId;
     }
 
+    if (this.searchTerm.trim()) {
+      params.SearchTerm = this.searchTerm.trim();
+    }
+
     this.apiService.getAllStudents(params)
-      .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.loaderService.hide();
+        this.cdr.markForCheck();
+      }))
       .subscribe({
         next: (res: any) => {
-          if (res && res.data) {
+          if (res?.data) {
             this.students = res.data.items || [];
-            this.loaderService.hide();
             if (res.data.totalCount !== undefined) {
-               this.pagination = {
-                 pageNumber: res.data.pageNumber,
-                 pageSize: res.data.pageSize,
-                 totalRecords: res.data.totalCount,
-                 totalPages: res.data.totalPages
-               };
+              this.pagination = {
+                pageNumber: res.data.pageNumber,
+                pageSize: res.data.pageSize,
+                totalRecords: res.data.totalCount,
+                totalPages: res.data.totalPages
+              };
             }
+          } else {
+            this.students = [];
           }
         },
-        error: (err: any) => console.error('Error loading students:', err)
+        error: (err: any) => {
+          console.error('Error loading students:', err);
+          this.students = [];
+        }
       });
   }
 

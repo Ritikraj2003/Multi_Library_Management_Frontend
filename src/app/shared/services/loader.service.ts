@@ -11,21 +11,16 @@ export class LoaderService {
   private activeRequests = 0;
 
   show() {
-    setTimeout(() => {
-      this.activeRequests++;
-      if (this.activeRequests === 1) {
-        this.loaderSubject.next(true);
-      }
-    });
+    this.activeRequests++;
+    if (this.activeRequests === 1) {
+      this.loaderSubject.next(true);
+    }
   }
 
   hide() {
-    setTimeout(() => {
-      this.activeRequests--;
-      if (this.activeRequests <= 0) {
-        this.activeRequests = 0;
-        this.loaderSubject.next(false);
-      }
-    });
+    this.activeRequests = Math.max(0, this.activeRequests - 1);
+    if (this.activeRequests === 0) {
+      this.loaderSubject.next(false);
+    }
   }
 }

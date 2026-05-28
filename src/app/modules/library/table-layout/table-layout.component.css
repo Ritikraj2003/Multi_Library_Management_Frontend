@@ -12,47 +12,55 @@
 
 .layout-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 50px;
-  padding: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 28px;
+  padding: 24px;
   justify-items: center;
 }
 
 .table-item {
   position: relative;
-  width: 130px;
-  height: 90px;
-  background: #ffffff;
-  border: 3px solid #e0e0e0;
-  border-radius: 12px;
+  width: 150px;
+  min-height: 130px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: 8px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-/* All tables are now squares/rectangles as requested */
-.rectangle {
-  border-color: #f1c40f; /* Using yellow border for all as seen in screenshot */
-}
-
-.table-content {
-  text-align: center;
-  font-weight: 700;
-  color: #2d3436;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .table-id {
-  font-size: 18px;
-  line-height: 1;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: 0.4px;
+  font-weight: 700;
+  color: #1f2d3d;
+  text-align: center;
 }
 
-.seat-info {
-  font-size: 13px;
-  color: #636e72;
-  margin-top: 4px;
+.table-item.status-available .table-id {
+  color: #1f9d55;
+}
+
+.table-item.status-occupied .table-id {
+  color: #d4a017;
+}
+
+.table-item.status-overlap .table-id {
+  color: #dc3545;
+}
+
+.table-icon {
+  width: 140px;
+  height: 90px;
+  object-fit: contain;
 }
 
 /* Chairs styling */
@@ -126,8 +134,43 @@
 }
 
 .table-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+}
+
+.table-item.status-occupied,
+.table-item.status-overlap {
+  cursor: not-allowed;
+  opacity: 0.75;
+  filter: grayscale(0.15);
+}
+
+@media (max-width: 768px) {
+  .layout-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 18px;
+    padding: 16px;
+  }
+
+  .table-item {
+    width: 140px;
+    min-height: 120px;
+    gap: 6px;
+  }
+
+  .table-icon {
+    width: 124px;
+    height: 78px;
+  }
+
+  .table-id {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .layout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .legend .bg-success { background-color: #2ecc71 !important; }

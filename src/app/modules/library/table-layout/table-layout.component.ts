@@ -24,6 +24,7 @@ export class TableLayoutComponent implements OnInit {
   batches: any[] = [];
   registrations: any[] = [];
   selectedFloorId: number | null = null;
+  selectedBatchId: number | null = null;
   loading = true;
   libraryId!: number;
 
@@ -72,6 +73,10 @@ export class TableLayoutComponent implements OnInit {
         this.batches = (res.data || []).sort((a: any, b: any) =>
           (a.name || a.batchName || '').localeCompare(b.name || b.batchName || '')
         );
+
+        if (this.batches.length > 0 && !this.selectedBatchId) {
+          this.selectedBatchId = this.batches[0].id ?? this.batches[0].Id;
+        }
       }
     });
   }
@@ -79,6 +84,10 @@ export class TableLayoutComponent implements OnInit {
   onFloorChange(floorId: any): void {
     this.selectedFloorId = +floorId;
     this.loadTables();
+  }
+
+  onBatchChange(batchId: any): void {
+    this.selectedBatchId = +batchId;
   }
 
   loadTables(): void {
@@ -111,44 +120,58 @@ export class TableLayoutComponent implements OnInit {
     });
   }
 
-  getTableBatches(tableId: number | undefined): any[] {
-    if (!tableId) return [];
+  getTableStatus(tableId: number | undefined): 'available' | 'occupied' | 'overlap' {
+    if (!tableId || !this.selectedBatchId) return 'available';
 
-    const enriched = this.batches.map(batch => {
-      const bId = batch.id ?? batch.Id;
-      if (!bId) return { ...batch, isOccupied: false, isOverlap: false };
+    const selectedBatch = this.batches.find(b => (b.id ?? b.Id) === this.selectedBatchId);
+    const sStart = selectedBatch?.startTime ?? selectedBatch?.StartTime ?? '';
+    const sEnd = selectedBatch?.endTime ?? selectedBatch?.EndTime ?? '';
 
-      const isOccupied = this.registrations.some(reg => {
+    const isOccupied = this.registrations.some(reg => {
+      const regTableId = reg.tableSeatId ?? reg.TableSeatId;
+      const regBatchId = reg.batchId ?? reg.BatchId;
+      return regTableId === tableId && regBatchId === this.selectedBatchId;
+    });
+    if (isOccupied) return 'occupied';
+
+    if (sStart && sEnd) {
+      const otherRegs = this.registrations.filter(reg => {
         const regTableId = reg.tableSeatId ?? reg.TableSeatId;
         const regBatchId = reg.batchId ?? reg.BatchId;
-        return regTableId === tableId && regBatchId === bId;
+        return regTableId === tableId && regBatchId !== this.selectedBatchId;
       });
 
-      return {
-        ...batch,
-        id: bId,
-        startTime: batch.startTime ?? batch.StartTime ?? '',
-        endTime: batch.endTime ?? batch.EndTime ?? '',
-        isOccupied,
-        isOverlap: false
-      };
-    });
-
-    for (let i = 0; i < enriched.length; i++) {
-      for (let j = i + 1; j < enriched.length; j++) {
-        const a = enriched[i];
-        const b = enriched[j];
-        if ((a.isOccupied || b.isOccupied) &&
-            a.startTime && a.endTime && b.startTime && b.endTime) {
-          if (this.timesOverlap(a.startTime, a.endTime, b.startTime, b.endTime)) {
-            if (!enriched[i].isOccupied) enriched[i] = { ...enriched[i], isOverlap: true };
-            if (!enriched[j].isOccupied) enriched[j] = { ...enriched[j], isOverlap: true };
-          }
+      for (const reg of otherRegs) {
+        const regBatchId = reg.batchId ?? reg.BatchId;
+        const b = this.batches.find(x => (x.id ?? x.Id) === regBatchId);
+        const bStart = b?.startTime ?? b?.StartTime ?? '';
+        const bEnd = b?.endTime ?? b?.EndTime ?? '';
+        if (bStart && bEnd && this.timesOverlap(sStart, sEnd, bStart, bEnd)) {
+          return 'overlap';
         }
       }
     }
 
-    return enriched;
+    return 'available';
+  }
+
+  getStatusLabel(status: 'available' | 'occupied' | 'overlap'): string {
+    switch (status) {
+      case 'occupied': return 'Occupied';
+      case 'overlap': return 'Time Overlap';
+      default: return 'Available';
+    }
+  }
+
+  getStatusIcon(status: 'available' | 'occupied' | 'overlap'): string {
+    switch (status) {
+      case 'occupied':
+        return 'assets/images/occupied-removebg-preview.png';
+      case 'overlap':
+        return 'assets/images/timeoverlap-removebg-preview.png';
+      default:
+        return 'assets/images/Avaialble-removebg-preview.png';
+    }
   }
 
   private timeToMinutes(time: string): number {
@@ -185,6 +208,46 @@ export class TableLayoutComponent implements OnInit {
     this.preselectedRegistration = {
       tableSeatId: table.id,
       batchId: batch.id
+    };
+    this.cdr.detectChanges();
+
+    const el = document.getElementById('layoutRegModal');
+    if (el) {
+      if (!this.regModal) {
+        this.regModal = new bootstrap.Modal(el);
+      }
+      this.regModal.show();
+    } else {
+      this.notificationService.showError('Registration modal element not found!');
+    }
+  }
+
+  onTableClick(table: any): void {
+    if (this.isEditMode) return;
+
+    if (!this.authService.hasPermission('TABLE_REGISTRATION')) {
+      this.notificationService.showError('You do not have permission to register tables!');
+      return;
+    }
+
+    if (!this.selectedBatchId) {
+      this.notificationService.showWarning('Please select a batch first.');
+      return;
+    }
+
+    const status = this.getTableStatus(table.id);
+    if (status !== 'available') {
+      if (status === 'overlap') {
+        this.notificationService.showWarning('This table has a time overlap with another booking.');
+      } else {
+        this.notificationService.showWarning('This table is already occupied for the selected batch.');
+      }
+      return;
+    }
+
+    this.preselectedRegistration = {
+      tableSeatId: table.id,
+      batchId: this.selectedBatchId
     };
     this.cdr.detectChanges();
 

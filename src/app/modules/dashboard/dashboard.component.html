@@ -171,9 +171,13 @@
                      <small class="text-muted">{{student.plan}} | {{student.phone}}</small>
                    </div>
                  </div>
-                 <a [href]="'https://wa.me/' + student.phone + '?text=Hi ' + student.name + ', your library subscription expires today. Please renew to continue your studies.'" target="_blank" class="btn btn-sm btn-outline-success rounded-circle" title="Send WhatsApp Reminder">
+                 <button type="button"
+                   class="btn btn-sm btn-outline-success rounded-circle"
+                   title="Send WhatsApp Reminder"
+                   (click)="openExpirationWhatsAppModal(student)"
+                   *ngIf="authService.hasPermission('INDIVIDUAL_WHATSAPP_MESSAGE')">
                    <i class="bi bi-whatsapp"></i>
-                 </a>
+                 </button>
               </div>
            </div>
         </div>
@@ -306,4 +310,57 @@
     </div>
   </div>
 
+</div>
+
+<!-- Expiration WhatsApp Reminder Modal -->
+<div class="modal fade" id="dashboardWhatsappModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+      <div class="modal-header border-0 pt-4 px-4 bg-success text-white">
+        <h5 class="modal-title fw-bold text-white">
+          <i class="bi bi-whatsapp me-2"></i> Send Expiration Reminder
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label small fw-bold text-muted text-uppercase">Recipient</label>
+          <div class="bg-light p-3 rounded-3 border d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-semibold text-dark">{{ whatsappRecipient }}</div>
+              <div class="text-muted small">Number: {{ whatsappPhone }}</div>
+            </div>
+            <span class="badge bg-danger rounded-pill px-3">Expires Today</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="dashboardWhatsappMessageText" class="form-label small fw-bold text-muted text-uppercase">Message</label>
+          <textarea id="dashboardWhatsappMessageText" class="form-control border-1 rounded-3 small p-3" rows="6"
+            [(ngModel)]="whatsappMessage" placeholder="Type your expiration reminder..."></textarea>
+          <div class="text-muted extra-small mt-2">
+            <i class="bi bi-info-circle me-1"></i> You can customize this message before sending.
+          </div>
+        </div>
+
+        <div class="alert alert-warning border-0 rounded-3 small mt-4 mb-0 d-flex align-items-start gap-2">
+          <i class="bi bi-exclamation-triangle-fill fs-5 text-warning flex-shrink-0"></i>
+          <div>
+            Please ensure your <b>WhatsApp service</b> is running and connected in <b>Master Settings → General Setting</b>.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal"
+          (click)="hideModal()">Cancel</button>
+        <button type="button" class="btn btn-success rounded-3 px-4 d-flex align-items-center gap-2"
+          [disabled]="whatsappLoading" (click)="sendExpirationWhatsAppMessage()">
+          <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"
+            *ngIf="whatsappLoading"></span>
+          <i class="bi bi-send-fill" *ngIf="!whatsappLoading"></i>
+          {{ whatsappLoading ? 'Sending...' : 'Send Reminder' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

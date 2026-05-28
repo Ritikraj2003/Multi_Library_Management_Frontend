@@ -26,6 +26,17 @@
     </div>
 
     <div class="col-md-6">
+      <label class="form-label fw-bold small text-muted">Gender</label>
+      <select formControlName="gender" class="form-select rounded-3"
+        [class.is-invalid]="studentForm.get('gender')?.touched && studentForm.get('gender')?.invalid">
+        <option value="">Select Gender</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
       <label class="form-label fw-bold small text-muted">Date of Birth</label>
       <input type="date" formControlName="dob" class="form-control rounded-3"
         [class.is-invalid]="studentForm.get('dob')?.touched && studentForm.get('dob')?.invalid">
@@ -91,9 +102,11 @@
 
   <div class="mt-4 d-flex justify-content-end gap-2 border-top pt-3">
     <button type="button" class="btn btn-light rounded-3 px-4" (click)="cancelled.emit()" [disabled]="loading">Cancel</button>
-    <button type="submit" class="btn btn-primary rounded-3 px-4 shadow-sm" [disabled]="loading">
-      <app-loader size="small" *ngIf="loading"  class="me-2" ></app-loader>
-      {{ isEdit ? 'Update Student' : 'Add Student' }}
+    <button type="submit"
+      class="btn btn-primary rounded-3 px-4 shadow-sm d-inline-flex align-items-center justify-content-center gap-2"
+      [disabled]="loading" style="min-width: 140px;">
+      <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="loading"></span>
+      {{ loading ? (isEdit ? 'Updating...' : 'Adding...') : (isEdit ? 'Update Student' : 'Add Student') }}
     </button>
   </div>
 </form>

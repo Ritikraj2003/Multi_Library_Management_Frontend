@@ -15,6 +15,16 @@
       </select>
     </div>
 
+    <div class="batch-selector d-flex align-items-center gap-2 flex-wrap justify-content-center">
+      <button type="button"
+              class="btn btn-sm rounded-pill px-3"
+              *ngFor="let b of batches"
+              [ngClass]="(selectedBatchId === (b.id ?? b.Id)) ? 'btn-success text-white' : 'btn-outline-secondary'"
+              (click)="onBatchChange(b.id ?? b.Id)">
+        {{ b.name || b.batchName || b.Name }}
+      </button>
+    </div>
+
     <div class="legend d-flex flex-wrap justify-content-center align-items-center gap-3 small fw-bold">
       <div class="d-flex align-items-center gap-2 text-nowrap">
         <span class="dot bg-success"></span> Batch Available
@@ -42,6 +52,8 @@
   <div class="layout-grid" [class.edit-mode]="isEditMode">
     <div *ngFor="let table of tables"
          class="table-item rectangle"
+         [ngClass]="'status-' + getTableStatus(table.id)"
+         (click)="onTableClick(table)"
          [class.draggable]="isEditMode"
          [style.left.px]="table.xAxis || 0"
          [style.top.px]="table.yAxis || 0">
@@ -51,23 +63,10 @@
         <i class="bi bi-arrows-move"></i>
       </div>
 
-      <div class="table-content">
-        <div class="table-id">{{ table.tableNumber }}</div>
-        <div class="seat-info">Seat {{ table.seatNumber }}</div>
-      </div>
-
-      <!-- Chairs: Number of chairs = number of batches -->
-      <div class="chairs">
-        <div *ngFor="let b of getTableBatches(table.id); let j = index"
-             class="chair"
-             [ngClass]="['pos-' + j, b.isOverlap ? 'overlap' : (b.isOccupied ? 'occupied' : 'available')]"
-             [style.cursor]="(!b.isOccupied && !b.isOverlap && authService.hasPermission('TABLE_REGISTRATION')) ? 'pointer' : 'default'"
-             [title]="b.name + (b.isOverlap ? ' ⚠ Time Overlap — Cannot Book' : (b.isOccupied ? ' (Occupied)' : (!authService.hasPermission('TABLE_REGISTRATION') ? '' : ' — Click to Register')))"
-             (click)="onBatchClick($event, table, b)">
-          <span class="batch-name-label">{{ b.name }}</span>
-          <span *ngIf="b.isOverlap" class="overlap-label">⚠ Overlap</span>
-        </div>
-      </div>
+      <img class="table-icon"
+           [src]="getStatusIcon(getTableStatus(table.id))"
+           [alt]="getStatusLabel(getTableStatus(table.id))">
+      <div class="table-id">{{ table.tableNumber }}</div>
     </div>
 
     <div *ngIf="tables.length === 0" class="no-tables text-muted">
