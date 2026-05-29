@@ -185,6 +185,16 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}student-registration`, { params });
   }
 
+  getActiveRegistrationStudentIds(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}student-registration/active-student-ids`, {
+      params: { libraryId }
+    });
+  }
+
+  hasActiveRegistration(studentId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}student-registration/has-active/${studentId}`);
+  }
+
   getRegistrationById(id: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}student-registration/${id}`);
   }
@@ -256,12 +266,44 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}GeneralSetting/GetByLibraryId/${libraryId}`);
   }
 
-  upsertSetting(body: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}GeneralSetting/Upsert`, body);
+  isRazorpayVerified(libraryId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}GeneralSetting/IsRazorpayVerified/${libraryId}`);
   }
 
-  deleteSetting(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.baseUrl}GeneralSetting/Delete/${id}`);
+  upsertEmailSettings(body: {
+    libraryId: number;
+    email: string;
+    emailSmtp: string;
+    emailPort: number;
+    emailAppPassword: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}GeneralSetting/UpsertEmail`, body);
+  }
+
+  createRazorpayOrder(body: {
+    libraryId: number;
+    amount: number;
+    currency?: string;
+    receipt?: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Razorpay/CreateOrder`, body);
+  }
+
+  verifyRazorpayPayment(body: {
+    libraryId: number;
+    razorpayPaymentId: string;
+    razorpayOrderId: string;
+    razorpaySignature: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}Razorpay/VerifyPayment`, body);
+  }
+
+  upsertRazorpaySettings(body: {
+    libraryId: number;
+    razorpayKey: string;
+    razorpaySecretKey: string;
+  }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}GeneralSetting/UpsertRazorpay`, body);
   }
 
   // Attendance Location Endpoints

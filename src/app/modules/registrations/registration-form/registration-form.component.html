@@ -34,7 +34,10 @@
         >
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <div class="fw-bold">{{s.fullName}}</div>
+              <div class="fw-bold">
+                {{ s.fullName }}
+                <span *ngIf="s.hasActiveRegistration" class="text-danger small fw-semibold">(Active Registration)</span>
+              </div>
               <small class="text-muted">ID: {{s.id}}</small>
             </div>
             <div class="text-primary small">
@@ -50,6 +53,10 @@
       >
         No students found
       </div>
+    </div>
+    <div *ngIf="!isEdit && selectedStudentHasActiveRegistration" class="alert alert-warning small py-2 mt-2 mb-0">
+      <i class="bi bi-exclamation-triangle me-1"></i>
+      This student already has an active registration. You cannot register again until it is cancelled or expired.
     </div>
     <div class="invalid-feedback" *ngIf="regForm.get('studentId')?.touched && regForm.get('studentId')?.invalid">
       Please select a student.
@@ -105,7 +112,7 @@
     <select class="form-select rounded-3 shadow-sm" formControlName="paymentMode">
       <option value="Cash">Cash</option>
       <option value="Online">Online</option>
-      <option value="Cheque">Cheque</option>
+      <option *ngIf="isRazorpayVerified" value="Razorpay">Razorpay</option>
     </select>
   </div>
 

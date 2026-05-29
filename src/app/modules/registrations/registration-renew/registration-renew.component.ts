@@ -20,6 +20,7 @@ export class RegistrationRenewComponent implements OnInit {
   renewForm: FormGroup;
   loading = false;
   libraryId!: number;
+  isRazorpayVerified = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +38,26 @@ export class RegistrationRenewComponent implements OnInit {
 
   ngOnInit(): void {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
+    this.loadRazorpayStatus();
+  }
+
+  private loadRazorpayStatus(): void {
+    if (this.libraryId <= 0) return;
+    this.apiService.isRazorpayVerified(this.libraryId).subscribe({
+      next: (res: any) => {
+        this.isRazorpayVerified = res.success && !!(res.data ?? res.Data);
+        const mode = this.renewForm.get('paymentMode')?.value;
+        if (!this.isRazorpayVerified && mode === 'Razorpay') {
+          this.renewForm.patchValue({ paymentMode: 'Cash' });
+        }
+        if (mode === 'Cheque') {
+          this.renewForm.patchValue({ paymentMode: 'Cash' });
+        }
+      },
+      error: () => {
+        this.isRazorpayVerified = false;
+      }
+    });
   }
 
   onSubmit(): void {

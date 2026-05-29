@@ -22,6 +22,7 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
   libraryId: number = 0;
   savingEmail = false;
   savingRazorpay = false;
+  isRazorpayVerified = false;
   savingAttendanceLocation = false;
   fetchingLocation = false;
 
@@ -82,15 +83,18 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       this.apiService.getSettingsByLibraryId(this.libraryId).subscribe({
         next: (res: any) => {
           if (res.success && res.data) {
-            const settings: any[] = res.data;
-            settings.forEach(s => {
-              if (s.key === 'email') this.emailForm.patchValue({ email: s.value });
-              if (s.key === 'password') this.emailForm.patchValue({ password: s.value });
-              if (s.key === 'host') this.emailForm.patchValue({ host: s.value });
-              if (s.key === 'port') this.emailForm.patchValue({ port: s.value });
-              if (s.key === 'keyId') this.razorpayForm.patchValue({ keyId: s.value });
-              if (s.key === 'keySecret') this.razorpayForm.patchValue({ keySecret: s.value });
+            const s = res.data;
+            this.emailForm.patchValue({
+              email: s.email ?? s.Email ?? '',
+              password: s.emailAppPassword ?? s.EmailAppPassword ?? '',
+              host: s.emailSmtp ?? s.EmailSmtp ?? '',
+              port: s.emailPort != null ? String(s.emailPort) : (s.EmailPort != null ? String(s.EmailPort) : '')
             });
+            this.razorpayForm.patchValue({
+              keyId: s.razorpayKey ?? s.RazorpayKey ?? '',
+              keySecret: s.razorpaySecretKey ?? s.RazorpaySecretKey ?? ''
+            });
+            this.isRazorpayVerified = !!(s.isRazorpayVerified ?? s.IsRazorpayVerified);
           }
         }
       });
@@ -110,45 +114,33 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
   }
 
   onSaveEmail() {
-    console.log('onSaveEmail triggered');
-    console.log('Form valid:', this.emailForm.valid);
-    console.log('Form values:', this.emailForm.value);
-    console.log('Library ID:', this.libraryId);
-
     if (this.emailForm.valid) {
       this.savingEmail = true;
       this.loaderService.show();
       const values = this.emailForm.value;
-      const keys = Object.keys(values);
-      
-      let completed = 0;
-      keys.forEach(key => {
-        console.log(`Upserting ${key}: ${values[key]}`);
-        this.apiService.upsertSetting({
-          libraryId: this.libraryId,
-          key: key,
-          value: values[key]
-        }).subscribe({
-          next: (res: any) => {
-            console.log(`Response for ${key}:`, res);
-            completed++;
-            if (completed === keys.length) {
-              this.savingEmail = false;
-              this.loaderService.hide();
-              this.notificationService.showSuccess('Email settings saved successfully!');
-              this.cdr.detectChanges();
-            }
-          },
-          error: (err: any) => {
-            console.error(`Error for ${key}:`, err);
-            this.savingEmail = false;
-            this.loaderService.hide();
-            this.cdr.detectChanges();
+      this.apiService.upsertEmailSettings({
+        libraryId: this.libraryId,
+        email: values.email,
+        emailSmtp: values.host,
+        emailPort: parseInt(values.port, 10),
+        emailAppPassword: values.password
+      }).subscribe({
+        next: (res: any) => {
+          this.savingEmail = false;
+          this.loaderService.hide();
+          if (res?.success) {
+            this.notificationService.showSuccess('Email settings saved successfully!');
+          } else {
+            this.notificationService.showError(res?.message || 'Failed to save email settings');
           }
-        });
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.savingEmail = false;
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }
       });
-    } else {
-      console.warn('Form is invalid. Errors:', this.getFormErrors(this.emailForm));
     }
   }
 
@@ -168,30 +160,32 @@ export class GeneralSettingComponent implements OnInit, OnDestroy {
       this.savingRazorpay = true;
       this.loaderService.show();
       const values = this.razorpayForm.value;
-      const keys = Object.keys(values);
-
-      let completed = 0;
-      keys.forEach(key => {
-        this.apiService.upsertSetting({
-          libraryId: this.libraryId,
-          key: key,
-          value: values[key]
-        }).subscribe({
-          next: () => {
-            completed++;
-            if (completed === keys.length) {
-              this.savingRazorpay = false;
-              this.loaderService.hide();
-              this.notificationService.showSuccess('Razorpay settings saved successfully!');
-              this.cdr.detectChanges();
+      this.apiService.upsertRazorpaySettings({
+        libraryId: this.libraryId,
+        razorpayKey: values.keyId,
+        razorpaySecretKey: values.keySecret
+      }).subscribe({
+        next: (res: any) => {
+          this.savingRazorpay = false;
+          this.loaderService.hide();
+          if (res?.success) {
+            const data = res.data;
+            this.isRazorpayVerified = !!(data?.isRazorpayVerified ?? data?.IsRazorpayVerified);
+            if (this.isRazorpayVerified) {
+              this.notificationService.showSuccess(res.message || 'Razorpay settings saved and verified successfully!');
+            } else {
+              this.notificationService.showWarning(res.message || 'Keys saved but could not be verified. Please check Key ID and Secret.');
             }
-          },
-          error: () => {
-            this.savingRazorpay = false;
-            this.loaderService.hide();
-            this.cdr.detectChanges();
+          } else {
+            this.notificationService.showError(res?.message || 'Failed to save Razorpay settings');
           }
-        });
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.savingRazorpay = false;
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }
       });
     }
   }

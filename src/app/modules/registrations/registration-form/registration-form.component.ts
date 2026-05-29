@@ -5,6 +5,19 @@ import { ApiService } from '../../../shared/services/api.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { finalize } from 'rxjs';
 import { LoaderService } from '../../../shared/services/loader.service';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { environment } from '../../../../environments/environment';
+
+declare const Razorpay: any;
+
+interface LibraryCheckoutInfo {
+  name: string;
+  address?: string;
+  city?: string;
+  mobile?: string;
+  email?: string;
+  imageUrl?: string;
+}
 
 @Component({
   selector: 'app-registration-form',
@@ -22,16 +35,20 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
   isEdit = false;
   students: any[] = [];
   filteredStudents: any[] = [];
+  activeRegistrationStudentIds = new Set<number>();
   searchTerm: string = '';
   seats: any[] = [];
   batches: any[] = [];
   libraryId!: number;
+  isRazorpayVerified = false;
+  libraryCheckout: LibraryCheckoutInfo = { name: 'Library' };
 
   constructor(
     private fb: FormBuilder,
     private apiService: ApiService,
     private authService: AuthService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private notificationService: NotificationService
   ) {
     this.regForm = this.fb.group({
       studentId: [null, [Validators.required]],
@@ -68,8 +85,47 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.libraryId = this.authService.currentUserValue?.libraryId ?? 0;
+    this.libraryCheckout.name = this.authService.currentUserValue?.libraryName || 'Library';
+    this.loadLibraryDetails();
     this.loadDropdowns();
+    this.loadRazorpayStatus();
     this.updateForm();
+  }
+
+  private loadLibraryDetails(): void {
+    const current = this.authService.currentUserValue;
+    if (!current) return;
+
+    const baseUrl = environment.apiUrl.replace(/api\/?$/, '');
+    const icon = current.libraryIcon;
+    this.libraryCheckout = {
+      name: current.libraryName || this.libraryCheckout.name,
+      imageUrl: icon ? `${baseUrl}${icon.startsWith('/') ? icon : '/' + icon}` : undefined
+    };
+  }
+
+  private loadRazorpayStatus(): void {
+    if (this.libraryId <= 0) return;
+    this.apiService.isRazorpayVerified(this.libraryId).subscribe({
+      next: (res: any) => {
+        this.isRazorpayVerified = res.success && !!(res.data ?? res.Data);
+        this.syncPaymentModeWithRazorpayStatus();
+      },
+      error: () => {
+        this.isRazorpayVerified = false;
+        this.syncPaymentModeWithRazorpayStatus();
+      }
+    });
+  }
+
+  private syncPaymentModeWithRazorpayStatus(): void {
+    const mode = this.regForm.get('paymentMode')?.value;
+    if (!this.isRazorpayVerified && mode === 'Razorpay') {
+      this.regForm.patchValue({ paymentMode: 'Cash' });
+    }
+    if (mode === 'Cheque') {
+      this.regForm.patchValue({ paymentMode: 'Cash' });
+    }
   }
 
   ngOnChanges(): void {
@@ -152,6 +208,50 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     }, 200);
   }
 
+  private loadActiveRegistrationStudentIds(): void {
+    if (this.libraryId <= 0) return;
+    this.apiService.getActiveRegistrationStudentIds(this.libraryId).subscribe({
+      next: (res: any) => {
+        const ids: number[] = res.data ?? res.Data ?? [];
+        this.activeRegistrationStudentIds = new Set(ids);
+        this.applyActiveRegistrationFlags();
+        if (this.searchTerm && !this.isEdit) {
+          const selectedId = this.regForm.get('studentId')?.value;
+          const selected = this.students.find(s => s.id === selectedId);
+          if (selected) {
+            this.searchTerm = this.getStudentDisplayLabel(selected);
+          }
+        }
+      }
+    });
+  }
+
+  private applyActiveRegistrationFlags(): void {
+    this.students = this.students.map(s => ({
+      ...s,
+      hasActiveRegistration: this.activeRegistrationStudentIds.has(s.id)
+    }));
+    if (this.filteredStudents.length > 0) {
+      this.filteredStudents = this.filteredStudents.map(s => ({
+        ...s,
+        hasActiveRegistration: this.activeRegistrationStudentIds.has(s.id)
+      }));
+    }
+  }
+
+  getStudentDisplayLabel(student: { fullName: string; mobile: string; hasActiveRegistration?: boolean }): string {
+    const base = `${student.fullName} (${student.mobile})`;
+    return student.hasActiveRegistration ? `${base} (Active Registration)` : base;
+  }
+
+  get selectedStudentHasActiveRegistration(): boolean {
+    if (this.isEdit) return false;
+    const studentId = this.regForm.get('studentId')?.value;
+    if (!studentId) return false;
+    const student = this.students.find(s => s.id === studentId);
+    return !!(student?.hasActiveRegistration || this.activeRegistrationStudentIds.has(studentId));
+  }
+
   loadDropdowns(): void {
     const params: any = this.authService.currentUserValue?.isSuperadmin ? {} : { LibraryId: this.libraryId };
     params.PageSize = 1000; // Increase page size to get all students
@@ -161,15 +261,18 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       this.students = data.map((s: any) => ({
         id: s.id ?? s.Id,
         fullName: s.fullName ?? s.FullName,
-        mobile: s.mobile ?? s.Mobile
+        mobile: s.mobile ?? s.Mobile,
+        hasActiveRegistration: false
       }));
+      this.applyActiveRegistrationFlags();
       this.filteredStudents = [...this.students];
-      
-      // If we are in edit mode, we need to set the search term now that students are loaded
+
       if (this.isEdit) {
         this.updateForm();
       }
     });
+
+    this.loadActiveRegistrationStudentIds();
     
     // Load all active seats (ignoring global IsOccupied as we now check per batch)
     this.apiService.getAllTables({ ...params, IsActive: true }).subscribe(res => {
@@ -271,7 +374,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     // If the term exactly matches a selected student's display string, don't show dropdown
     const selectedId = this.regForm.get('studentId')?.value;
     const selectedStudent = this.students.find(s => s.id === selectedId);
-    const displayString = selectedStudent ? `${selectedStudent.fullName} (${selectedStudent.mobile})`.toLowerCase() : '';
+    const displayString = selectedStudent ? this.getStudentDisplayLabel(selectedStudent).toLowerCase() : '';
     
     if (lowTerm === displayString) {
       this.filteredStudents = [];
@@ -287,8 +390,15 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
 
   selectStudent(student: any): void {
     this.regForm.get('studentId')?.setValue(student.id);
-    this.searchTerm = `${student.fullName} (${student.mobile})`;
+    const withFlag = {
+      ...student,
+      hasActiveRegistration: this.activeRegistrationStudentIds.has(student.id)
+    };
+    this.searchTerm = this.getStudentDisplayLabel(withFlag);
     this.filteredStudents = [];
+    if (withFlag.hasActiveRegistration) {
+      this.notificationService.showWarning('This student already has an active registration.');
+    }
   }
 
   isStudentSelected(term: string): boolean {
@@ -296,8 +406,7 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
     if (!selectedId) return false;
     const selectedStudent = this.students.find(s => s.id === selectedId);
     if (!selectedStudent) return false;
-    const displayString = `${selectedStudent.fullName} (${selectedStudent.mobile})`;
-    return term.toLowerCase() === displayString.toLowerCase();
+    return term.toLowerCase() === this.getStudentDisplayLabel(selectedStudent).toLowerCase();
   }
 
   private timeToMinutes(time: string): number {
@@ -332,36 +441,226 @@ export class RegistrationFormComponent implements OnInit, OnChanges {
       return;
     }
 
+    if (!this.isEdit) {
+      const studentId = this.regForm.get('studentId')?.value;
+      if (!studentId) {
+        this.notificationService.showError('Please select a student.');
+        return;
+      }
+      this.apiService.hasActiveRegistration(studentId).subscribe({
+        next: (res: any) => {
+          const hasActive = res.success && !!(res.data ?? res.Data);
+          if (hasActive) {
+            this.activeRegistrationStudentIds.add(studentId);
+            this.applyActiveRegistrationFlags();
+            const student = this.students.find(s => s.id === studentId);
+            if (student) {
+              this.searchTerm = this.getStudentDisplayLabel({ ...student, hasActiveRegistration: true });
+            }
+            this.notificationService.showError('Student already has an active registration. Cannot register again.');
+            return;
+          }
+          this.proceedAfterActiveCheck();
+        },
+        error: () => {
+          if (this.selectedStudentHasActiveRegistration) {
+            this.notificationService.showError('Student already has an active registration. Cannot register again.');
+            return;
+          }
+          this.proceedAfterActiveCheck();
+        }
+      });
+      return;
+    }
+
+    this.proceedAfterActiveCheck();
+  }
+
+  private proceedAfterActiveCheck(): void {
+    if (!this.isEdit && this.regForm.get('paymentMode')?.value === 'Razorpay') {
+      this.startRazorpayPayment();
+      return;
+    }
+    this.submitRegistration();
+  }
+
+  private startRazorpayPayment(): void {
+    const values = this.regForm.getRawValue();
+    const amount = Number(values.monthlyAmount || 0) + Number(values.securityAmount || 0);
+    if (amount <= 0) {
+      this.notificationService.showError('Total amount must be greater than zero for Razorpay payment.');
+      return;
+    }
+
+    if (typeof Razorpay === 'undefined') {
+      this.notificationService.showError('Razorpay SDK failed to load. Please refresh the page.');
+      return;
+    }
+
     this.loading = true;
     this.loaderService.show();
-    const body = { 
-      ...this.regForm.getRawValue(), 
+
+    this.apiService.createRazorpayOrder({
       libraryId: this.libraryId,
-      createdBy: this.authService.currentUserValue?.userId 
+      amount,
+      currency: 'INR'
+    }).subscribe({
+      next: (orderRes: any) => {
+        if (!orderRes?.success) {
+          this.loading = false;
+          this.loaderService.hide();
+          this.notificationService.showError(orderRes?.message || 'Could not create Razorpay order.');
+          return;
+        }
+
+        const options = this.buildRazorpayOptions(orderRes, amount);
+
+        const rzp = new Razorpay(options);
+        rzp.on('payment.failed', (err: any) => {
+          this.loading = false;
+          this.loaderService.hide();
+          const msg = err?.error?.description || err?.error?.reason || 'Payment failed.';
+          this.notificationService.showError(msg);
+        });
+        this.loading = false;
+        this.loaderService.hide();
+        rzp.open();
+      },
+      error: (err: any) => {
+        this.loading = false;
+        this.loaderService.hide();
+        const msg = typeof err === 'string' ? err : (err?.error?.message || 'Failed to start Razorpay payment.');
+        this.notificationService.showError(msg);
+      }
+    });
+  }
+
+  private buildRazorpayOptions(orderRes: any, amount: number): Record<string, unknown> {
+    const lib = this.libraryCheckout;
+    const studentId = this.regForm.get('studentId')?.value;
+    const student = this.students.find(s => s.id === studentId);
+    const location = [lib.address, lib.city].filter(Boolean).join(', ');
+    const descriptionParts = ['Student registration fee'];
+    if (location) descriptionParts.push(location);
+    if (student?.mobile) {
+      descriptionParts.push(`Contact: ${student.mobile}`);
+    } else if (lib.mobile) {
+      descriptionParts.push(`Contact: ${lib.mobile}`);
+    }
+
+    const options: Record<string, unknown> = {
+      key: orderRes.key,
+      amount: orderRes.amount,
+      currency: orderRes.currency || 'INR',
+      name: lib.name,
+      description: descriptionParts.join(' • '),
+      order_id: orderRes.orderId,
+      handler: (response: any) => this.onRazorpaySuccess(response),
+      notes: {
+        library_id: String(this.libraryId),
+        library_name: lib.name,
+        ...(student?.mobile ? { library_mobile: student.mobile } : lib.mobile ? { library_mobile: lib.mobile } : {}),
+        ...(student?.email ? { library_email: student.email } : lib.email ? { library_email: lib.email } : {}),
+        amount_inr: String(amount)
+      },
+      modal: {
+        ondismiss: () => {
+          this.loading = false;
+          this.loaderService.hide();
+          this.notificationService.showWarning('Payment cancelled. Registration was not created.');
+        }
+      }
     };
 
+    if (lib.imageUrl) {
+      options['image'] = lib.imageUrl;
+    }
+
+    if (student) {
+      options['prefill'] = {
+        name: student.fullName,
+        contact: student.mobile,
+        email: student.email || ''
+      };
+    }
+
+    return options;
+  }
+
+  private onRazorpaySuccess(response: any): void {
+    this.loading = true;
+    this.loaderService.show();
+    this.apiService.verifyRazorpayPayment({
+      libraryId: this.libraryId,
+      razorpayPaymentId: response.razorpay_payment_id,
+      razorpayOrderId: response.razorpay_order_id,
+      razorpaySignature: response.razorpay_signature
+    }).subscribe({
+      next: (verifyRes: any) => {
+        const verified = verifyRes?.success === true || verifyRes?.Success === true;
+        if (verified) {
+          this.submitRegistration({
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id
+          });
+        } else {
+          this.endLoading();
+          this.notificationService.showError(verifyRes?.message || 'Payment verification failed. Registration was not created.');
+        }
+      },
+      error: (err: any) => {
+        this.endLoading();
+        const msg = typeof err === 'string' ? err : (err?.error?.message || 'Payment verification failed.');
+        this.notificationService.showError(msg);
+      }
+    });
+  }
+
+  private endLoading(): void {
+    this.loading = false;
+    this.loaderService.hide();
+  }
+
+  private submitRegistration(razorpay?: { razorpayPaymentId: string; razorpayOrderId: string }): void {
+    this.loading = true;
+    if (!razorpay) {
+      this.loaderService.show();
+    }
+    const body: any = {
+      ...this.regForm.getRawValue(),
+      libraryId: this.libraryId,
+      createdBy: this.authService.currentUserValue?.userId
+    };
+
+    if (razorpay) {
+      body.razorpayPaymentId = razorpay.razorpayPaymentId;
+      body.razorpayOrderId = razorpay.razorpayOrderId;
+    }
+
     if (this.isEdit) {
-      body.status = body.isActiveStatus ? 1 : 3; // 1: Active, 3: Cancelled
+      body.status = body.isActiveStatus ? 1 : 3;
     }
     delete body.isActiveStatus;
 
-    const request = this.isEdit 
+    const request = this.isEdit
       ? this.apiService.updateRegistration(this.registrationData.id, body)
       : this.apiService.createRegistration(body);
 
-    request.pipe(finalize(() => {
-      this.loading = false;
-      this.loaderService.hide();
-    }))
-      .subscribe({
-        next: (res: any) => {
-          if (res.success) {
-            this.saved.emit(res.data);
-          } else {
-            alert(res.message);
-          }
-        },
-        error: (err: any) => console.error('Error saving registration:', err)
-      });
+    request.pipe(finalize(() => this.endLoading())).subscribe({
+      next: (res: any) => {
+        const ok = res?.success === true || res?.Success === true;
+        if (ok) {
+          this.notificationService.showSuccess(res.message || res.Message || 'Registration saved successfully.');
+          this.saved.emit(res.data);
+        } else {
+          this.notificationService.showError(res?.message || res?.Message || 'Failed to save registration.');
+        }
+      },
+      error: (err: any) => {
+        const msg = typeof err === 'string' ? err : (err?.error?.message || 'Error saving registration.');
+        this.notificationService.showError(msg);
+        console.error('Error saving registration:', err);
+      }
+    });
   }
 }

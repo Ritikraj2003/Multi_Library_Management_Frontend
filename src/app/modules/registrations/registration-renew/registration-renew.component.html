@@ -20,7 +20,7 @@
     <select class="form-select rounded-3 shadow-sm" formControlName="paymentMode">
       <option value="Cash">Cash</option>
       <option value="Online">Online</option>
-      <option value="Cheque">Cheque</option>
+      <option *ngIf="isRazorpayVerified" value="Razorpay">Razorpay</option>
     </select>
   </div>
 
