@@ -30,6 +30,7 @@ export class StudentListComponent implements OnInit {
   isSuperadmin = false;
   pagination: Pagination | null = null;
   viewSelectedStudent: any = null;
+  enrollmentNumber = '';
 
 
   constructor(
@@ -127,9 +128,28 @@ export class StudentListComponent implements OnInit {
     if (this.modal) this.modal.hide();
   }
 
-  onSaved(): void {
+  onSaved(event?: any): void {
     this.hideModal('studentModal');
     this.loadStudents(this.pagination?.pageNumber || 1);
+    
+    if (event && !event.isEdit && event.response) {
+      const res = event.response;
+      let finalId = 'N/A';
+      if (res.data) {
+        finalId = res.data.id ?? res.data.Id ?? res.data.studentId ?? res.data.StudentId ?? finalId;
+      }
+      if (finalId === 'N/A') {
+        finalId = res.id ?? res.Id ?? res.studentId ?? res.StudentId ?? finalId;
+      }
+      
+      if (finalId !== 'N/A') {
+        this.enrollmentNumber = finalId.toString();
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.showModal('successEnrollmentModal');
+        }, 300);
+      }
+    }
   }
 
   getImageUrl(path: string): string {

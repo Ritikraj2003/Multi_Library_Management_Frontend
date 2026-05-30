@@ -17,7 +17,7 @@ import { LoaderService } from '../../../shared/services/loader.service';
 })
 export class StudentFormComponent implements OnInit, OnChanges {
   @Input() studentData: any = null;
-  @Output() saved = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<any>();
   @Output() cancelled = new EventEmitter<void>();
 
   studentForm: FormGroup;
@@ -165,7 +165,7 @@ export class StudentFormComponent implements OnInit, OnChanges {
         next: (res: any) => {
           if (res?.success) {
             this.notificationService.showSuccess(this.isEdit ? 'Student updated successfully' : 'Student created successfully');
-            this.saved.emit();
+            this.saved.emit({ isEdit: this.isEdit, response: res });
           } else {
             this.notificationService.showError(res?.message || 'Failed to save student');
           }

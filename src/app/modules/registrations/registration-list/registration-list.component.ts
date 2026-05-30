@@ -35,7 +35,7 @@ export class RegistrationListComponent implements OnInit {
   libraryName: string = '';
   isSuperadmin = false;
   modal: any;
-  currentModalType?: 'form' | 'renew' | 'history' | 'view' | 'qr' | 'whatsapp' | 'bulk_whatsapp' | 'print';
+  currentModalType?: 'form' | 'renew' | 'history' | 'view' | 'qr' | 'whatsapp' | 'bulk_whatsapp' | 'print' | 'cancel';
   qrUrl = '';
   pendingPrintRegistration: any = null;
 
@@ -200,17 +200,23 @@ export class RegistrationListComponent implements OnInit {
 
 
   cancelRegistration(reg: any): void {
-    if (!confirm(`Are you sure you want to cancel the registration for ${reg.studentName}? This will free up the seat.`)) {
-      return;
-    }
+    this.selectedRegistration = reg;
+    this.currentModalType = 'cancel';
+    this.showModal('cancelConfirmModal');
+  }
 
+  confirmCancelRegistration(): void {
+    if (!this.selectedRegistration) return;
+    this.hideModal();
+    
     this.loading = true;
-    this.apiService.deleteRegistration(reg.id)
+    this.apiService.deleteRegistration(this.selectedRegistration.id)
       .pipe(finalize(() => { this.loading = false; this.cdr.markForCheck(); }))
       .subscribe({
         next: (res: any) => {
           if (res.success) {
             this.loadRegistrations(this.pagination?.pageNumber || 1);
+            this.notificationService.showSuccess('Registration cancelled successfully.');
           } else {
             alert(res.message || 'Cancellation failed');
           }

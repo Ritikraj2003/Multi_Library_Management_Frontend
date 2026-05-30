@@ -494,6 +494,30 @@
   </div>
 </div>
 
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+      <div class="modal-header border-0 pt-4 px-4 bg-danger text-white">
+        <h5 class="modal-title fw-bold text-white">
+          <i class="bi bi-exclamation-triangle me-2"></i> Cancel Registration
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" (click)="hideModal()"></button>
+      </div>
+      <div class="modal-body p-4 text-center">
+        <p class="mb-4">Are you sure you want to cancel the registration for <strong *ngIf="selectedRegistration">{{ selectedRegistration.studentName }}</strong>?</p>
+        <div class="alert alert-warning border-0 rounded-3 small mb-0">
+          <i class="bi bi-info-circle me-2"></i> This will free up the seat.
+        </div>
+      </div>
+      <div class="modal-footer border-top-0 px-4 pb-4 pt-0 bg-light d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-outline-secondary rounded-3 px-4" data-bs-dismiss="modal" (click)="hideModal()">Cancel</button>
+        <button type="button" class="btn btn-danger rounded-3 px-4" (click)="confirmCancelRegistration()">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Print Preview Modal -->
 <div class="modal fade" id="printPreviewModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="onModalHidden()">
   <div class="modal-dialog modal-dialog-centered modal-lg">
